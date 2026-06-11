@@ -21,11 +21,14 @@ class VanPOS_Order_Display {
 	 * Initialize order display functionality
 	 */
 	public static function init() {
-		// Note: Driver details are now handled by theme template override
-		// Template: woocommerce/order/order-details.php
-		// This template is used for both order view page and order received (thankyou) page
-		
-		// Display child orders on parent order view
+		// Note: Driver details are rendered by display_driver_details() hooked to
+		// woocommerce_after_order_details below. This eliminates the need for a
+		// woocommerce/order/order-details.php template override in the theme.
+
+		// Display driver details below the order details section.
+		add_action( 'woocommerce_after_order_details', array( __CLASS__, 'display_driver_details' ), 10, 1 );
+
+		// Display child orders on parent order view.
 		add_action( 'woocommerce_order_details_after_order_table', array( __CLASS__, 'display_child_orders_section' ), 10, 1 );
 		
 		// Display parent order info on child order view
@@ -450,7 +453,7 @@ class VanPOS_Order_Display {
 		// it stays correct regardless of how the rental is split.
 		//
 		// We deliberately do NOT read _vanpos_total_price: it is derived from the cart
-		// deposit breakdown (deposit_amount + second_payment) whose VAT basis is not
+		// deposit breakdown (deposit_amount + remaining_amount) whose VAT basis is not
 		// consistent across orders (gross on some, net on others), so it is unreliable
 		// as a display source. The installment sum avoids that entirely.
 		//
@@ -525,7 +528,7 @@ class VanPOS_Order_Display {
 		if ( 'payment_order' === $order_type ) {
 			return true;
 		}
-		if ( in_array( $payment_type, array( 'deposit', 'security_deposit', 'remaining', 'second_payment' ), true ) ) {
+		if ( in_array( $payment_type, array( 'security_deposit', 'remaining' ), true ) ) {
 			return true;
 		}
 		if ( $order->get_parent_id() || $order->get_meta( '_vanpos_primary_order_id' ) ) {

@@ -37,8 +37,8 @@ class VanPOS_Frontend {
 	 */
 	public function enqueue_scripts() {
 		// Only load on pages with the shortcode, or on product pages where
-		// the child theme renders the shortcode via do_shortcode() (the child
-		// theme sets $GLOBALS['vanpos_force_enqueue'] before wp_enqueue_scripts).
+		// class-vanpos-product-page.php renders the shortcode via do_shortcode()
+		// (it sets $GLOBALS['vanpos_force_enqueue'] before wp_enqueue_scripts fires).
 		global $post;
 		if ( ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'vanjorn_rental_pos' ) ) || ! empty( $GLOBALS['vanpos_force_enqueue'] ) ) {
 			wp_enqueue_style( 'vanpos-main', VANPOS_PLUGIN_URL . 'frontend/css/main.css', array(), VANPOS_VERSION );

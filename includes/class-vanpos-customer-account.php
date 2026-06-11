@@ -39,7 +39,9 @@ class VanPOS_Customer_Account {
 		
 		// Add due date column to orders table
 		add_filter( 'woocommerce_account_orders_columns', array( __CLASS__, 'add_due_date_column' ), 10, 1 );
-		add_action( 'woocommerce_my_account_my_orders_column_due_date', array( __CLASS__, 'display_due_date_column' ), 10, 1 );
+		// Note: column ID is 'due-date' (hyphen) so the action tag must use the hyphen.
+		// The previous registration used 'due_date' (underscore) which never matched.
+		add_action( 'woocommerce_my_account_my_orders_column_due-date', array( __CLASS__, 'display_due_date_column' ), 10, 1 );
 		
 		// Add parent order link for child orders
 		add_action( 'woocommerce_my_account_my_orders_column_order-number', array( __CLASS__, 'display_order_number_with_parent' ), 5, 1 );
@@ -191,7 +193,7 @@ class VanPOS_Customer_Account {
 			}
 		}
 
-		if ( VanPOS_Order_Manager::has_payment_order( $order_id, 'remaining' ) || VanPOS_Order_Manager::has_payment_order( $order_id, 'second_payment' ) ) {
+		if ( VanPOS_Order_Manager::has_payment_order( $order_id, 'remaining' ) ) {
 			return; // Already created (typically by Deposit_Manager::create_partial_payment_orders at checkout)
 		}
 
@@ -431,13 +433,48 @@ class VanPOS_Customer_Account {
 	 * @param WC_Order $order Order object.
 	 * @return void
 	 */
+	/**
+	 * Display due date in orders table.
+	 *
+	 * Logic migrated from the orders.php template elseif block now that the
+	 * action name correctly matches the 'due-date' column ID.
+	 *
+	 * - Primary rental orders show "Paid" (they have no due date; the deposit
+	 *   was charged at checkout).
+	 * - Child payment orders that are completed/processing show "Paid".
+	 * - Pending child orders show the due date, with an overdue badge when past.
+	 * - Orders with no due date show an em dash.
+	 *
+	 * @param WC_Order $order Order object.
+	 * @return void
+	 */
 	public static function display_due_date_column( $order ) {
-		$due_date = $order->get_meta( '_vanpos_due_date' );
+		$order_type = $order->get_meta( '_vanpos_order_type' );
+		$due_date   = $order->get_meta( '_vanpos_due_date' );
+
+		if ( 'primary_rental' === $order_type ) {
+			echo '<span class="vanpos-due-date vanpos-paid">' . esc_html__( 'Paid', 'vanjorn-rental-pos' ) . '</span>';
+			return;
+		}
+
 		if ( $due_date ) {
 			$due_datetime = new DateTime( $due_date );
-			echo esc_html( date_i18n( get_option( 'date_format' ), $due_datetime->getTimestamp() ) );
+			$now          = new DateTime();
+			$is_paid      = in_array( $order->get_status(), array( 'completed', 'processing' ), true );
+
+			if ( $is_paid ) {
+				echo '<span class="vanpos-due-date vanpos-paid">' . esc_html__( 'Paid', 'vanjorn-rental-pos' ) . '</span>';
+			} else {
+				$is_overdue = $due_datetime < $now;
+				echo '<span class="vanpos-due-date ' . ( $is_overdue ? 'vanpos-overdue' : '' ) . '">';
+				echo esc_html( date_i18n( get_option( 'date_format' ), $due_datetime->getTimestamp() ) );
+				if ( $is_overdue ) {
+					echo ' <span class="vanpos-overdue-badge">' . esc_html__( 'Overdue', 'vanjorn-rental-pos' ) . '</span>';
+				}
+				echo '</span>';
+			}
 		} else {
-			echo esc_html_x( '—', 'placeholder for empty due date', 'vanjorn-rental-pos' );
+			echo '<span class="vanpos-no-due-date">' . esc_html_x( '—', 'placeholder for empty due date', 'vanjorn-rental-pos' ) . '</span>';
 		}
 	}
 

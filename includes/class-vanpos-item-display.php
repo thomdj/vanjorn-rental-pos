@@ -219,6 +219,8 @@ class VanPOS_Item_Display {
 			'wcrp_rental_products_rent_from',
 			'wcrp_rental_products_rent_to',
 			'wcrp_rental_products_rental_duration',
+			// WooCommerce internal key — suppressed here so no theme file is needed for this.
+			'_reduced_stock',
 		);
 
 		return array_merge( $hidden_meta, $rental_meta_keys );
@@ -275,14 +277,13 @@ class VanPOS_Item_Display {
 		}
 
 		$payment_type = (string) $order->get_meta( '_vanpos_payment_type' );
-		if ( in_array( $payment_type, array( 'remaining', 'second_payment' ), true ) ) {
+		if ( in_array( $payment_type, array( 'remaining' ), true ) ) {
 			return 0.0;
 		}
 
 		$primary_id = self::resolve_primary_order_id( $order );
 		if ( $primary_id > 0 && class_exists( 'VanPOS_Order_Manager' ) ) {
-			if ( VanPOS_Order_Manager::has_payment_order( $primary_id, 'remaining' )
-				|| VanPOS_Order_Manager::has_payment_order( $primary_id, 'second_payment' ) ) {
+			if ( VanPOS_Order_Manager::has_payment_order( $primary_id, 'remaining' ) ) {
 				return 0.0;
 			}
 		}
