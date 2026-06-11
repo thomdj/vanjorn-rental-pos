@@ -1,0 +1,640 @@
+.vanpos-dashboard-page {
+	--vanpos-border: #e4e7ec;
+	--vanpos-text: #101828;
+	--vanpos-muted: #667085;
+	--vanpos-primary: #175cd3;
+	--vanpos-bg-soft: #f8fafc;
+	--vanpos-radius: 12px;
+	max-width: 1400px;
+}
+
+.vanpos-dashboard-page .description {
+	margin: 6px 0 0;
+	color: var(--vanpos-muted);
+}
+
+.vanpos-dashboard-page__hero {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 12px 0 14px;
+}
+
+.vanpos-dashboard-page__title-wrap h1 {
+	margin-bottom: 0;
+}
+
+.vanpos-dashboard-page__stats {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(120px, 1fr));
+	gap: 8px;
+	width: min(560px, 100%);
+}
+
+.vanpos-dashboard-page__card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 4px;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+	border: 1px solid var(--vanpos-border);
+	border-radius: var(--vanpos-radius);
+	background: #fff;
+	padding: 10px;
+	min-height: 92px;
+	text-align: center;
+}
+
+.vanpos-dashboard-page__card .dashicons {
+	color: var(--vanpos-primary);
+}
+
+.vanpos-dashboard-page__card-label {
+	color: var(--vanpos-muted);
+	font-size: 11px;
+}
+
+.vanpos-dashboard-page__card strong {
+	color: var(--vanpos-text);
+	font-size: 20px;
+	line-height: 1.2;
+}
+
+.vanpos-dashboard-page__filters {
+	margin-top: 10px;
+	box-shadow: 0 2px 4px rgba(16, 24, 40, 0.04);
+	border: 1px solid var(--vanpos-border);
+	border-radius: var(--vanpos-radius);
+	background: #fff;
+	padding: 12px;
+}
+
+.vanpos-dashboard-page__toolbar {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(150px, 1fr));
+	align-items: end;
+	gap: 10px;
+}
+
+.vanpos-dashboard-page__toolbar-group {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.vanpos-dashboard-page__toolbar-group label,
+.vanpos-dashboard-page__advanced-grid label {
+	margin: 0 !important;
+	color: #344054;
+	font-weight: 600;
+	font-size: 12px;
+}
+
+.vanpos-dashboard-page__toolbar-group select,
+.vanpos-dashboard-page__toolbar-group input,
+.vanpos-dashboard-page__advanced-grid select,
+.vanpos-dashboard-page__advanced-grid input {
+	transition: all 220ms ease-in-out;
+	box-sizing: border-box;
+	border: 1px solid #d0d5dd !important;
+	border-radius: 10px !important;
+	padding: 8px 10px !important;
+	width: 100% !important;
+	max-width: 100% !important;
+	min-height: 38px !important;
+	line-height: 1.35 !important;
+}
+
+.vanpos-dashboard-page__toolbar-group select:focus,
+.vanpos-dashboard-page__toolbar-group input:focus,
+.vanpos-dashboard-page__advanced-grid select:focus,
+.vanpos-dashboard-page__advanced-grid input:focus {
+	box-shadow: 0 0 0 3px rgba(23, 92, 211, 0.12) !important;
+	border-color: #84adff !important;
+}
+
+.vanpos-dashboard-page__toolbar-group--wide {
+	grid-column: span 2;
+}
+
+.vanpos-dashboard-page__toolbar-group--search {
+	grid-column: span 2;
+}
+
+.vanpos-dashboard-page__toolbar-group--search input[type="search"] {
+	min-width: 240px;
+}
+
+.vanpos-dashboard-page__advanced {
+	margin-top: 10px;
+	border-top: 1px dashed #d0d5dd;
+	padding-top: 10px;
+}
+
+.vanpos-dashboard-page__advanced summary {
+	cursor: pointer;
+	color: #344054;
+	font-weight: 600;
+}
+
+.vanpos-dashboard-page__advanced-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(140px, 1fr));
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.vanpos-dashboard-page__actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 14px;
+	border-top: 1px solid #f2f4f7;
+	padding-top: 10px;
+}
+
+.vanpos-dashboard-page__actions .button {
+	transition: all 220ms ease-in-out;
+	border-radius: 10px;
+}
+
+.vanpos-dashboard-page__actions .button:hover {
+	transform: translateY(-1px);
+}
+
+.vanpos-dashboard-page__actions .button-primary {
+	padding-inline: 14px;
+}
+
+.vanpos-dashboard-page__table-wrap {
+	transition: opacity 220ms ease-in-out;
+	margin-top: 14px;
+	box-shadow: 0 2px 4px rgba(16, 24, 40, 0.04);
+	border: 1px solid var(--vanpos-border);
+	border-radius: var(--vanpos-radius);
+	background: #fff;
+	overflow: auto;
+}
+
+.vanpos-dashboard-page__table {
+	border-spacing: 0;
+	width: 100%;
+	min-width: 980px;
+}
+
+.vanpos-dashboard-page__table thead th,
+.vanpos-dashboard-page__table tbody td {
+	box-sizing: border-box;
+}
+
+.vanpos-dashboard-page__table thead th {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	border-bottom: 1px solid var(--vanpos-border);
+	background: var(--vanpos-bg-soft);
+	padding: 11px 12px !important;
+	color: #344054;
+	font-size: 12px;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.vanpos-dashboard-page__table tbody td {
+	vertical-align: middle;
+	padding: 12px !important;
+	color: var(--vanpos-text);
+}
+
+/* CMIT CODE - UPDATED - 06 MAY 2026 — narrow product column; other cells stay single-line where needed */
+.vanpos-dashboard-page__table thead th:not(.vanpos-dashboard-page__product-col),
+.vanpos-dashboard-page__table tbody td:not(.vanpos-dashboard-page__product-cell) {
+	white-space: nowrap;
+}
+
+.vanpos-dashboard-page__product-col,
+.vanpos-dashboard-page__product-cell {
+	box-sizing: border-box;
+	width: 12rem;
+	max-width: 12rem;
+}
+
+.vanpos-dashboard-product {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	min-width: 0;
+	max-width: 100%;
+}
+
+.vanpos-dashboard-product__id {
+	flex-shrink: 0;
+	font-weight: 700;
+	font-size: 12px;
+	letter-spacing: -0.01em;
+	text-decoration: none;
+}
+
+.vanpos-dashboard-product__title,
+.vanpos-dashboard-product__plain {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	font-size: 13px;
+	line-height: 1.35;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.vanpos-dashboard-product__title {
+	display: inline-block;
+	vertical-align: bottom;
+	max-width: 100%;
+	text-decoration: none;
+}
+
+.vanpos-dashboard-product__plain {
+	display: inline-block;
+	vertical-align: bottom;
+	cursor: default;
+	color: inherit;
+}
+
+.vanpos-dashboard-page__table tbody tr:nth-child(even) {
+	background: #fcfcfd;
+}
+
+.vanpos-dashboard-page__table tbody tr:hover {
+	transition: background-color 220ms ease-in-out;
+	background: #eef4ff;
+}
+
+.vanpos-dashboard-page__table a {
+	color: var(--vanpos-primary);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.vanpos-dashboard-page__table a:hover {
+	text-decoration: underline;
+}
+
+.vanpos-sort-heading small {
+	color: #98a2b3;
+	font-size: 11px;
+}
+
+.vanpos-pill {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 999px;
+	padding: 4px 10px;
+	font-weight: 700;
+	font-size: 11px;
+	line-height: 1.2;
+}
+
+.vanpos-pill--type {
+	background: #eef4ff;
+	color: #3538cd;
+}
+
+.vanpos-pill--status.vanpos-status--pending {
+	background: #fffaeb;
+	color: #b54708;
+}
+
+.vanpos-pill--status.vanpos-status--paid {
+	background: #ecfdf3;
+	color: #027a48;
+}
+
+.vanpos-pill--status.vanpos-status--processing {
+	background: #eff8ff;
+	color: #175cd3;
+}
+
+.vanpos-pill--returned {
+	background: #ecfdf3;
+	color: #027a48;
+	border: 1px solid #abefc6;
+	margin-left: 4px;
+}
+
+.vanpos-pill--status.vanpos-status--neutral {
+	background: #f2f4f7;
+	color: #344054;
+}
+
+.vanpos-dashboard-page__total-cell {
+	color: #101828;
+	font-weight: 700;
+}
+
+.vanpos-dashboard-page__empty-state {
+	padding: 40px 12px !important;
+	text-align: center;
+}
+
+.vanpos-dashboard-page__empty-state .dashicons {
+	display: block;
+	margin: 0 auto 8px;
+	color: #98a2b3;
+	font-size: 22px;
+}
+
+.vanpos-dashboard-page__empty-state strong {
+	display: block;
+	margin-bottom: 4px;
+	color: #344054;
+	font-size: 14px;
+}
+
+.vanpos-dashboard-page__empty-state span:last-child {
+	display: block;
+	margin-top: 4px;
+	color: var(--vanpos-muted);
+	font-size: 12px;
+}
+
+.vanpos-dashboard-page__pagination {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+.vanpos-dashboard-page__pagination .button {
+	min-width: 84px;
+}
+
+.vanpos-dashboard-page__pagination-label {
+	color: var(--vanpos-muted);
+	font-size: 12px;
+}
+
+.vanpos-dashboard-page__loading {
+	display: flex;
+	position: fixed;
+	justify-content: center;
+	align-items: center;
+	z-index: 99999;
+	inset: 0;
+	background: rgba(248, 250, 252, 0.76);
+}
+
+.vanpos-dashboard-page__loading[hidden] {
+	display: none !important;
+}
+
+.vanpos-dashboard-page__loading-card {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	box-shadow: 0 10px 30px rgba(16, 24, 40, 0.12);
+	border: 1px solid var(--vanpos-border);
+	border-radius: 12px;
+	background: #fff;
+	padding: 10px 14px;
+}
+
+.vanpos-dashboard-page__loading .spinner {
+	float: none;
+	margin: 0;
+}
+
+.vanpos-skeleton-row td {
+	padding: 10px 12px !important;
+}
+
+.vanpos-skeleton-block {
+	display: block;
+	animation: vanposShimmer 1.2s infinite;
+	border-radius: 8px;
+	background: linear-gradient(90deg, #eef2f6 25%, #f5f7fa 37%, #eef2f6 63%);
+	background-size: 400% 100%;
+	width: 100%;
+	height: 16px;
+}
+
+.vanpos-fade-in {
+	animation: vanposFadeIn 220ms ease-in-out;
+}
+
+@keyframes vanposShimmer {
+	0% { background-position: 100% 0; }
+	100% { background-position: 0 0; }
+}
+
+@keyframes vanposFadeIn {
+	from { transform: translateY(2px); opacity: 0.5; }
+	to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 1360px) {
+	.vanpos-dashboard-page {
+		max-width: none;
+	}
+	.vanpos-dashboard-page__toolbar {
+		grid-template-columns: repeat(4, minmax(150px, 1fr));
+	}
+	.vanpos-dashboard-page__toolbar-group--search {
+		grid-column: span 2;
+	}
+}
+
+@media (max-width: 1100px) {
+	.vanpos-dashboard-page__hero {
+		flex-direction: column;
+	}
+	.vanpos-dashboard-page__stats {
+		grid-template-columns: repeat(2, minmax(120px, 1fr));
+		width: 100%;
+	}
+	.vanpos-dashboard-page__toolbar {
+		grid-template-columns: repeat(3, minmax(130px, 1fr));
+	}
+	.vanpos-dashboard-page__advanced-grid {
+		grid-template-columns: repeat(3, minmax(120px, 1fr));
+	}
+}
+
+@media (max-width: 860px) {
+	.vanpos-dashboard-page__toolbar,
+	.vanpos-dashboard-page__advanced-grid {
+		grid-template-columns: repeat(2, minmax(120px, 1fr));
+	}
+	.vanpos-dashboard-page__toolbar-group--search {
+		grid-column: span 2;
+	}
+	.vanpos-dashboard-page__table {
+		min-width: 760px;
+	}
+}
+
+/* CMIT CODE - UPDATED - 06 MAY 2026 — dashboard booking trash modal + notices */
+.vanpos-dashboard-page__wrap-for-notices {
+	margin: 8px 0 0;
+}
+
+.vanpos-dashboard-page__wrap-for-notices .vanpos-dashboard-page__notice {
+	margin: 0 0 10px;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+	padding: 8px 12px;
+}
+
+.vanpos-dashboard-page__actions-cell {
+	vertical-align: middle;
+	min-width: 118px;
+}
+
+.vanpos-dashboard-page__actions-stack {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 6px;
+}
+
+.vanpos-dashboard-page__actions-stack .button-small {
+	margin: 0;
+}
+
+.vanpos-dashboard-page__dash {
+	color: var(--vanpos-muted);
+	font-size: 13px;
+}
+
+.vanpos-booking-delete-modal-backdrop {
+	display: flex;
+	position: fixed;
+	justify-content: center;
+	align-items: center;
+	z-index: 100000;
+	inset: 0;
+	background: rgba(16, 24, 40, 0.45);
+	padding: 20px;
+}
+
+.vanpos-booking-delete-modal {
+	box-sizing: border-box;
+	box-shadow: 0 12px 40px rgba(16, 24, 40, 0.18);
+	border-radius: var(--vanpos-radius);
+	background: #fff;
+	padding: 22px 24px;
+	width: 100%;
+	max-width: 520px;
+	max-height: 90vh;
+	overflow: auto;
+}
+
+.vanpos-booking-delete-modal__title {
+	margin: 0 0 12px;
+	color: var(--vanpos-text);
+	font-weight: 600;
+	font-size: 18px;
+}
+
+.vanpos-booking-delete-modal__intro {
+	margin: 0 0 10px;
+	color: var(--vanpos-text);
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+/* CMIT CODE - UPDATED - 06 MAY 2026 */
+.vanpos-booking-delete-modal .vanpos-dashboard-order-highlight {
+	display: inline-block;
+	vertical-align: baseline;
+	margin: 0 2px;
+	box-shadow: 0 1px 2px rgba(30, 66, 159, 0.12);
+	border: 1px solid #b4ccfd;
+	border-radius: 6px;
+	background: linear-gradient(180deg, #e0ecff 0%, #dce7ff 100%);
+	padding: 2px 10px;
+	color: #1e429f;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+}
+
+.vanpos-booking-delete-modal__note {
+	margin: 0 0 14px;
+	color: var(--vanpos-muted);
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+.vanpos-booking-delete-modal__no-children {
+	margin: 0 0 14px;
+	font-size: 14px;
+	line-height: 1.55;
+}
+
+.vanpos-booking-delete-modal__list-title {
+	margin: 0 0 6px;
+	font-weight: 600;
+	font-size: 13px;
+}
+
+.vanpos-booking-delete-modal__list {
+	margin: 0 0 14px;
+	padding-left: 1.25em;
+	color: var(--vanpos-text);
+	font-size: 13px;
+}
+
+.vanpos-booking-delete-modal__list .vanpos-muted {
+	color: var(--vanpos-muted);
+	font-weight: 400;
+}
+
+.vanpos-booking-delete-modal__check {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	cursor: pointer;
+	margin: 0 0 16px;
+	font-size: 14px;
+	line-height: 1.45;
+}
+
+.vanpos-booking-delete-modal__check input {
+	margin-top: 3px;
+}
+
+.vanpos-booking-delete-modal__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin: 18px 0 0 !important;
+}
+
+.vanpos-dashboard-cancel-booking.button-small,
+.vanpos-dashboard-trash-booking.button-small {
+	box-shadow: 0 1px 1px rgba(16, 24, 40, 0.04);
+}
+
+.vanpos-dashboard-cancel-booking.button-small {
+	border-color: #b32d2e;
+	color: #b32d2e;
+}
+
+@media (max-width: 560px) {
+	.vanpos-dashboard-page__stats {
+		grid-template-columns: 1fr;
+	}
+	.vanpos-dashboard-page__toolbar,
+	.vanpos-dashboard-page__advanced-grid {
+		grid-template-columns: 1fr;
+	}
+	.vanpos-dashboard-page__toolbar-group--search {
+		grid-column: span 1;
+	}
+	.vanpos-dashboard-page__toolbar-group--search input[type="search"] {
+		min-width: 0;
+	}
+}

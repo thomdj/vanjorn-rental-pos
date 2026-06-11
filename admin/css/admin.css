@@ -1,0 +1,301 @@
+/**
+ * Admin CSS for VAN-Jorn Rental POS
+ *
+ * @package VJ_Rental_POS
+ * @author CMITEXPERTS TEAM
+ */
+
+.fulfillment-status,
+.order-status {
+    padding: 0 1em;
+}
+
+.fulfillment-status > span,
+.order-status > span {
+    margin: 0;
+}
+
+.order-status.status-cancelled {
+    background: #eba3a3;
+    color: #550202;
+}
+
+.vanpos-settings-form {
+    max-width: 800px;
+}
+
+.vanpos-settings-form fieldset {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.vanpos-settings-form label {
+    display: block;
+    margin: 0.5em 0;
+}
+
+.vanpos-settings-form input[type="number"] {
+    width: 100px;
+    padding: 0.5em;
+}
+
+.vanpos-settings-form .description {
+    color: #666;
+    font-style: italic;
+    margin-top: 0.5em;
+}
+
+.vanpos-admin-wrap {
+    max-width: 1200px;
+}
+
+.vanpos-page-title {
+    margin-bottom: 0.5em;
+}
+
+.vanpos-page-intro {
+    max-width: 720px;
+    margin-bottom: 1.5em;
+}
+
+.vanpos-page-intro__meta {
+    margin-top: 0.25em;
+    color: #555d66;
+}
+
+.vanpos-settings-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.vanpos-settings-main {
+    min-width: 0;
+}
+
+.vanpos-settings-aside {
+    min-width: 0;
+}
+
+.vanpos-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+}
+
+.vanpos-card h2 {
+    margin-top: 0;
+}
+
+.vanpos-card--primary {
+    border-left: 4px solid #3858e9;
+}
+
+.vanpos-card--help ol {
+    margin-left: 1.2em;
+}
+
+.vanpos-card--help li {
+    margin-bottom: 0.35em;
+}
+
+.vanpos-help-tip {
+    margin-top: 1em;
+}
+
+.vanpos-help-wrap .vanpos-help-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr);
+    gap: 20px;
+}
+
+.vanpos-shortcode-table code {
+    font-size: 13px;
+}
+
+.vanpos-help-list {
+    list-style: disc;
+    margin-left: 1.4em;
+}
+
+.vanpos-help-list li {
+    margin-bottom: 0.75em;
+}
+
+@media (max-width: 960px) {
+    .vanpos-settings-layout,
+    .vanpos-help-wrap .vanpos-help-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Child Orders Section */
+.vanpos-child-orders-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.vanpos-child-orders-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vanpos-child-orders-section .button {
+    margin-right: 10px;
+}
+
+.vanpos-child-orders-section table {
+    margin-top: 10px;
+}
+
+.vanpos-child-orders-section table th {
+    font-weight: 700;
+    padding: 10px;
+}
+
+.vanpos-child-orders-section table td {
+    padding: 10px;
+    vertical-align: middle;
+}
+
+.vanpos-child-orders-section .order-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Create Child Order Button */
+.vanpos-create-child-order {
+    margin-left: 10px;
+}
+
+.vanpos-create-child-order:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Admin Notices */
+.vanpos-admin-notice {
+    position: relative;
+    padding-right: 38px;
+}
+
+.vanpos-admin-notice .notice-dismiss {
+    position: absolute;
+    top: 0;
+    right: 1px;
+    border: none;
+    margin: 0;
+    padding: 9px;
+    background: none;
+    color: #787c82;
+    cursor: pointer;
+}
+
+.vanpos-admin-notice .notice-dismiss:hover {
+    color: #d63638;
+}
+
+/* Order Items Action Buttons Area */
+.wc-order-data-row .vanpos-create-child-order {
+    margin-left: 10px;
+}
+
+/* Admin Order Item Meta - Rental Details */
+.vanpos-admin-order-item-meta {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #f6f7f7;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.vanpos-admin-order-item-meta__table {
+    width: 100%;
+    border: none;
+}
+
+.vanpos-admin-order-item-meta__table tr {
+    border: none;
+}
+
+.vanpos-admin-order-item-meta__table td {
+    padding: 4px 0;
+    border: none;
+    vertical-align: top;
+}
+
+.vanpos-admin-order-item-meta__label {
+    width: 140px;
+    min-width: 140px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.vanpos-admin-order-item-meta__value {
+    color: #50575e;
+}
+
+.vanpos-admin-order-item-meta__value p {
+    margin: 0;
+    padding: 0;
+}
+
+#order_data .order_data_column {
+    width: auto !important;
+}
+
+/* Only Admin Order Edit Screen - Compact Layout */
+.wp-admin.post-type-shop_order .variation {
+    background: #fff;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-top: 6px;
+}
+
+/* Compact row structure */
+.wp-admin.post-type-shop_order .variation dt,
+.wp-admin.post-type-shop_order .variation dd {
+    display: inline-block;
+    width: 49%;
+    margin: 2px 0;   /* reduced spacing */
+    line-height: 1.4;
+    vertical-align: top;
+}
+
+/* Labels */
+.wp-admin.post-type-shop_order .variation dt {
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Values */
+.wp-admin.post-type-shop_order .variation dd {
+    text-align: right;
+    color: #374151;
+}
+
+/* Remove default dd spacing */
+.wp-admin.post-type-shop_order .variation dd p {
+    margin: 0;
+}
+
+/* Price slightly highlighted but compact */
+.wp-admin.post-type-shop_order .variation .woocommerce-Price-amount {
+    font-weight: 700;
+    font-size: 13px;
+    color: #1d4ed8;
+}

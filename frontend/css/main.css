@@ -1,0 +1,935 @@
+:root {
+    --e-global-color-accent: #E37E2B;
+    --e-global-color-accent-dark: #c96a1f;
+    --e-global-color-text: #333333;
+    --e-global-color-text-light: #B3C1CE;
+    
+    --vanjorn-bg-hover: #e6e8ea;
+    --vanjorn-bg-light: #EEF1F4;
+    
+    --vanjorn-border: #B3C1CE;
+    --vanjorn-border-light: #e6e8ea;
+    
+    --vanjorn-color-danger: #d32f2f;
+    --vanjorn-color-danger-light: #ffebee;
+    --vanjorn-color-info: #3b82f6;
+    --vanjorn-color-info-light: #e0f2fe;
+    --vanjorn-color-success: #2e7d32;
+    --vanjorn-color-success-light: #e6f4ea;
+    --vanjorn-color-warning: #f57c00;
+    --vanjorn-color-warning-light: #fff9e6;
+    
+    --vanjorn-avail-high: #dcfce7;
+    --vanjorn-avail-high-border: #86efac;
+    --vanjorn-avail-low: #fed7aa;
+    --vanjorn-avail-low-border: #fdba74;
+    --vanjorn-avail-none: #fee2e2;
+    --vanjorn-avail-none-border: #fecaca;
+    
+    --vanjorn-radius-lg: 12px;
+    --vanjorn-radius-pill: 100px;
+    --vanjorn-radius-sm: 6px;
+    
+    --vanjorn-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --vanjorn-shadow-hover: 0 6px 18px rgba(0, 0, 0, 0.15);
+    --vanjorn-shadow-lg: -15px 50px 50px 0 rgba(88, 103, 128, 0.1);
+    
+    --vanjorn-text-secondary: #69727d;
+}
+
+button.swal2-confirm.swal2-styled {
+    color: white !important;
+}
+
+h2#swal2-title {
+    color: #121923;
+}
+
+.calendar-content h2 {
+    color: var(--e-global-color-text) !important;
+}
+
+.camper-details {
+    width: 100%;
+}
+
+.camper-details-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.vanjorn-rental-pos {
+    margin: 0;
+    background: transparent;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    color: var(--e-global-color-text);
+    font-size: inherit;
+    line-height: inherit;
+    font-family: inherit;
+}
+
+.vanjorn-rental-pos * {
+    box-sizing: border-box;
+}
+
+.vanjorn-rental-pos .availability-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    transition: all .3s;
+    box-shadow: var(--vanjorn-shadow);
+    border-radius: var(--vanjorn-radius-lg);
+    padding: 4px 10px;
+    font-weight: 700;
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+}
+
+.vanjorn-rental-pos .availability-badge.available-badge {
+    background-color: var(--vanjorn-color-success);
+    color: white;
+}
+
+.vanjorn-rental-pos .availability-badge.unavailable-badge {
+    background-color: var(--vanjorn-color-danger);
+    color: white;
+}
+
+.vanjorn-rental-pos .camper-card {
+    position: relative;
+    transition: all .3s;
+    margin-bottom: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: white;
+    padding: 0.875rem;
+}
+
+.vanjorn-rental-pos .camper-card:first-of-type {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.vanjorn-rental-pos .camper-card.hidden {
+    display: none;
+}
+
+.vanjorn-rental-pos .camper-card.unavailable-card {
+    opacity: 0.55;
+    filter: grayscale(0.3);
+}
+
+.vanjorn-rental-pos .camper-card:hover .availability-badge {
+    box-shadow: var(--vanjorn-shadow);
+}
+
+.vanjorn-rental-pos .camper-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.vanjorn-rental-pos .camper-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.vanjorn-rental-pos .camper-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+}
+
+.vanjorn-rental-pos .camper-footer .view-btn {
+    flex: 1;
+    min-width: 110px;
+}
+
+.vanjorn-rental-pos .camper-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--vanjorn-radius-sm);
+    background: rgba(0, 0, 0, 0.04);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-size: 2.25em;
+    line-height: 1;
+}
+
+.vanjorn-rental-pos .camper-image .material-icons {
+    color: var(--vanjorn-text-secondary, #94a3b8);
+    font-size: inherit;
+}
+
+.vanjorn-rental-pos .camper-image-wrapper {
+    position: relative;
+    flex-shrink: 0;
+    aspect-ratio: 16/9;
+    width: 100%;
+}
+
+.vanjorn-rental-pos .camper-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.875em;
+}
+
+.vanjorn-rental-pos .camper-info span {
+    display: inline-flex;
+    gap: 0.3rem;
+    border-radius: 5px;
+    background: var(--vanjorn-bg-hover);
+    padding: 0.5rem;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 0.875em;
+    white-space: break-spaces;
+    word-break: break-all;
+}
+
+.vanjorn-rental-pos .camper-info .material-icons {
+    padding: 0;
+    font-size: 1.125em;
+    line-height: 1;
+}
+
+.vanjorn-rental-pos .camper-name {
+    transition: all .3s;
+    margin-bottom: 0.25rem;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.25em;
+    line-height: 1;
+}
+
+.vanjorn-rental-pos .camper-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.25em;
+    line-height: 1;
+    white-space: pre;
+}
+
+.vanjorn-rental-pos .camper-type {
+    margin-top: 0.625rem;
+    margin-bottom: 0.625rem;
+    color: var(--e-global-color-accent);
+    font-weight: 700;
+    font-size: 0.75em;
+    line-height: 1.2;
+    letter-spacing: 0.8px;
+}
+
+.vanjorn-rental-pos .campers-header {
+    display: inline-block;
+    margin: 0;
+    background-color: white;
+    padding: 1rem 1rem 0.75rem;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: var( --e-global-typography-secondary-font-size );
+    line-height: 1.8;
+}
+
+.vanjorn-rental-pos .campers-header h2,
+.vanjorn-rental-pos .campers-header h3 {
+    color: var(--e-global-color-text);
+}
+
+.vanjorn-rental-pos .clear-selection-btn {
+    float: right;
+    transition: all .3s;
+    margin: 1rem 1rem 0.75rem;
+    background: var(--e-global-color-accent);
+    padding: 0.6rem 1rem !important;
+    text-decoration: none;
+}
+
+.vanjorn-rental-pos .clear-filters:focus,
+.vanjorn-rental-pos .back-to-calendar-btn:focus,
+.vanjorn-rental-pos .select-van-btn:focus,
+.vanjorn-rental-pos .nav-btn:focus {
+    background: white;
+}
+
+.vanjorn-rental-pos .clear-selection-btn:hover {
+    background: white;
+    color: var(--e-global-color-accent);
+}
+
+.vanpos-cart-summary-note {
+    margin-top: 5px;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+}
+
+.vanjorn-rental-pos .campers-list {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+    min-height: 0;
+    overflow-x: clip;
+    overflow-y: auto;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    scrollbar-width: thin;
+}
+
+.vanjorn-rental-pos .campers-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vanjorn-rental-pos .campers-list::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.vanjorn-rental-pos .campers-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.vanjorn-rental-pos .campers-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.vanjorn-rental-pos .campers-section {
+    box-shadow: var(--vanjorn-shadow-lg);
+    border: 1px solid var(--vanjorn-border-light);
+    border-radius: var(--vanjorn-radius-lg);
+    background: white;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.vanjorn-rental-pos:not(.vanpos-single-van-mode) .container {
+    margin: auto;
+    padding: 0px 30px;
+    max-width: 1260px;
+}
+
+.vanjorn-rental-pos .content-area {
+    display: grid;
+    grid-template-columns: 260px 1.5fr 1fr;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.vanjorn-rental-pos .details-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    border-radius: var(--vanjorn-radius-pill);
+    background: inherit;
+    padding: 0.5rem 0.875rem;
+    height: 36px;
+    color: inherit;
+    font-weight: 500;
+    font-size: 0.875em;
+    white-space: nowrap;
+}
+
+.vanjorn-rental-pos .select-van-btn {
+    padding: 0.5rem 0.875rem !important;
+    height: 36px;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.vanjorn-rental-pos .empty-state {
+    padding: 2.5rem 1rem;
+    color: inherit;
+    font-size: 1em;
+    text-align: center;
+}
+
+.vanjorn-rental-pos .empty-state p {
+    margin: 0;
+    font-style: italic;
+}
+
+.vanjorn-rental-pos .main-content {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+.vanjorn-rental-pos .price-period {
+    font-weight: 500;
+    font-size: 0.75em;
+}
+
+.vanjorn-rental-pos .view-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s;
+    cursor: pointer;
+    border-radius: var(--vanjorn-radius-pill);
+    background: var(--e-global-color-accent);
+    padding: 0.5rem 0.875rem;
+    height: 36px;
+    color: white;
+    font-weight: 500;
+    font-size: 0.875em;
+    white-space: nowrap;
+}
+
+.vanjorn-rental-pos .view-btn:disabled {
+    transform: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.4);
+}
+
+.vanpos-cart-summary-add {
+    background: #7c3aed;
+    color: white;
+}
+
+.vanpos-cart-summary-add:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.vanpos-cart-summary-add:hover {
+    background: #6d28d9;
+}
+
+.vanpos-cart-summary-body {
+    padding: 15px 24px;
+}
+
+.vanpos-cart-summary-cancel,
+.vanpos-cart-summary-add {
+    transition: all .3s;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--vanjorn-radius-sm);
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.vanpos-cart-summary-cancel {
+    background: var(--vanjorn-bg-light);
+    color: var(--vanjorn-text-secondary);
+}
+
+.vanpos-cart-summary-cancel:hover {
+    background: var(--vanjorn-bg-hover);
+}
+
+.vanpos-cart-summary-close {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    transition: all .3s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50px !important;
+    background: none;
+    padding: 0px !important;
+    width: 32px;
+    height: 32px;
+    color: var(--vanjorn-text-secondary);
+}
+
+.vanpos-cart-summary-close .material-icons {
+    font-size: 1.25em;
+}
+
+.vanpos-cart-summary-close:hover {
+    background: var(--vanjorn-bg-light);
+    color: var(--e-global-color-text);
+}
+
+.vanpos-cart-summary-content {
+    position: relative;
+    z-index: 1;
+    box-shadow: var(--vanjorn-shadow-hover);
+    border-radius: var(--vanjorn-radius-sm);
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.vanpos-cart-summary-dates p {
+    margin: 8px 0;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+}
+
+.vanpos-cart-summary-dates p strong {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+}
+
+.vanpos-cart-summary-divider {
+    margin: 16px 0;
+    background: var(--vanjorn-border-light);
+    height: 1px;
+}
+
+.vanpos-cart-summary-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid var(--vanjorn-border-light);
+    padding: 20px 24px;
+}
+
+.vanpos-cart-summary-footer button.vanpos-cart-summary-add {
+    font-weight: 700;
+}
+
+.vanpos-cart-summary-footer button.vanpos-cart-summary-cancel {
+    border: 2px solid rgba(0, 0, 0, 0.15) !important;
+    background-image: unset;
+    background-color: transparent !important;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+}
+
+.vanpos-cart-summary-footer button.vanpos-cart-summary-cancel:hover {
+    border: 2px solid var(--e-global-color-accent) !important;
+    background-image: unset;
+    background-color: transparent !important;
+    color: var(--e-global-color-accent);
+}
+
+.vanpos-cart-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--vanjorn-border-light);
+    padding: 15px 24px;
+}
+
+.vanpos-cart-summary-header h2 {
+    margin: 0;
+    color: var(--e-global-color-text) !important;
+}
+
+.vanpos-cart-summary-highlight {
+    color: var(--vanjorn-color-success) !important;
+    font-weight: 700 !important;
+    font-size: 1.125em;
+}
+
+.vanpos-cart-summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.vanpos-cart-summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+}
+
+.vanpos-cart-summary-line span:first-child {
+    color: var(--e-global-color-text);
+}
+
+.vanpos-cart-summary-line span:last-child {
+    color: var(--e-global-color-text);
+    font-weight: 500;
+}
+
+.vanpos-cart-summary-modal {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 20px;
+}
+
+.vanpos-cart-summary-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--vanjorn-bg-light);
+    padding: 12px 0;
+}
+
+.vanpos-cart-summary-option input {
+    accent-color: var(--e-global-color-accent);
+}
+
+.vanpos-cart-summary-option input[type="checkbox"] {
+    cursor: pointer;
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+}
+
+.vanpos-cart-summary-option label {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    cursor: pointer;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+}
+
+.vanpos-cart-summary-option-price {
+    color: var(--e-global-color-text);
+    font-weight: 500;
+}
+
+.vanpos-cart-summary-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.vanpos-cart-summary-payment-info {
+    margin-bottom: 16px;
+}
+
+.vanpos-cart-summary-payment-note {
+    margin: 0;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+    line-height: 1.5;
+}
+
+.vanpos-cart-summary-payment-note strong {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+}
+
+.vanpos-cart-summary-payment-section {
+    margin-top: 0px;
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--vanjorn-bg-light);
+    padding: 16px;
+}
+
+.vanpos-cart-summary-pricing {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--vanjorn-border-light);
+    padding-top: 20px;
+}
+
+.vanpos-cart-summary-pricing-title {
+    margin: 0;
+    width: 100%;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1em;
+    letter-spacing: 0.5px;
+}
+
+.vanpos-cart-summary-section {
+    margin: 0px;
+    border-radius: var(--vanjorn-radius-lg);
+    background-color: var(--vanjorn-bg-light);
+    padding: 15px;
+    width: calc(50% - 10px);
+}
+
+.vanpos-cart-summary-section-row th,
+.vanpos-cart-summary-section-row td {
+    border-top: 2px solid var(--vanjorn-border-light) !important;
+    padding: 16px 0 !important;
+}
+
+.vanpos-cart-summary-section-title {
+    margin: 0 0 12px 0;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 0.875em;
+    letter-spacing: 0.5px;
+}
+
+.vanpos-cart-summary-section:last-child {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+.vanpos-cart-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    border-top: 1px solid var(--vanjorn-border-light);
+    padding-top: 16px;
+}
+
+.vanpos-cart-summary-total-amount {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.25em;
+}
+
+.vanpos-cart-summary-total-label {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1em;
+}
+
+.vanpos-cart-summary-total-line {
+    margin-top: 12px;
+    border-top: 1px solid var(--vanjorn-border-light);
+    padding-top: 12px;
+}
+
+.vanpos-cart-summary-type {
+    margin: 0;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.875em;
+}
+
+.vanpos-cart-summary-van h3 {
+    margin: 0 0 4px 0;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.25em;
+}
+
+.vanpos-cart-summary-vat {
+    margin-top: 8px;
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.75em;
+    text-align: left;
+}
+
+.vanpos-order-paid td,
+.vanpos-order-remaining td {
+    text-align: right;
+}
+
+.vanpos-order-paid th,
+.vanpos-order-paid td,
+.vanpos-order-remaining th,
+.vanpos-order-remaining td {
+    padding: 12px 0 !important;
+    font-size: 1em;
+}
+
+.vanpos-order-paid th,
+.vanpos-order-remaining th {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+
+    .vanjorn-rental-pos .content-area {
+        grid-template-rows: auto auto auto;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+}
+
+@media (max-width: 991px) {
+
+    .vanpos-cart-summary-item {
+        flex-direction: column;
+    }
+
+    .vanpos-cart-summary-pricing {
+        flex-direction: column;
+    }
+
+    .vanpos-cart-summary-section {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .vanjorn-rental-pos {
+        margin: 1em 0;
+    }
+
+    .vanjorn-rental-pos .content-area {
+        gap: 0.75rem;
+    }
+
+}
+
+@media (max-width: 640px) {
+
+    .counter-controls {
+        gap: 8px;
+    }
+
+    div#vanTypeFilters {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .month-options {
+        margin-bottom: 22px;
+    }
+
+    .month-options button {
+        padding: 10px 10px !important;
+    }
+
+    .quick-options {
+        gap: 10px;
+    }
+
+    .vanjorn-rental-pos .camper-content {
+        flex-direction: column;
+    }
+
+    .vanjorn-rental-pos .camper-footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vanjorn-rental-pos .campers-header div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+
+    .vanjorn-rental-pos .container {
+        padding: 0;
+    }
+
+    .vanjorn-rental-pos .details-btn,
+    .vanjorn-rental-pos .view-btn {
+        width: 100%;
+    }
+
+    .vanjorn-rental-pos .filter-group {
+        margin-bottom: 7px;
+        padding-bottom: 7px;
+    }
+
+    .vanjorn-rental-pos .filter-group h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        font-size: 1.25em;
+        text-transform: none;
+    }
+
+    .vanjorn-rental-pos .view-btn {
+        padding: 0.7rem 0.875rem;
+    }
+
+    .vanpos-cart-summary-cancel,
+    .vanpos-cart-summary-add {
+        width: 100%;
+    }
+
+    .vanpos-cart-summary-content {
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .vanpos-cart-summary-footer {
+        flex-direction: column;
+    }
+
+    .vanpos-cart-summary-header,
+    .vanpos-cart-summary-body,
+    .vanpos-cart-summary-footer {
+        padding: 16px;
+    }
+
+    .vanpos-cart-summary-header h2 {
+        font-size: 1.5em;
+    }
+
+    .vanpos-cart-summary-van h3 {
+        font-size: 1.25em;
+    }
+
+    .vanpos-login-prompt-actions {
+        flex-direction: column;
+    }
+
+    .vanpos-login-prompt-body h3 {
+        font-size: 1.25em;
+    }
+
+    .vanpos-login-prompt-btn {
+        width: 100%;
+    }
+
+    .vanpos-login-prompt-content {
+        margin: 0;
+        max-width: 100%;
+    }
+
+    .vanpos-login-prompt-header,
+    .vanpos-login-prompt-body {
+        padding: 20px 16px;
+    }
+
+    .vanpos-login-prompt-header h2 {
+        font-size: 1.25em !important;
+    }
+
+    .vanpos-login-prompt-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .vanpos-login-prompt-icon .material-icons {
+        font-size: 56px;
+    }
+
+    .weekdays {
+        gap: 0rem !important;
+    }
+
+}

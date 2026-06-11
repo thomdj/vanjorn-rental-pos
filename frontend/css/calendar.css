@@ -1,0 +1,1138 @@
+.back-to-calendar-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all .3s;
+    padding: 0.6rem 1rem !important;
+}
+
+.back-to-calendar-btn:hover {
+    background: rgba(249, 115, 22, 0.15);
+    color: var(--e-global-color-accent-dark);
+}
+
+.calendar-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    z-index: 9;
+    background-color: white;
+    padding: 1rem;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.calendar-content h2 {
+    margin-bottom: 24px;
+    color: var(--e-global-color-text);
+}
+
+.calendar-content.hidden {
+    display: none;
+}
+
+.calendar-disabled {
+    cursor: not-allowed !important;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    padding: 0 1rem 1rem;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem 1rem 0.75rem;
+}
+
+.calendar-header h2 {
+    margin: 0;
+    color: var(--e-global-color-text) !important;
+    font-weight: 700;
+    font-size: 1.375em;
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.calendar-section {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    transition: all .3s;
+    box-shadow: var(--vanjorn-shadow-lg);
+    border: 1px solid var(--vanjorn-border-light);
+    border-radius: var(--vanjorn-radius-lg);
+    background: inherit;
+    background-color: white;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.calendar-section .clear-dates-btn,
+.calendar-section .show-month-picker-btn,
+.calendar-section .duration-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid var(--e-global-color-accent) !important;
+    border-radius: var(--vanjorn-radius-pill);
+    background: white !important;
+    padding: 0.6rem 1rem !important;
+    color: var(--e-global-color-accent) !important;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.calendar-section .clear-dates-btn:hover,
+.calendar-section .show-month-picker-btn:hover,
+.calendar-section .duration-btn:hover {
+    background: var(--e-global-color-accent) !important;
+    color: white !important;
+}
+
+.calendar-section .duration-btn.active {
+    border-width: 2px 2px 2px 2px;
+    border-style: solid;
+    border-color: var(--e-global-color-accent) !important;
+    border-radius: var(--vanjorn-radius-pill);
+    background-image: linear-gradient(240deg, var(--e-global-color-accent) 0%, #DA7523 100%) !important;
+    padding: 12px 20px 12px 20px;
+    color: white !important;
+}
+
+.calendar-section .duration-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 1rem;
+}
+
+.calendar-section .duration-toolbar button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.campers-section button.view-all-btn {
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--e-global-color-accent);
+    border-radius: var(--vanjorn-radius-pill);
+    background-image: linear-gradient(240deg, var(--e-global-color-accent) 0%, #DA7523 100%);
+    padding: 12px 20px;
+    color: rgb(255, 255, 255);
+}
+
+.campers-section button.view-all-btn:hover {
+    background-color: white;
+    color: var(--e-global-color-accent);
+}
+
+.clear-dates-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid var(--e-global-color-accent) !important;
+    border-radius: var(--vanjorn-radius-sm);
+    background: white !important;
+    padding: 0.6rem 1rem;
+    color: var(--e-global-color-accent) !important;
+    font-size: 0.875em;
+}
+
+.clear-dates-btn:hover {
+    border-color: var(--e-global-color-accent) !important;
+    background: rgba(249, 115, 22, 0.06) !important;
+    color: var(--e-global-color-accent) !important;
+}
+
+.day {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    background: var(--vanjorn-bg-light);
+    aspect-ratio: 1;
+    overflow: hidden;
+    font-weight: 500;
+    font-size: 1em;
+}
+
+.day-number {
+    position: relative;
+    z-index: 2;
+}
+
+.day.in-range {
+    border-color: rgba(249, 115, 22, 0.2);
+    background: rgba(249, 115, 22, 0.1) !important;
+}
+
+.day.empty,
+.day.past {
+    background: var(--vanjorn-bg-light);
+    color: var(--e-global-color-text-light);
+    opacity: 0.5;
+}
+
+.day.pickup-return-day.available-high {
+    border-color: var(--vanjorn-avail-high-border);
+    background: var(--vanjorn-avail-high);
+}
+
+.day.pickup-return-day.available-low {
+    border-color: var(--vanjorn-avail-low-border);
+    background: var(--vanjorn-avail-low);
+}
+
+.day.pickup-return-day.unavailable {
+    border-color: var(--vanjorn-avail-none-border);
+    background: var(--vanjorn-avail-none);
+}
+
+.day.pickup-return-day.available-high:hover {
+    background: var(--vanjorn-avail-high-border);
+    color: white;
+}
+
+.day.pickup-return-day.available-low:hover {
+    background: var(--vanjorn-avail-low-border);
+    color: white;
+}
+
+.day.pickup-return-day.unavailable:hover {
+    background: var(--vanjorn-avail-none-border);
+    color: white;
+}
+
+.day.pickup,
+.day.return {
+    background: var(--e-global-color-accent) !important;
+    color: white;
+    font-weight: 700;
+}
+
+.day.weekend-in-range {
+    border-color: rgba(249, 115, 22, 0.15);
+    background: rgba(249, 115, 22, 0.08) !important;
+    color: inherit;
+}
+
+.day:hover .tooltip {
+    transform: translateX(-50%) translateY(-5px);
+    opacity: 1;
+}
+
+.day:not(.empty):not(.past):hover {
+    z-index: 1;
+}
+
+.divider {
+    position: relative;
+    margin: 1.75rem 0;
+    text-align: center;
+}
+
+.divider span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: inherit;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.divider:before {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    background: rgba(0, 0, 0, 0.08);
+    width: 100%;
+    height: 1px;
+    content: '';
+}
+
+.equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+}
+
+.equipment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    transition: all .3s;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--vanjorn-radius-sm);
+    background: white;
+    padding: 0.625rem;
+    color: inherit;
+    font-size: 0.875em;
+}
+
+.equipment-item::before {
+    content: '\e5ca';
+    color: var(--vanjorn-color-success);
+    font-weight: normal;
+    font-size: 1.125em;
+    font-family: 'Material Icons';
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 2rem 1rem;
+    font-size: 0.875em;
+}
+
+.legend-color {
+    flex-shrink: 0;
+    border-radius: var(--vanjorn-radius-sm);
+    width: 18px;
+    height: 18px;
+}
+
+.legend-color-available-high {
+    border: 2px solid var(--vanjorn-avail-high-border);
+    background: var(--vanjorn-avail-high);
+}
+
+.legend-color-available-low {
+    border: 2px solid var(--vanjorn-avail-low-border);
+    background: var(--vanjorn-avail-low);
+}
+
+.legend-color-unavailable {
+    border: 2px solid var(--vanjorn-avail-none-border);
+    background: var(--vanjorn-avail-none);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.month-option-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--vanjorn-radius-sm);
+    background: rgba(0, 0, 0, 0.03);
+    padding: 0.5rem 0.75rem;
+    color: inherit;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.month-option-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.month-option-btn:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.month-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.625rem;
+}
+
+.nav-btn {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--vanjorn-radius-sm);
+    background: rgba(0, 0, 0, 0.04);
+    width: 34px;
+    height: 34px;
+    color: inherit;
+    font-size: 1.125em;
+}
+
+.nav-btn::before {
+    content: '\e5cb';
+    font-weight: normal;
+    font-size: 1.25em;
+    font-family: 'Material Icons';
+}
+
+.nav-btn:hover:not(:disabled) {
+    border-color: var(--e-global-color-accent);
+    background: rgba(249, 115, 22, 0.1);
+    color: var(--e-global-color-accent);
+}
+
+.nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.nav-btn:last-child::before {
+    content: '\e5cc';
+}
+
+.next-avail-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--vanjorn-radius-sm);
+    background: #4f46e5;
+    padding: 0.5rem 1rem;
+    color: white;
+    font-weight: 700;
+    font-size: 0.875em;
+    white-space: nowrap;
+}
+
+.next-avail-btn:hover {
+    background: #4338ca;
+}
+
+.no-availability-notice {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    border: 2px solid #fde68a;
+    border-radius: 10px;
+    background: var(--vanjorn-color-warning-light);
+    padding: 0.875rem 1rem;
+    font-size: 0.875em;
+}
+
+.no-availability-notice span {
+    color: #92400e;
+    font-weight: 700;
+}
+
+.overlay {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    border-radius: var(--vanjorn-radius-sm);
+    background: inherit;
+    width: 100%;
+    height: 100%;
+}
+
+.overlay-content {
+    padding: 1.5rem;
+    max-width: 520px;
+    text-align: center;
+}
+
+.overlay-content h2 {
+    margin-bottom: 0.75rem;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+.overlay-subtitle {
+    margin-bottom: 1.75rem;
+    color: var(--e-global-color-text-light);
+    font-size: 1em;
+}
+
+.overlay.hidden {
+    display: none;
+}
+
+.quick-option-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: none;
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--e-global-color-accent);
+    padding: 0.875rem 1.5rem;
+    min-width: 100px;
+    color: white;
+    font-weight: 700;
+    font-size: 1em;
+}
+
+.quick-option-btn:hover {
+    box-shadow: var(--vanjorn-shadow-hover);
+    background: var(--e-global-color-accent-dark);
+}
+
+.quick-option-subtitle {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75em;
+}
+
+.quick-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.875rem;
+    margin-top: 30px;
+    margin-bottom: 1.75rem;
+}
+
+.select-van-btn {
+    flex: 1;
+    transition: all .3s;
+    cursor: pointer;
+    border: none;
+    border-radius: 10px;
+    background: var(--e-global-color-accent);
+    padding: 1rem 2rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1em;
+}
+
+.select-van-btn:hover {
+    background: var(--e-global-color-accent-dark);
+}
+
+.show-month-picker-btn {
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid var(--e-global-color-accent) !important;
+    border-radius: var(--vanjorn-radius-sm);
+    background: white !important;
+    padding: 0.6rem 1rem !important;
+    color: var(--e-global-color-accent) !important;
+    font-size: 0.875em;
+}
+
+.spec-item {
+    display: flex;
+    justify-content: space-between;
+    transition: all .3s;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--vanjorn-radius-sm);
+    background: white;
+    padding: 0.875rem;
+}
+
+.spec-label {
+    color: var(--vanjorn-text-secondary);
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.spec-value {
+    color: inherit;
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.specs-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.time-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 5;
+    box-shadow: var(--vanjorn-shadow);
+    border-radius: 4px;
+    background: rgb(255 255 255 / 95%);
+    padding: 2px 4px;
+    color: var(--e-global-color-accent);
+    font-weight: 700;
+    font-size: 0.625em;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    z-index: 10;
+    transition: all .3s;
+    margin-bottom: 0.5rem;
+    box-shadow: var(--vanjorn-shadow);
+    border-radius: var(--vanjorn-radius-sm);
+    background: #1e293b;
+    padding: 0.5rem 0.75rem;
+    pointer-events: none;
+    color: white;
+    font-size: 0.875em;
+    white-space: nowrap;
+}
+
+.van-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.van-details-footer {
+    display: flex;
+    gap: 1rem;
+    z-index: 2;
+    margin-top: 0rem;
+    border-top: 2px solid rgba(0, 0, 0, 0.08);
+    padding-top: 1rem;
+}
+
+.van-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    padding-bottom: 1rem;
+}
+
+.van-details-view {
+    display: none;
+}
+
+.van-details-view .van-details-header h2 {
+    margin: 0;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.625em;
+}
+
+.van-details-view.active {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1rem;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.van-hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--vanjorn-radius-lg);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    padding: 3rem;
+    aspect-ratio: 16/9;
+    width: 100%;
+}
+
+.van-hero .material-icons {
+    color: var(--vanjorn-text-secondary, #94a3b8);
+    font-size: 4rem;
+}
+
+.van-info-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--vanjorn-bg-light);
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.van-info-card h4 {
+    margin-top: 0;
+    margin-bottom: 0.3rem;
+    font-size: 1em !important;
+    letter-spacing: 0.5px;
+}
+
+.van-info-card p {
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.van-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.van-section {
+    border-radius: 10px;
+    background: var(--vanjorn-bg-light);
+    padding: 15px;
+}
+
+.van-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: inherit;
+    font-weight: 700;
+    font-size: 1.125em;
+}
+
+.vanpos-no-vans-warning {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 1rem 1rem;
+    border: 2px solid var(--vanjorn-color-warning);
+    border-radius: 10px;
+    background: var(--vanjorn-color-warning-light);
+    padding: 1rem 1.25rem;
+    color: var(--e-global-color-text);
+    font-size: 1em;
+}
+
+.weekday {
+    padding: 0.5rem;
+    color: var(--e-global-color-text-light);
+    font-weight: 700;
+    font-size: 0.875em;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.625rem;
+    padding: 0 1rem;
+}
+
+.year-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.year-nav .prev-year,
+.year-nav .next-year {
+    transition: all .3s;
+    cursor: pointer;
+    border: 2px solid rgba(0, 0, 0, 0.12);
+    border-radius: var(--vanjorn-radius-pill);
+    background: rgba(0, 0, 0, 0.04);
+    padding: 0.5rem 1rem;
+    color: inherit;
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.year-nav .prev-year:disabled,
+.year-nav .next-year:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.year-nav .prev-year:hover:not(:disabled),
+.year-nav .next-year:hover:not(:disabled) {
+    border-color: var(--e-global-color-accent);
+    background: rgba(249, 115, 22, 0.1);
+    color: var(--e-global-color-accent);
+}
+
+.back-to-calendar-btn .material-icons {
+    font-size: 1.125em;
+    line-height: 1;
+}
+
+.van-section h3 .material-icons {
+    vertical-align: middle;
+    font-size: 1.25em;
+    line-height: 1;
+}
+
+.year-nav .prev-year .material-icons,
+.year-nav .next-year .material-icons {
+    vertical-align: middle;
+    font-size: 1.125em;
+    line-height: 1;
+}
+
+/* ── Van Details: Gallery Carousel ── */
+
+.van-hero {
+    position: relative;
+    overflow: hidden;
+}
+
+.vanpos-gallery {
+    position: absolute;
+    inset: 0;
+}
+
+.vanpos-gallery-slide {
+    position: absolute;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    cursor: pointer;
+    inset: 0;
+}
+
+.vanpos-gallery-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.vanpos-gallery-single {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.vanpos-gallery-slide.active {
+    opacity: 1;
+}
+
+.vanpos-gallery-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(-50%);
+    opacity: 0;
+    z-index: 2;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    color: var(--e-global-color-text);
+    line-height: 1;
+}
+
+.van-hero:hover .vanpos-gallery-btn {
+    opacity: 1;
+}
+
+.vanpos-gallery-btn:hover {
+    background-image: linear-gradient(240deg, white 0%, white 100%);
+}
+
+.vanpos-gallery-btn .material-icons {
+    color: white;
+}
+
+.vanpos-gallery-btn:hover .material-icons {
+    color: var(--e-global-color-accent);
+}
+
+.vanpos-gallery-prev {
+    left: 10px;
+}
+
+.vanpos-gallery-next {
+    right: 10px;
+}
+
+.vanpos-gallery-btn .material-icons {
+    font-size: 1.25em;
+}
+
+.vanpos-gallery-dots {
+    display: flex;
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    gap: 6px;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+.vanpos-gallery-dot {
+    transition: all 0.2s;
+    cursor: pointer;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    width: 8px;
+    height: 8px;
+}
+
+.vanpos-gallery-dot.active {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    background: white;
+}
+
+/* ── Van Details: Lightbox ── */
+
+.vanpos-lightbox {
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    align-items: center;
+    z-index: 10002;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.vanpos-lightbox-img {
+    border-radius: var(--vanjorn-radius-sm);
+    max-width: 90vw;
+    max-height: 85vh;
+    object-fit: contain;
+}
+
+.vanpos-lightbox-close {
+    display: flex;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    color: white;
+}
+
+.vanpos-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.vanpos-lightbox-close .material-icons {
+    font-size: 1.5em;
+}
+
+.vanpos-lightbox-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    justify-content: center;
+    align-items: center;
+    transform: translateY(-50%);
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0;
+    width: 44px;
+    height: 44px;
+    color: white;
+}
+
+.vanpos-lightbox-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.vanpos-lightbox-btn .material-icons {
+    font-size: 1.5em;
+}
+
+.vanpos-lightbox-prev {
+    left: 16px;
+}
+
+.vanpos-lightbox-next {
+    right: 16px;
+}
+
+.vanpos-lightbox-counter {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.875em;
+}
+
+/* ── Van Details: Excerpt ── */
+
+.van-excerpt {
+    color: var(--vanjorn-text-secondary);
+    font-size: 0.9375em;
+    line-height: 1.6;
+}
+
+.van-excerpt p {
+    margin: 0 0 0.5em;
+}
+
+.van-excerpt p:last-child {
+    margin-bottom: 0;
+}
+
+/* ── Van Details: Footer with more-info link ── */
+
+.van-details-footer .details-btn {
+    text-align: center;
+    text-decoration: none;
+}
+
+.van-details-footer .details-btn:hover {
+    border-color: var(--e-global-color-accent);
+    color: var(--e-global-color-accent);
+}
+
+/* ── Single-Van Mode ─────────────────────────────────────────────────
+   When the shortcode carries a product_id the wrapper receives the
+   .vanpos-single-van-mode class.  Hide fleet-only UI and show a
+   compact action bar (date summary + Book Now) below the calendar.
+   ─────────────────────────────────────────────────────────────────── */
+
+.vanpos-single-van-mode .filters-section       { display: none !important; }
+.vanpos-single-van-mode .campers-section        { display: none !important; }
+.vanpos-single-van-mode #vanDetailsView         { display: none !important; }
+.vanpos-single-van-mode .legend                 { display: none; }
+
+.vanpos-single-van-mode .content-area {
+    grid-template-columns: 1fr !important;
+}
+
+/* Action bar container */
+.vanpos-single-van-action {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    margin-top: 1.25em;
+    border-radius: 8px;
+    background: var(--vanpos-action-bg, #f8f8f8);
+    padding: 1em 1.25em;
+}
+
+.vanpos-single-van-action-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em 1.5em;
+    font-size: 0.95em;
+}
+
+.vanpos-single-van-action-dates strong {
+    font-weight: 700;
+}
+
+.vanpos-single-van-action-price {
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+.vanpos-single-van-action-btn {
+    transition: opacity 0.15s;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background: var(--vanpos-action-btn-bg, #f97316);
+    padding: 0.75em 2em;
+    color: var(--vanpos-action-btn-color, white);
+    font-weight: 700;
+    font-size: 1em;
+}
+
+.vanpos-single-van-action-btn:hover:not(:disabled),
+.vanpos-single-van-action-btn:focus:not(:disabled) {
+    background: white;
+}
+
+.vanpos-single-van-action-btn:disabled {
+    transform: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.2);
+    color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.vanpos-single-van-action-hint {
+    opacity: 0.6;
+    margin: 0;
+    width: 100%;
+    font-size: 0.85em;
+}
+
+@media (max-width: 768px) {
+
+    .calendar-grid {
+        gap: 0.375rem;
+    }
+
+    .day {
+        font-size: 0.875em;
+    }
+
+    .equipment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .specs-list {
+        grid-template-columns: 1fr;
+    }
+
+    .van-details-footer {
+        flex-direction: column;
+    }
+
+    .van-details-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .van-hero {
+        padding: 2rem;
+        min-height: 180px;
+        font-size: 3.5em;
+    }
+
+    .vanpos-gallery-btn {
+        opacity: 1;
+        width: 30px;
+        height: 30px;
+    }
+
+    .vanpos-lightbox-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .van-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

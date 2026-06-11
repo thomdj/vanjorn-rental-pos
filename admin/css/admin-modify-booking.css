@@ -1,0 +1,297 @@
+/**
+ * Admin Change Dates — Styles
+ *
+ * Styles for the "Change Rental Dates" meta box on the WooCommerce
+ * order edit page. Designed for the sidebar meta box position.
+ *
+ * @package VJ_Rental_POS
+ */
+
+/* ======================= Current dates display ======================= */
+
+.vanpos-cd-current {
+	margin-bottom: 12px;
+}
+
+.vanpos-cd-current-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	padding: 4px 0;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.vanpos-cd-current-row + .vanpos-cd-current-row {
+	border-top: 1px solid #f0f0f1;
+}
+
+.vanpos-cd-label {
+	flex-shrink: 0;
+	color: #1d2327;
+	font-weight: 500;
+}
+
+.vanpos-cd-value {
+	color: #50575e;
+	text-align: right;
+}
+
+.vanpos-cd-value small {
+	margin-left: 4px;
+	color: #a7aaad;
+	font-size: 11px;
+}
+
+/* =========================== Toggle button =========================== */
+
+.vanpos-cd-toggle {
+	width: 100%;
+	text-align: center;
+}
+
+/* =========================== Form fields ============================= */
+
+.vanpos-cd-form {
+	margin-top: 12px;
+	border-top: 1px solid #e0e0e0;
+	padding-top: 12px;
+}
+
+.vanpos-cd-field {
+	margin-bottom: 10px;
+}
+
+.vanpos-cd-field label {
+	display: block;
+	margin-bottom: 3px;
+	color: #1d2327;
+	font-weight: 500;
+	font-size: 12px;
+}
+
+.vanpos-cd-field input[type="date"],
+.vanpos-cd-field select {
+	box-sizing: border-box;
+	border: 1px solid #8c8f94;
+	border-radius: 3px;
+	padding: 4px 8px;
+	width: 100%;
+	font-size: 13px;
+}
+
+.vanpos-cd-field input:focus,
+.vanpos-cd-field select:focus {
+	outline: none;
+	box-shadow: 0 0 0 1px #3858e9;
+	border-color: #3858e9;
+}
+
+/* ======================= Preview table =============================== */
+
+.vanpos-cd-preview {
+	margin: 12px 0;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #f6f7f7;
+	padding: 10px;
+}
+
+.vanpos-cd-preview-table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 12px;
+}
+
+.vanpos-cd-preview-table td {
+	vertical-align: middle;
+	padding: 3px 0;
+}
+
+.vanpos-cd-row-label {
+	color: #1d2327;
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.vanpos-cd-row-old {
+	color: #a7aaad;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.vanpos-cd-row-arrow {
+	padding: 0 4px;
+	width: 20px;
+	color: #c3c4c7;
+	text-align: center;
+}
+
+.vanpos-cd-row-new {
+	color: #1d2327;
+	font-weight: 500;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.vanpos-cd-changed .vanpos-cd-row-old {
+	text-decoration: line-through;
+}
+
+.vanpos-cd-changed .vanpos-cd-row-new {
+	color: #3858e9;
+}
+
+/* ===================== Price impact messages ========================= */
+
+.vanpos-cd-impact {
+	margin-top: 8px;
+	border-radius: 3px;
+	padding: 6px 8px;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.vanpos-cd-impact--increase {
+	border: 1px solid #d63638;
+	background: #fcf0f1;
+	color: #8a1f1f;
+}
+
+.vanpos-cd-impact--decrease {
+	border: 1px solid #46b450;
+	background: #edfaef;
+	color: #1e4620;
+}
+
+.vanpos-cd-impact--neutral {
+	border: 1px solid #72aee6;
+	background: #f0f6fc;
+	color: #183ad6;
+}
+
+.vanpos-cd-child-note {
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	margin-top: 6px;
+	padding: 6px 8px;
+	color: #646970;
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+.vanpos-cd-child-note .dashicons {
+	flex-shrink: 0;
+	margin-top: 1px;
+	width: 14px;
+	height: 14px;
+	font-size: 14px;
+}
+
+/* ======================= Action buttons ============================== */
+
+.vanpos-cd-actions {
+	display: grid;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.vanpos-cd-actions .button {
+	flex: 1;
+	min-width: 0;
+	text-align: center;
+}
+
+.vanpos-cd-cancel {
+	flex: 0 0 auto !important;
+}
+
+/* ================== Availability Indicator =========================== */
+
+.vanpos-cd-availability {
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	margin: 8px 0 0;
+	border-radius: 3px;
+	padding: 6px 8px;
+	font-weight: 500;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.vanpos-cd-availability .dashicons {
+	flex-shrink: 0;
+	margin-top: 0;
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+}
+
+.vanpos-cd-availability--ok {
+	border: 1px solid #46b450;
+	background: #edfaef;
+	color: #1e4620;
+}
+
+.vanpos-cd-availability--blocked {
+	border: 1px solid #d63638;
+	background: #fcf0f1;
+	color: #8a1f1f;
+}
+
+.vanpos-cd-override-wrap {
+	margin-top: 6px;
+	border: 1px solid #dba617;
+	border-radius: 3px;
+	background: #fcf9e8;
+	padding: 6px 8px;
+}
+
+.vanpos-cd-override-label {
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+	cursor: pointer;
+	color: #6e4e00;
+	font-size: 11px;
+	line-height: 1.4;
+}
+
+.vanpos-cd-override-label input[type="checkbox"] {
+	flex-shrink: 0;
+	margin: 1px 0 0;
+}
+
+/* ========================= Notices ==================================== */
+
+.vanpos-cd-notice {
+	margin: 10px 0;
+	border-radius: 3px;
+	padding: 6px 10px;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
+.vanpos-cd-notice p {
+	margin: 0;
+}
+
+.vanpos-cd-notice--success {
+	border: 1px solid #46b450;
+	background: #edfaef;
+	color: #1e4620;
+}
+
+.vanpos-cd-notice--error {
+	border: 1px solid #d63638;
+	background: #fcf0f1;
+	color: #8a1f1f;
+}
+
+.vanpos-cd-notice--info {
+	border: 1px solid #72aee6;
+	background: #f0f6fc;
+	color: #183ad6;
+}

@@ -1,0 +1,39 @@
+.vanpos-pos-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0 0 18px;
+	padding: 0;
+}
+
+.vanpos-pos-nav__tab {
+	display: inline-flex;
+	align-items: center;
+	padding: 8px 16px;
+	border-radius: 8px;
+	border: 1px solid #c3c4c7;
+	background: #fff;
+	color: #1d2327;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.3;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.vanpos-pos-nav__tab:hover,
+.vanpos-pos-nav__tab:focus {
+	background: #f6f7f7;
+	border-color: #8c8f94;
+	color: #1d2327;
+}
+
+.vanpos-pos-nav__tab.is-active,
+.vanpos-pos-nav__tab.is-active:hover,
+.vanpos-pos-nav__tab.is-active:focus {
+	background: #175cd3;
+	border-color: #175cd3;
+	color: #fff;
+	box-shadow: 0 2px 4px rgba(23, 92, 211, 0.25);
+}

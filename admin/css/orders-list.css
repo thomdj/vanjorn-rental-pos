@@ -1,0 +1,82 @@
+/**
+ * WooCommerce order list (HPOS + legacy): VanPOS rental columns & compact layout.
+ */
+
+.tablenav .vanpos-bc-orders-link {
+	margin-right: 6px;
+	vertical-align: middle;
+}
+
+.post-type-shop_order .column-vanpos_rental_product,
+.post-type-shop_order .column-vanpos_rental_start,
+.post-type-shop_order .column-vanpos_rental_end,
+.wc-orders-list-table .column-vanpos_rental_product,
+.wc-orders-list-table .column-vanpos_rental_start,
+.wc-orders-list-table .column-vanpos_rental_end {
+	max-width: 11em;
+}
+
+.post-type-shop_order .column-vanpos_rental_product .vanpos-orders-list-cell,
+.post-type-shop_order .column-vanpos_rental_start .vanpos-orders-list-cell,
+.post-type-shop_order .column-vanpos_rental_end .vanpos-orders-list-cell,
+.wc-orders-list-table .column-vanpos_rental_product .vanpos-orders-list-cell,
+.wc-orders-list-table .column-vanpos_rental_start .vanpos-orders-list-cell,
+.wc-orders-list-table .column-vanpos_rental_end .vanpos-orders-list-cell {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 12px;
+	line-height: 1.35;
+	color: #50575e;
+}
+
+.post-type-shop_order .column-vanpos_rental_product .vanpos-orders-list-product-link,
+.wc-orders-list-table .column-vanpos_rental_product .vanpos-orders-list-product-link {
+	color: #3858e9;
+	text-decoration: none;
+}
+
+.post-type-shop_order .column-vanpos_rental_product .vanpos-orders-list-product-link:hover,
+.wc-orders-list-table .column-vanpos_rental_product .vanpos-orders-list-product-link:hover {
+	color: #183ad6;
+	text-decoration: underline;
+}
+
+.post-type-shop_order .column-vanpos_order_type mark.order-status,
+.post-type-shop_order .column-vanpos_due_date mark.order-status,
+.wc-orders-list-table .column-vanpos_order_type mark.order-status,
+.wc-orders-list-table .column-vanpos_due_date mark.order-status {
+	margin-bottom: 2px;
+}
+
+.post-type-shop_order .column-vanpos_order_type .vanpos-order-list-parent,
+.wc-orders-list-table .column-vanpos_order_type .vanpos-order-list-parent {
+	display: inline;
+	margin-left: 0.25em;
+	font-size: 11px;
+	color: #646970;
+}
+
+.post-type-shop_order .column-vanpos_order_type br,
+.wc-orders-list-table .column-vanpos_order_type br {
+	display: none;
+}
+
+.post-type-shop_order .column-vanpos_due_date small,
+.wc-orders-list-table .column-vanpos_due_date small {
+	display: inline;
+	margin-left: 0.25em;
+	font-size: 11px;
+	color: #646970;
+}
+
+.post-type-shop_order .column-vanpos_due_date br,
+.wc-orders-list-table .column-vanpos_due_date br {
+	display: none;
+}
+
+#wc-orders-filter .widefat td,
+#wc-orders-filter .widefat td ul {
+	font-size: 12px;
+}

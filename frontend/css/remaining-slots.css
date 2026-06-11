@@ -1,0 +1,67 @@
+/**
+ * Remaining Slots Shortcode — VAN-Jorn Rental POS
+ * frontend/css/remaining-slots.css
+ */
+
+.vanpos-remaining-slots {
+    display: grid;
+    gap: .75rem;
+    color: var(--e-global-color-aa433f5);
+    font-size: 18px;
+    font-family: inherit;
+}
+
+/* One line per van */
+.vanpos-rs-row {
+    margin: 0 0 0.5rem;
+    line-height: 1.6;
+}
+
+.vanpos-rs-row:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Clickable date range — underlined, inherits body colour */
+.vanpos-remaining-slots .vanpos-rs-slot {
+    transition: all .3s;
+    cursor: pointer;
+    color: var(--e-global-color-aa433f5);
+    text-decoration: underline;
+}
+
+.vanpos-remaining-slots .vanpos-rs-slot:hover {
+    opacity: 0.45;
+    color: var(--e-global-color-aa433f5);
+}
+
+/* Loading: dim + block pointer events while AJAX runs */
+.vanpos-rs-slot.is-loading {
+    opacity: 0.45;
+    cursor: wait;
+    pointer-events: none;
+}
+
+/* Bullet separator between slots on the same row */
+.vanpos-rs-sep {
+    position: relative;
+    bottom: 3px;
+    vertical-align: middle;
+    margin: 0 5px;
+    color: var(--e-global-color-aa433f5);
+    font-size: 16px;
+}
+
+/* Inline error injected by JS after the affected row */
+.vanpos-rs-error {
+    display: none;
+    margin: 0.1rem 0 0.35rem;
+    color: var(--vanjorn-color-danger);
+    font-size: 16px;
+}
+
+/* Empty state */
+.vanpos-rs-no-slots {
+    margin: 0;
+    color: var(--vanjorn-text-secondary);
+    font-style: italic;
+}

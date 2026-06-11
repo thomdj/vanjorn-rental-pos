@@ -1,0 +1,476 @@
+a.vanpos-pay-button {
+    border-radius: var(--vanjorn-radius-pill) !important;
+    background-color: var(--e-global-color-accent) !important;
+    font-weight: 500 !important;
+}
+
+a.vanpos-pay-button:hover {
+    color: var( --e-global-color-accent ) !important;
+}
+
+section.woocommerce-order-details.woocommerce-info.mollie-instructions {
+    margin-top: 1.5em;
+}
+
+table tbody th {
+    border-color: var(--vanjorn-bg-light);
+}
+
+table tbody>tr:nth-child(odd)>td, table tbody>tr:nth-child(odd)>th {
+    background: unset;
+}
+
+.vanpos-active-rentals-section {
+    margin-top: 2em;
+}
+
+.vanpos-dashboard-greeting {
+    border-bottom: 2px solid var(--e-global-color-accent);
+    padding-bottom: .5rem;
+}
+
+.vanpos-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5em;
+    margin-bottom: 1.5em;
+}
+
+.vanpos-dashboard-wrapper {
+    margin: 2em 0;
+}
+
+.vanpos-driver-details-table {
+    margin-bottom: 0 !important;
+}
+
+.vanpos-greeting-title {
+    margin: 0;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+.vanpos-info-block {
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--vanjorn-bg-light);
+    padding: 12px;
+}
+
+.vanpos-info-title {
+    margin-bottom: 3px;
+    color: #777;
+    font-size: 0.75em;
+    letter-spacing: 0.5px;
+}
+
+.vanpos-info-value {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 1em;
+}
+
+.vanpos-no-rentals {
+    padding-top: 3em;
+    text-align: center;
+}
+
+.vanpos-no-rentals .button {
+    display: inline-block;
+    transition: all .3s;
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--e-global-color-accent);
+    padding: 0.75em 2em;
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vanpos-no-rentals .button:hover {
+    background: var(--e-global-color-accent-dark);
+    color: white;
+}
+
+.vanpos-no-rentals p {
+    margin-bottom: 1.5em;
+    color: var(--vanjorn-text-secondary);
+    font-size: 1.125em;
+}
+
+.vanpos-order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-top: 15px;
+    border-top: 1px solid var(--vanjorn-border-light);
+    padding-top: 15px;
+}
+
+.vanpos-order-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    margin-bottom: 15px;
+}
+
+.vanpos-order-id {
+    color: var(--e-global-color-text);
+    font-weight: bold;
+    font-size: 1.125em;
+}
+
+.vanpos-order-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.vanpos-overdue-badge {
+    display: inline-block;
+    border-radius: var(--vanjorn-radius-lg);
+    background: var(--vanjorn-color-danger);
+    padding: 0.2em 0.6em;
+    color: white;
+    font-weight: 700;
+    font-size: 0.75em;
+}
+
+.vanpos-paid-indicator {
+    color: var(--vanjorn-color-success);
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.vanpos-pay-button {
+    display: inline-block;
+    transition: all .3s;
+    border: none;
+    border-radius: 4px;
+    background: var(--vanjorn-color-success);
+    padding: 0.5em 1em;
+    color: white !important;
+    font-weight: 700;
+    font-size: 0.875em;
+    text-decoration: none !important;
+}
+
+.vanpos-pay-button:hover {
+    background: #1b5e20;
+    color: white !important;
+}
+
+.vanpos-pay-now-btn {
+    border: 2px solid var(--vanjorn-color-success);
+    background: var(--vanjorn-color-success);
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.vanpos-pay-now-btn:hover {
+    border-color: #1b5e20;
+    background: #1b5e20;
+    color: white;
+}
+
+.vanpos-payment-actions {
+    white-space: nowrap;
+}
+
+.vanpos-payment-due-date {
+    color: var(--vanjorn-text-secondary);
+}
+
+.vanpos-payment-due-date .vanpos-overdue {
+    color: var(--vanjorn-color-danger);
+    font-weight: 700;
+}
+
+.vanpos-payment-order-id a {
+    transition: all .3s;
+    color: var(--e-global-color-accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.vanpos-payment-order-id a:hover {
+    color: var(--e-global-color-accent-dark);
+    text-decoration: underline;
+}
+
+.vanpos-payment-row .vanpos-due {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+    color: var(--vanjorn-color-danger);
+    font-weight: bold;
+}
+
+.vanpos-payment-row .vanpos-due.vanpos-overdue {
+    color: var(--vanjorn-color-danger);
+}
+
+.vanpos-payment-row .vanpos-paid {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    color: var(--vanjorn-color-success);
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.vanpos-payment-row span:first-child {
+    color: var(--vanjorn-text-secondary);
+    font-size: 1em;
+}
+
+.vanpos-payment-section {
+    margin-bottom: 15px;
+    border-radius: var(--vanjorn-radius-sm);
+    background: var(--vanjorn-bg-light);
+    padding: 15px;
+}
+
+.vanpos-payment-summary {
+    border-radius: var(--vanjorn-radius-sm);
+    background: white;
+    padding: 10px 15px;
+}
+
+.vanpos-payment-table {
+    box-shadow: var(--vanjorn-shadow);
+    background: white;
+    width: 100%;
+    overflow: hidden;
+}
+
+.vanpos-payment-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.vanpos-payment-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.vanpos-payment-table td {
+    border-bottom: 1px solid var(--vanjorn-border-light);
+    padding: 12px 15px;
+    font-size: 1em;
+}
+
+.vanpos-payment-table th {
+    border-bottom: 2px solid var(--vanjorn-border-light);
+    padding: 12px 15px;
+    color: var(--e-global-color-text);
+    font-weight: 700;
+    font-size: 0.875em;
+    text-align: left;
+}
+
+.vanpos-payment-table thead {
+    background: #f5f5f5;
+}
+
+.vanpos-payment-table-row.vanpos-payment-paid td {
+    color: var(--vanjorn-text-secondary);
+}
+
+.vanpos-payment-table-wrapper {
+    margin-top: 1em;
+    overflow-x: auto;
+}
+
+.vanpos-payment-total {
+    color: var(--e-global-color-text);
+    font-weight: 700;
+}
+
+.vanpos-payment-type {
+    color: var(--e-global-color-text) !important;
+    font-weight: 700 !important;
+}
+
+.vanpos-rental-cards {
+    display: grid;
+    gap: 1.5em;
+}
+
+.woocommerce-order-details__title,
+.vanpos-section-title {
+    margin-top: 1em !important;
+}
+
+.vanpos-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    transition: all .3s;
+    border-radius: 10px;
+    background: var(--vanjorn-bg-light);
+    padding: 1.5em;
+}
+
+.vanpos-stat-card:hover {
+    box-shadow: var(--vanjorn-shadow-md);
+}
+
+.vanpos-stat-content {
+    flex: 1;
+}
+
+.vanpos-stat-icon  {
+    font-size: 2.5em;
+    line-height: 1;
+}
+
+.vanpos-stat-icon .material-icons {
+    color: var(--e-global-color-accent);
+    font-size: inherit;
+    padding: 11px;
+    border: 2px solid var(--e-global-color-accent);
+    border-radius: 50%;
+}
+
+.vanpos-stat-label {
+    color: var(--vanjorn-text-secondary);
+    font-weight: 500;
+    font-size: 0.875em;
+}
+
+.vanpos-stat-link {
+    transition: all .3s;
+    color: var(--e-global-color-accent);
+    font-weight: 700;
+    font-size: 0.875em;
+    text-decoration: none;
+}
+
+.vanpos-stat-link:hover {
+    color: var(--e-global-color-accent-dark);
+}
+
+.vanpos-stat-link .material-icons {
+    vertical-align: middle;
+    font-size: 1em;
+    line-height: 1;
+}
+
+.vanpos-stat-value {
+    margin-bottom: 0.25em;
+    color: var(--e-global-color-accent);
+    font-weight: bold;
+    font-size: 2em;
+}
+
+.vanpos-status-badge {
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-weight: 700;
+    font-size: 0.875em;
+}
+
+.vanpos-status-badge.vanpos-status-cancelled,
+.vanpos-status-badge.vanpos-status-refunded,
+.vanpos-status-badge.vanpos-status-failed {
+    background: var(--vanjorn-color-danger-light);
+    color: var(--vanjorn-color-danger);
+}
+
+.vanpos-status-badge.vanpos-status-completed,
+.vanpos-status-badge.vanpos-status-processing,
+.vanpos-status-badge.vanpos-status-in-progress {
+    background: var(--vanjorn-color-success-light);
+    color: var(--vanjorn-color-success);
+}
+
+.vanpos-user-name {
+    color: var(--e-global-color-accent);
+}
+
+.vanpos-view-order-btn,
+.vanpos-pay-now-btn {
+    display: inline-block;
+    transition: all .3s;
+    border-radius: var(--vanjorn-radius-sm);
+    padding: 0.75em 1.5em;
+    font-weight: 700;
+    font-size: 1em;
+    text-decoration: none;
+}
+
+.vanpos-view-order-btn {
+    border: 2px solid var(--e-global-color-accent);
+    border-radius: var(--vanjorn-radius-pill);
+    background: var(--e-global-color-accent);
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.vanpos-view-order-btn:hover {
+    background: white;
+    color: var(--e-global-color-accent) !important;
+}
+
+@media (max-width: 768px) {
+
+    .vanpos-dashboard-greeting h2 {
+        line-height: normal;
+    }
+
+    .vanpos-dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .vanpos-order-actions {
+        flex-direction: column;
+    }
+
+    .vanpos-order-card {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .vanpos-order-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .vanpos-order-info {
+        grid-template-columns: 1fr;
+    }
+
+    .vanpos-pay-button {
+        padding: 0.4em 0.75em;
+        font-size: 0.875em;
+    }
+
+    .vanpos-payment-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .vanpos-payment-table th,
+	.vanpos-payment-table td {
+        padding: 10px 8px;
+        font-size: 0.875em;
+    }
+
+    .vanpos-payment-table th {
+        font-size: 0.75em;
+    }
+
+    .vanpos-payment-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .vanpos-view-order-btn,
+	.vanpos-pay-now-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+}

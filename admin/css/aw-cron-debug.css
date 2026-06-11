@@ -1,0 +1,296 @@
+/**
+ * VanPOS Mailer Debug — Admin Styles
+ *
+ * @package VJ_Rental_POS
+ */
+
+/* ----------------------------------------------------------------
+   Layout
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-cron-wrap {
+	max-width: 1200px;
+}
+
+.vanpos-aw-cron-intro {
+	font-size: 14px;
+	color: #50575e;
+	margin-bottom: 24px;
+}
+
+.vanpos-aw-section {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 20px 24px;
+	margin-bottom: 20px;
+}
+
+.vanpos-aw-section h2 {
+	margin-top: 0;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #f0f0f1;
+	font-size: 16px;
+}
+
+.vanpos-aw-section h3 {
+	margin-top: 18px;
+	font-size: 14px;
+}
+
+/* ----------------------------------------------------------------
+   Status table
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-status-table {
+	border-collapse: collapse;
+	width: auto;
+	min-width: 480px;
+}
+
+.vanpos-aw-status-table th,
+.vanpos-aw-status-table td {
+	padding: 6px 14px 6px 0;
+	vertical-align: top;
+	font-size: 13px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.vanpos-aw-status-table th {
+	font-weight: 600;
+	color: #1d2327;
+	white-space: nowrap;
+	width: 180px;
+}
+
+/* ----------------------------------------------------------------
+   Badges
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+.vanpos-aw-badge--ok {
+	background: #dff0d8;
+	color: #3c763d;
+}
+
+.vanpos-aw-badge--warn {
+	background: #fcf8e3;
+	color: #8a6d3b;
+}
+
+.vanpos-aw-badge--error {
+	background: #f2dede;
+	color: #a94442;
+}
+
+.vanpos-aw-badge--info {
+	background: #e8f0fe;
+	color: #1a73e8;
+}
+
+.vanpos-aw-badge--muted {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+/* ----------------------------------------------------------------
+   Buttons & actions
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-button-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 8px;
+}
+
+.vanpos-aw-action-status {
+	font-size: 13px;
+	color: #50575e;
+}
+
+/* ----------------------------------------------------------------
+   Results table overrides
+   ---------------------------------------------------------------- */
+
+#vanpos-aw-results-table td {
+	vertical-align: top;
+	font-size: 13px;
+}
+
+#vanpos-aw-results-summary {
+	margin-bottom: 14px;
+	font-size: 14px;
+}
+
+/* Workflow badges inside results table */
+.vanpos-aw-wf-badge {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.6;
+	margin: 1px 3px 1px 0;
+}
+
+.vanpos-aw-wf-badge--matched {
+	background: #dff0d8;
+	color: #3c763d;
+}
+
+.vanpos-aw-wf-badge--already_run {
+	background: #e8f0fe;
+	color: #1a73e8;
+}
+
+.vanpos-aw-wf-badge--rules_failed {
+	background: #f2dede;
+	color: #a94442;
+}
+
+.vanpos-aw-wf-badge--error {
+	background: #fcf8e3;
+	color: #8a6d3b;
+}
+
+.vanpos-aw-wf-badge--no_workflows {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+/* ----------------------------------------------------------------
+   Detail panel
+   ---------------------------------------------------------------- */
+
+#vanpos-aw-detail-section {
+	border-left: 4px solid #3858e9;
+}
+
+.vanpos-aw-detail-wf {
+	margin-bottom: 18px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.vanpos-aw-detail-wf:last-child {
+	border-bottom: none;
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+.vanpos-aw-detail-wf h4 {
+	margin: 0 0 8px;
+	font-size: 14px;
+}
+
+.vanpos-aw-rules-table {
+	border-collapse: collapse;
+	width: 100%;
+	font-size: 12px;
+}
+
+.vanpos-aw-rules-table th,
+.vanpos-aw-rules-table td {
+	padding: 5px 10px;
+	border: 1px solid #e5e5e5;
+	text-align: left;
+}
+
+.vanpos-aw-rules-table th {
+	background: #f9f9f9;
+	font-weight: 600;
+}
+
+.vanpos-aw-rules-table .rule-passed {
+	color: #3c763d;
+	font-weight: 600;
+}
+
+.vanpos-aw-rules-table .rule-failed {
+	color: #a94442;
+	font-weight: 600;
+}
+
+.vanpos-aw-rules-table .rule-unknown {
+	color: #8a6d3b;
+}
+
+/* ----------------------------------------------------------------
+   Workflow list in status panel
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-wf-list {
+	list-style: none;
+	padding: 0;
+	margin: 8px 0 0;
+}
+
+.vanpos-aw-wf-list li {
+	padding: 4px 0;
+	font-size: 13px;
+}
+
+.vanpos-aw-wf-list li code {
+	font-size: 12px;
+	margin-left: 6px;
+}
+
+/* ----------------------------------------------------------------
+   History table
+   ---------------------------------------------------------------- */
+
+#vanpos-aw-history-table td {
+	font-size: 13px;
+	vertical-align: top;
+}
+
+/* ----------------------------------------------------------------
+   Loading state
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-loading {
+	padding: 20px 0;
+	color: #50575e;
+	font-style: italic;
+}
+
+/* ----------------------------------------------------------------
+   Misc helpers
+   ---------------------------------------------------------------- */
+
+.vanpos-aw-mono {
+	font-family: Consolas, Monaco, monospace;
+	font-size: 12px;
+}
+
+.vanpos-aw-muted {
+	color: #50575e;
+}
+
+.vanpos-aw-order-meta-table {
+	border-collapse: collapse;
+	margin-top: 10px;
+	margin-bottom: 18px;
+	font-size: 12px;
+}
+
+.vanpos-aw-order-meta-table th,
+.vanpos-aw-order-meta-table td {
+	padding: 4px 12px 4px 0;
+	border-bottom: 1px solid #f0f0f1;
+	text-align: left;
+}
+
+.vanpos-aw-order-meta-table th {
+	font-weight: 600;
+	white-space: nowrap;
+}
