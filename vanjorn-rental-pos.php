@@ -170,6 +170,31 @@ class VJ_Rental_POS {
 			VanPOS_Order_Display::init();
 		}
 
+		// Initialize checkout fields (driver details, registration, account edit).
+		if ( class_exists( 'VanPOS_Checkout_Fields' ) ) {
+			VanPOS_Checkout_Fields::init();
+		}
+
+		// Initialize cart validation (Kestrel timestamp fix, notice cleanup).
+		if ( class_exists( 'VanPOS_Cart_Validation' ) ) {
+			VanPOS_Cart_Validation::init();
+		}
+
+		// Initialize van specifications product tab.
+		if ( class_exists( 'VanPOS_Product_Tabs' ) ) {
+			VanPOS_Product_Tabs::init();
+		}
+
+		// Initialize WCPDF rental meta (PDF invoice integration).
+		if ( class_exists( 'VanPOS_WCPDF_Rental_Meta' ) ) {
+			VanPOS_WCPDF_Rental_Meta::init();
+		}
+
+		// Initialize WooCommerce template loader (checkout, account, order templates).
+		if ( class_exists( 'VanPOS_Template_Loader' ) ) {
+			VanPOS_Template_Loader::init();
+		}
+
 		// Initialize dashboard enhancement
 		if ( class_exists( 'VanPOS_Dashboard' ) ) {
 			VanPOS_Dashboard::init();
@@ -262,10 +287,38 @@ class VJ_Rental_POS {
 		// Load order title manager
 		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-order-title.php';
 
-		// Load AutomateWoo date-based rules + daily trigger for pending child payment orders.
+		// Load AutomateWoo date-based rules, daily trigger, and country translation fix.
 		// Used instead of AW's "Schedule with a variable" timing, which does not work
 		// reliably with meta-based date variables on this site.
 		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-aw-date-rules.php';
+
+		// Checkout & registration custom fields (driver details, license dates).
+		// Migrated from child theme.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-checkout-fields.php';
+
+		// Cart validation: Kestrel timestamp fix + notice cleanup.
+		// Migrated from child theme.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-cart-validation.php';
+
+		// Van specifications product tab (ACF field group).
+		// Migrated from child theme.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-product-tabs.php';
+
+		// WCPDF rental meta (PDF invoice integration).
+		// Migrated from child theme.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-wcpdf-rental-meta.php';
+
+		// Product page customizations: Kestrel form replacement + VanPOS gallery.
+		// Migrated from child theme.
+		require_once VANPOS_PLUGIN_DIR . 'frontend/class-vanpos-product-page.php';
+
+		// PDF rendering helpers (rental period banner, driver details, payment terms, legal footer).
+		// Migrated from child theme's woocommerce/pdf/Vanjorn/template-functions.php.
+		require_once VANPOS_PLUGIN_DIR . 'includes/vanpos-pdf-helpers.php';
+
+		// WooCommerce template loader — redirects WC template lookup to plugin's templates/ dir.
+		// Migrated from child theme: form-checkout, dashboard, orders templates.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-template-loader.php';
 
 		// Load AutomateWoo cron debug & manual runner admin tool.
 		require_once VANPOS_PLUGIN_DIR . 'admin/class-vanpos-aw-cron-debug.php';

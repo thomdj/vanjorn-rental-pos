@@ -11,6 +11,9 @@
  * And one custom trigger:
  *   - VanPOS - Daily Pending Payment Check
  *
+ * Also provides a fix for AutomateWoo's {{ customer.country }} variable
+ * under WPML (see "Country Translation Fix" section below).
+ *
  * The trigger fires once daily at 09:00 site time, iterating over all
  * pending child payment orders (_vanpos_order_type = payment_order).
  * Use this trigger together with the date rules above to create
@@ -329,4 +332,65 @@ function vanpos_aw_clear_daily_cron() {
 	if ( $timestamp ) {
 		wp_unschedule_event( $timestamp, 'vanpos_aw_daily_pending_check' );
 	}
+}
+
+// ============================================================
+// COUNTRY TRANSLATION FIX — migrated from child theme
+// ============================================================
+//
+// Problem: AutomateWoo switches locale correctly for queued workflows,
+// but WooCommerce caches country names on first load. By the time the
+// workflow runs, WC()->countries already holds the names in the site's
+// default language and won't refresh on switch_to_locale().
+//
+// Fix: Re-include WooCommerce's i18n/countries.php under a temporary
+// locale switch. The include re-evaluates all __() calls against the
+// freshly loaded textdomain, so we get the translated country name
+// without touching WC()->countries (which would leak foreign-locale
+// state into the rest of the request).
+
+add_filter( 'automatewoo/variables/after_get_value', 'vanpos_aw_translate_customer_country', 10, 5 );
+
+/**
+ * Translate {{ customer.country }} into the order's WPML language.
+ *
+ * @param mixed                    $value      The resolved variable value.
+ * @param string                   $data_type  Data item type (e.g. 'customer').
+ * @param string                   $data_value Variable name (e.g. 'country').
+ * @param array                    $parameters Additional parameters.
+ * @param \AutomateWoo\Workflow    $workflow   The running workflow.
+ * @return mixed
+ */
+function vanpos_aw_translate_customer_country( $value, $data_type, $data_value, $parameters, $workflow ) {
+	if ( 'customer' !== $data_type || 'country' !== $data_value ) {
+		return $value;
+	}
+
+	$order = $workflow->get_data_item( 'order' );
+	if ( ! $order instanceof WC_Order ) {
+		return $value;
+	}
+
+	$language     = $order->get_meta( 'wpml_language' );
+	$country_code = $order->get_billing_country();
+	if ( ! $language || ! $country_code ) {
+		return $value;
+	}
+
+	// Resolve WPML language code (e.g. "de") to WP locale (e.g. "de_DE").
+	$active_languages = apply_filters( 'wpml_active_languages', null );
+	if ( empty( $active_languages[ $language ]['default_locale'] ) ) {
+		return $value;
+	}
+	$locale = $active_languages[ $language ]['default_locale'];
+
+	if ( $locale === determine_locale() ) {
+		return $value;
+	}
+
+	switch_to_locale( $locale );
+	$countries = include WC()->plugin_path() . '/i18n/countries.php';
+	restore_current_locale();
+
+	return $countries[ $country_code ] ?? $value;
 }
