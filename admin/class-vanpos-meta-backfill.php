@@ -405,8 +405,8 @@ class VanPOS_Meta_Backfill {
 			switch ( $payment_type ) {
 				case 'security_deposit':
 					return 'security_deposit';
-				case 'deposit':
-					return 'deposit_payment';
+				case 'initial':
+					return 'initial_payment';
 				case 'remaining':
 					return 'remaining_payment';
 				case 'extension':
@@ -586,12 +586,12 @@ class VanPOS_Meta_Backfill {
 		// 4. Formatted companions.
 		$initial = $order->get_meta( '_vanpos_initial_payment' );
 		if ( '' !== (string) $initial && '' === (string) $order->get_meta( '_vanpos_initial_payment_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( (float) $initial ) ) );
+			$order->update_meta_data( '_vanpos_initial_payment_formatted', VanPOS_Order_Manager::format_price( (float) $initial ) );
 			$changed[] = '_vanpos_initial_payment_formatted';
 		}
 		$sd = $order->get_meta( '_vanpos_security_deposit_payment' );
 		if ( '' !== (string) $sd && '' === (string) $order->get_meta( '_vanpos_security_deposit_payment_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_security_deposit_payment_formatted', wp_strip_all_tags( wc_price( (float) $sd ) ) );
+			$order->update_meta_data( '_vanpos_security_deposit_payment_formatted', VanPOS_Order_Manager::format_price( (float) $sd ) );
 			$changed[] = '_vanpos_security_deposit_payment_formatted';
 		}
 
@@ -616,7 +616,7 @@ class VanPOS_Meta_Backfill {
 		$sd_order      = null;
 		foreach ( $children as $child ) {
 			$ptype = (string) $child->get_meta( '_vanpos_payment_type' );
-			if ( 'remaining' === $ptype || 'second_payment' === $ptype ) {
+			if ( VanPOS_Order_Manager::is_remaining_payment( $ptype ) ) {
 				$has_remaining = true;
 			} elseif ( 'security_deposit' === $ptype ) {
 				$sd_order = $child;
@@ -919,7 +919,7 @@ class VanPOS_Meta_Backfill {
 			// A remaining child owns _vanpos_remaining_payment as its own bucket;
 			// never treat a divergence there as a parent-copy mismatch.
 			$own_bucket_keys = array();
-			if ( 'remaining' === $payment_type || 'second_payment' === $payment_type ) {
+			if ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 				$own_bucket_keys = array( '_vanpos_remaining_payment', '_vanpos_remaining_payment_formatted' );
 			}
 			// If the parent's remaining_payment went negative (over-refund artefact),
@@ -990,6 +990,19 @@ class VanPOS_Meta_Backfill {
 			$due_date = $order->get_meta( '_payment_due_date' );
 			if ( $due_date && ! $order->get_meta( '_payment_due_date_formatted' ) ) {
 				$missing[] = '_payment_due_date_formatted';
+			}
+
+			// Extension orders: check for missing amount meta and due date.
+			// Both are set by the change manager on creation; older orders won't have them.
+			if ( 'extension' === $payment_type ) {
+				if ( '' === (string) $order->get_meta( '_vanpos_extension_amount' ) ) {
+					$missing[] = '_vanpos_extension_amount';
+				} elseif ( '' === (string) $order->get_meta( '_vanpos_extension_amount_formatted' ) ) {
+					$missing[] = '_vanpos_extension_amount_formatted';
+				}
+				if ( ! $due_date ) {
+					$missing[] = '_payment_due_date';
+				}
 			}
 
 			// Check _is_short_term_booking (required by AutomateWoo triggers on rental payment orders).
@@ -1188,11 +1201,13 @@ class VanPOS_Meta_Backfill {
 		$return_date = $order->get_meta( '_vanpos_return_date' );
 
 		if ( $pickup_date && ! $order->get_meta( '_vanpos_pickup_date_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_pickup_date_formatted', date_i18n( 'j F Y', strtotime( $pickup_date ) ) );
+			// Use the canonical format_meta_date() helper (d-m-Y) so backfilled
+			// orders match the format written by checkout and the change manager.
+			$order->update_meta_data( '_vanpos_pickup_date_formatted', VanPOS_Order_Manager::format_meta_date( $pickup_date ) );
 			$fixed[] = '_vanpos_pickup_date_formatted';
 		}
 		if ( $return_date && ! $order->get_meta( '_vanpos_return_date_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'j F Y', strtotime( $return_date ) ) );
+			$order->update_meta_data( '_vanpos_return_date_formatted', VanPOS_Order_Manager::format_meta_date( $return_date ) );
 			$fixed[] = '_vanpos_return_date_formatted';
 		}
 
@@ -1239,7 +1254,7 @@ class VanPOS_Meta_Backfill {
 
 		$total_price = $order->get_meta( '_vanpos_total_price' );
 		if ( $total_price !== '' && $total_price !== false && ! $order->get_meta( '_vanpos_total_price_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( (float) $total_price ) ) );
+			$order->update_meta_data( '_vanpos_total_price_formatted', VanPOS_Order_Manager::format_price( (float) $total_price ) );
 			$fixed[] = '_vanpos_total_price_formatted';
 		}
 
@@ -1260,7 +1275,7 @@ class VanPOS_Meta_Backfill {
 			}
 		}
 		if ( $remaining !== '' && $remaining !== false && ! $order->get_meta( '_vanpos_remaining_payment_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( (float) $remaining ) ) );
+			$order->update_meta_data( '_vanpos_remaining_payment_formatted', VanPOS_Order_Manager::format_price( (float) $remaining ) );
 			$fixed[] = '_vanpos_remaining_payment_formatted';
 		}
 
@@ -1517,7 +1532,7 @@ class VanPOS_Meta_Backfill {
 		// real total, which may legitimately differ from the parent). Never
 		// overwrite a child's own bucket from the parent here.
 		$own_bucket_keys = array();
-		if ( 'remaining' === $payment_type || 'second_payment' === $payment_type ) {
+		if ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			$own_bucket_keys = array( '_vanpos_remaining_payment', '_vanpos_remaining_payment_formatted' );
 		}
 		// Same guard as the scan: if the parent's remaining_payment is negative
@@ -1565,8 +1580,39 @@ class VanPOS_Meta_Backfill {
 		// Generate formatted due date
 		$due_date = $order->get_meta( '_payment_due_date' );
 		if ( $due_date && ! $order->get_meta( '_payment_due_date_formatted' ) ) {
-			$order->update_meta_data( '_payment_due_date_formatted', date_i18n( 'j F Y', strtotime( $due_date ) ) );
+			$order->update_meta_data( '_payment_due_date_formatted', VanPOS_Order_Manager::format_meta_date( $due_date ) );
 			$fixed[] = '_payment_due_date_formatted';
+		}
+
+		// Extension orders: backfill amount meta and due date if missing.
+		if ( 'extension' === $payment_type ) {
+			$ext_amount = (string) $order->get_meta( '_vanpos_extension_amount' );
+			if ( '' === $ext_amount ) {
+				// Derive from the order total — that is the extension charge.
+				$total = (float) $order->get_total();
+				if ( $total > 0 ) {
+					$order->update_meta_data( '_vanpos_extension_amount', round( $total, 2 ) );
+					$fixed[] = '_vanpos_extension_amount';
+					$ext_amount = (string) round( $total, 2 );
+				}
+			}
+			if ( '' !== $ext_amount && '' === (string) $order->get_meta( '_vanpos_extension_amount_formatted' ) ) {
+				$order->update_meta_data( '_vanpos_extension_amount_formatted', VanPOS_Order_Manager::format_price( (float) $ext_amount ) );
+				$fixed[] = '_vanpos_extension_amount_formatted';
+			}
+			if ( ! $due_date && class_exists( 'VanPOS_Functions' ) ) {
+				// Use the pickup date on the extension order (copied from the parent).
+				$pickup_date = (string) $order->get_meta( '_vanpos_pickup_date' );
+				if ( $pickup_date ) {
+					$ext_due = VanPOS_Functions::calculate_due_date_from_pickup( $pickup_date, 'remaining' );
+					if ( $ext_due ) {
+						$order->update_meta_data( '_payment_due_date', $ext_due );
+						$order->update_meta_data( '_vanpos_due_date', $ext_due );
+						$order->update_meta_data( '_payment_due_date_formatted', VanPOS_Order_Manager::format_meta_date( $ext_due ) );
+						$fixed[] = '_payment_due_date';
+					}
+				}
+			}
 		}
 
 		// Copy missing time meta from parent, then normalize legacy slot labels.
@@ -2085,6 +2131,9 @@ class VanPOS_Meta_Backfill {
 					'meta_migration:flags':                 '<code>has_remaining / has_security_deposit / sd_paid</code> <em>(seed from child orders)</em>',
 					'split_reconcile':                      '<code>payment split</code> <em style="color:#b32d2e;">(stored total ≠ real order total — recompute)</em>',
 					'email_meta:mismatch':                  '<code>email meta</code> <em style="color:#b32d2e;">(stale copy — differs from parent, will sync)</em>',
+					'_vanpos_extension_amount':             '<code>extension_amount</code> <em>(missing — will derive from order total)</em>',
+					'_vanpos_extension_amount_formatted':   '<code>extension_amount_formatted</code> <em>(missing — will format from amount)</em>',
+					'_payment_due_date':                    '<code>payment_due_date</code> <em>(missing — will calculate from pickup date)</em>',
 				};
 				if (labels[key]) return labels[key];
 				// Fallback: strip prefix and show as code

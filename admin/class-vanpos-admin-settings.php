@@ -89,13 +89,6 @@ class VanPOS_Admin_Settings {
 						<h2><?php esc_html_e( 'Need to test quickly?', 'vanjorn-rental-pos' ); ?></h2>
 						<p><?php esc_html_e( 'Use Thursday and Friday for pickup/return and a 6-22 day window. This matches the calendar UX and keeps bookings realistic.', 'vanjorn-rental-pos' ); ?></p>
 					</div>
-					<?php if ( class_exists( 'VanPOS_Logger' ) && VanPOS_Logger::is_enabled() ) : ?>
-					<div class="vanpos-card vanpos-card--info">
-						<h2><?php esc_html_e( 'View Logs', 'vanjorn-rental-pos' ); ?></h2>
-						<p><?php esc_html_e( 'Debug logging is enabled. View logs in WooCommerce status page.', 'vanjorn-rental-pos' ); ?></p>
-						<p><a href="<?php echo esc_url( VanPOS_Logger::get_logs_url() ); ?>" class="button button-primary" target="_blank"><?php esc_html_e( 'View WooCommerce Logs', 'vanjorn-rental-pos' ); ?></a></p>
-					</div>
-					<?php endif; ?>
 				</aside>
 			</div>
 		</div>

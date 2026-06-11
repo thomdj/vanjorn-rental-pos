@@ -3,10 +3,10 @@
 # This file is distributed under the same license as the VAN-Jorn Rental POS package.
 msgid ""
 msgstr ""
-"Project-Id-Version: VAN-Jorn Rental POS 1.9.2\n"
+"Project-Id-Version: VAN-Jorn Rental POS 1.9.3\n"
 "Report-Msgid-Bugs-To: https://www.cmitexperts.com\n"
 "POT-Creation-Date: 2026-05-07 13:04+0000\n"
-"PO-Revision-Date: 2026-06-10 08:59+0000\n"
+"PO-Revision-Date: 2026-06-05 13:21+0000\n"
 "Last-Translator: Thom\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -73,8 +73,8 @@ msgstr "%d Tag"
 #. %d is the number of rental days
 #. %d is the number of days
 #: admin/class-vanpos-admin-add-order.php:128
-#: admin/class-vanpos-admin-modify-booking.php:493
-#: admin/class-vanpos-admin-order-list.php:444
+#: admin/class-vanpos-admin-modify-booking.php:492
+#: admin/class-vanpos-admin-order-list.php:441
 #: frontend/class-vanpos-frontend.php:206
 msgid "%d days"
 msgstr "%d Tage"
@@ -123,7 +123,7 @@ msgstr "2 Wochen (15 Tage)"
 msgid "3 weeks (22 days)"
 msgstr "3 Wochen (22 Tage)"
 
-#: admin/class-vanpos-admin-dashboard-page.php:104
+#: admin/class-vanpos-admin-dashboard-page.php:103
 msgid ""
 "<strong>Calendar:</strong> Cancelling the booking <strong>releases</strong> "
 "reserved dates in the Kestrel calendar."
@@ -131,7 +131,7 @@ msgstr ""
 "<strong>Kalender:</strong> Beim Stornieren der Buchung werden reservierte "
 "Daten im Kestrel-Kalender <strong>freigegeben</strong>."
 
-#: admin/class-vanpos-admin-dashboard-page.php:88
+#: admin/class-vanpos-admin-dashboard-page.php:87
 msgid ""
 "<strong>Calendar:</strong> Moving the booking to Trash <strong>"
 "releases</strong> reserved dates in the Kestrel calendar."
@@ -152,7 +152,7 @@ msgstr ""
 msgid "Action"
 msgstr "Aktion"
 
-#: admin/class-vanpos-admin-dashboard-page.php:353
+#: admin/class-vanpos-admin-dashboard-page.php:324
 #: admin/class-vanpos-aw-cron-debug.php:707
 #: frontend/class-vanpos-dashboard.php:486
 #: frontend/class-vanpos-order-display.php:244
@@ -231,7 +231,7 @@ msgstr "Admin-Notiz (optional)"
 msgid "Adults"
 msgstr "Erwachsene"
 
-#: admin/class-vanpos-admin-dashboard-page.php:670
+#: admin/class-vanpos-admin-dashboard-page.php:639
 msgid "All"
 msgstr "Alle"
 
@@ -239,17 +239,17 @@ msgstr "Alle"
 msgid "All (10 years)"
 msgstr "Alle (10 Jahre)"
 
-#: admin/class-vanpos-admin-order-list.php:518
-#: admin/class-vanpos-admin-order-list.php:558
+#: admin/class-vanpos-admin-order-list.php:515
+#: admin/class-vanpos-admin-order-list.php:555
 msgid "All Order Types"
 msgstr "Alle Bestelltypen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:691
+#: admin/class-vanpos-admin-dashboard-page.php:660
 msgid "All order types"
 msgstr "Alle Bestelltypen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:313
-#: admin/class-vanpos-admin-order-list.php:496
+#: admin/class-vanpos-admin-dashboard-page.php:284
+#: admin/class-vanpos-admin-order-list.php:493
 msgid "All rental products"
 msgstr "Alle Mietprodukte"
 
@@ -289,7 +289,7 @@ msgstr ""
 msgid "Already Run"
 msgstr "Bereits ausgeführt"
 
-#: admin/class-vanpos-admin-dashboard-page.php:89
+#: admin/class-vanpos-admin-dashboard-page.php:88
 msgid ""
 "Also move <strong>all linked payment orders</strong> to <strong>"
 "Trash</strong> (recommended to avoid orphaned orders)."
@@ -298,7 +298,7 @@ msgstr ""
 "den <strong>Papierkorb</strong> (empfohlen, um verwaiste Bestellungen zu "
 "vermeiden)."
 
-#: admin/class-vanpos-admin-dashboard-page.php:105
+#: admin/class-vanpos-admin-dashboard-page.php:104
 msgid ""
 "Also set <strong>all linked payment orders</strong> to <strong>"
 "Cancelled</strong> (recommended to avoid orphaned active orders)."
@@ -318,11 +318,11 @@ msgstr "Betrag"
 msgid "An error occurred. Please try again."
 msgstr "Ein Fehler ist aufgetreten. Bitte versuchen du es erneut."
 
-#: admin/class-vanpos-admin-modify-booking.php:606
+#: admin/class-vanpos-admin-modify-booking.php:602
 msgid "Apply Changes"
 msgstr "Änderungen übernehmen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:334
+#: admin/class-vanpos-admin-dashboard-page.php:305
 msgid "Apply Filters"
 msgstr "Filter anwenden"
 
@@ -330,7 +330,7 @@ msgstr "Filter anwenden"
 msgid "Applying changes…"
 msgstr "Änderungen werden übernommen …"
 
-#: admin/class-vanpos-admin-dashboard-page.php:370
+#: admin/class-vanpos-admin-dashboard-page.php:341
 msgid "Applying filters..."
 msgstr "Filter werden angewendet …"
 
@@ -363,13 +363,13 @@ msgstr "AutomateWoo-Cron-Debug"
 msgid "AutomateWoo Loaded"
 msgstr "AutomateWoo geladen"
 
-#: includes/class-vanpos-change-manager.php:567
-#: includes/class-vanpos-change-manager.php:664
+#: includes/class-vanpos-change-manager.php:541
+#: includes/class-vanpos-change-manager.php:638
 msgid "Availability check failed. Please try again."
 msgstr "Verfügbarkeitsprüfung fehlgeschlagen. Bitte erneut versuchen."
 
 #: admin/class-vanpos-admin-add-order.php:1234
-#: includes/class-vanpos-change-manager.php:630
+#: includes/class-vanpos-change-manager.php:604
 msgid "Availability check not available — proceeding."
 msgstr "Verfügbarkeitsprüfung nicht verfügbar — wird fortgesetzt."
 
@@ -382,7 +382,7 @@ msgid "Available Months"
 msgstr "Verfügbare Monate"
 
 #. %s is a comma-separated list of alternative dates
-#: admin/class-vanpos-admin-modify-booking.php:908
+#: admin/class-vanpos-admin-modify-booking.php:898
 #, php-format
 msgid "Available nearby dates: %s"
 msgstr "Verfügbare Daten in der Nähe: %s"
@@ -423,14 +423,14 @@ msgstr "Buchung über das VAN-Jorn Rental POS-Dashboard storniert."
 msgid "Booking Complete Total"
 msgstr "Buchung Gesamtbetrag"
 
-#: includes/class-vanpos-change-manager.php:381
+#: includes/class-vanpos-change-manager.php:364
 msgid "Booking dates changed — total price locked, no recalculation."
 msgstr ""
 "Die Buchungsdaten haben sich geändert – der Gesamtpreis bleibt unverändert, "
 "eine Neuberechnung ist nicht möglich."
 
 #. %s is the order number
-#: admin/class-vanpos-admin-modify-booking.php:924
+#: admin/class-vanpos-admin-modify-booking.php:914
 #, php-format
 msgid "Booking for order #%s updated successfully."
 msgstr "Buchung für Bestellung Nr. %s erfolgreich aktualisiert."
@@ -441,11 +441,11 @@ msgstr "Buchung für Bestellung Nr. %s erfolgreich aktualisiert."
 msgid "Booking ID: #%s"
 msgstr "Buchungs-ID: #%s"
 
-#: includes/class-vanpos-change-manager.php:460
+#: includes/class-vanpos-change-manager.php:434
 msgid "Booking modification adjustment"
 msgstr "Anpassung der Buchungsänderung"
 
-#: admin/class-vanpos-admin-modify-booking.php:417
+#: admin/class-vanpos-admin-modify-booking.php:416
 msgid "Booking modifications are only available for primary rental orders."
 msgstr "Buchungsänderungen sind nur für primäre Mietbestellungen verfügbar."
 
@@ -509,20 +509,20 @@ msgstr "Berechne…"
 msgid "Call"
 msgstr "Anrufen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:95
-#: admin/class-vanpos-admin-modify-booking.php:609
+#: admin/class-vanpos-admin-dashboard-page.php:94
+#: admin/class-vanpos-admin-modify-booking.php:605
 #: frontend/class-vanpos-frontend.php:268
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:101
-#: admin/class-vanpos-admin-dashboard-page.php:110
-#: admin/class-vanpos-admin-dashboard-page.php:510
+#: admin/class-vanpos-admin-dashboard-page.php:100
+#: admin/class-vanpos-admin-dashboard-page.php:109
+#: admin/class-vanpos-admin-dashboard-page.php:478
 msgid "Cancel booking"
 msgstr "Buchung stornieren"
 
 #. %s: order number
-#: admin/class-vanpos-admin-dashboard-page.php:502
+#: admin/class-vanpos-admin-dashboard-page.php:469
 #, php-format
 msgid "Cancel booking #%s (with optional linked orders)"
 msgstr "Buchung #%s stornieren (mit optionalen verknüpften Bestellungen)"
@@ -531,23 +531,19 @@ msgstr "Buchung #%s stornieren (mit optionalen verknüpften Bestellungen)"
 msgid "Cancel handler not loaded."
 msgstr "Storno-Handler nicht geladen."
 
-#: includes/class-vanpos-change-manager.php:1234
-#| msgid "Cancelled: remaining payment no longer required after date change."
-msgid ""
-"Cancelled: remaining payment no longer required after rental was shortened."
-msgstr ""
-"Storniert: Die Restzahlung ist nach Verkürzung der Mietdauer nicht mehr "
-"erforderlich."
+#: includes/class-vanpos-change-manager.php:1178
+msgid "Cancelled: remaining payment no longer required after date change."
+msgstr "Storniert: Restzahlung nach Datumsänderung nicht mehr erforderlich."
 
-#: includes/class-vanpos-change-manager.php:1410
+#: includes/class-vanpos-change-manager.php:1335
 msgid "Cancelled: superseded by a new date change."
 msgstr "Storniert: durch eine neue Datumsänderung ersetzt."
 
-#: admin/class-vanpos-admin-dashboard-page.php:109
+#: admin/class-vanpos-admin-dashboard-page.php:108
 msgid "Cancelling…"
 msgstr "Wird storniert…"
 
-#: admin/class-vanpos-admin-modify-booking.php:859
+#: admin/class-vanpos-admin-modify-booking.php:849
 msgid "Change Manager not available."
 msgstr "Change Manager nicht verfügbar."
 
@@ -568,7 +564,7 @@ msgstr "%d Tage vor Abholung berechnet, nach Rückgabe erstattet"
 msgid "Checking..."
 msgstr "Wird geprüft..."
 
-#: admin/class-vanpos-admin-order-list.php:334
+#: admin/class-vanpos-admin-order-list.php:331
 msgid "Child Order"
 msgstr "Unterbestellung"
 
@@ -585,7 +581,7 @@ msgstr "Unterbestellung erstellt, konnte aber nicht abgerufen werden."
 msgid "Child order created successfully!"
 msgstr "Unterbestellung erfolgreich erstellt!"
 
-#: admin/class-vanpos-admin-modify-booking.php:70
+#: admin/class-vanpos-admin-modify-booking.php:69
 msgid ""
 "Child order dates, due dates, and AutomateWoo flags will be updated "
 "automatically."
@@ -668,7 +664,7 @@ msgstr "Klicken Sie auf eine Buchung für Details und Aktionen."
 msgid "Click to select"
 msgstr "Klicken zum Auswählen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:111
+#: admin/class-vanpos-admin-dashboard-page.php:110
 #: admin/class-vanpos-bookings-calendar-admin.php:312
 #: admin/class-vanpos-bookings-calendar-admin.php:425
 msgid "Close"
@@ -812,17 +808,18 @@ msgstr "Aktueller Preis: %s"
 msgid "Current Time"
 msgstr "Aktuelle Zeit"
 
-#. 1: daily rate, 2: days, 3: total
-#: includes/class-vanpos-change-manager.php:412
+#. 1: nightly rate, 2: nights, 3: total
+#: includes/class-vanpos-change-manager.php:386
 #, php-format
 #| msgid ""
-#| "Custom rate applied on modification: %1$s/dag × %2$d dagen = %3$s (incl. "
-#| "BTW)."
+#| "Custom daily rate applied on modification: %1$s/day × %2$d days = %3$s "
+#| "(incl. BTW)."
 msgid ""
-"Custom rate applied on modification: %1$s/day × %2$d days = %3$s (incl. VAT)."
+"Custom rate applied on modification: %1$s/night × %2$d nights = %3$s (incl. "
+"BTW)."
 msgstr ""
-"Bei Änderung wird ein individueller Tarif angewendet: %1$s/Tag × %2$d Tage = "
-"%3$s (inkl. MwSt.)."
+"Bei Änderung wird ein individueller Tarif angewendet: %1$s/Nacht × %2$d "
+"Nächte = %3$s (inkl. MwSt.)."
 
 #. 1: nightly rate, 2: nights, 3: total
 #: admin/class-vanpos-admin-add-order.php:1125
@@ -832,8 +829,8 @@ msgstr ""
 "Individueller Preissatz: %1$s/Nacht × %2$d Nächte = %3$s (inkl. MwSt.)."
 
 #: admin/class-vanpos-admin-add-order.php:202
-#: admin/class-vanpos-admin-dashboard-page.php:349
-#: admin/class-vanpos-admin-order-list.php:615
+#: admin/class-vanpos-admin-dashboard-page.php:320
+#: admin/class-vanpos-admin-order-list.php:612
 #: admin/class-vanpos-admin-returns-queue-page.php:278
 #: admin/class-vanpos-aw-cron-debug.php:726
 #: admin/class-vanpos-bookings-calendar-admin.php:317
@@ -850,8 +847,8 @@ msgstr "Kundenkonto erstellt."
 msgid "Customer not found."
 msgstr "Kunde nicht gefunden."
 
+#: admin/class-vanpos-admin-dashboard-page.php:34
 #: admin/class-vanpos-admin-dashboard-page.php:35
-#: admin/class-vanpos-admin-dashboard-page.php:36
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -883,7 +880,7 @@ msgid "Dates required"
 msgstr "Daten erforderlich"
 
 #. %1$s is the new pickup date, %2$s is the new return date
-#: includes/class-vanpos-change-manager.php:1023
+#: includes/class-vanpos-change-manager.php:997
 #, php-format
 msgid "Dates updated from parent order. New pickup: %1$s, new return: %2$s."
 msgstr ""
@@ -898,7 +895,7 @@ msgid_plural "days"
 msgstr[0] "Tag"
 msgstr[1] "Tage"
 
-#: admin/class-vanpos-admin-modify-booking.php:76
+#: admin/class-vanpos-admin-modify-booking.php:75
 msgid "Days"
 msgstr "Tage"
 
@@ -951,7 +948,7 @@ msgstr "Anzahlung (%d%%)"
 msgid "Deposit Percentage"
 msgstr "Anzahlungsprozentsatz"
 
-#: includes/class-vanpos-change-manager.php:1523
+#: includes/class-vanpos-change-manager.php:1448
 msgid "Deposit refund after return"
 msgstr "Kautionsrückerstattung nach Rückgabe"
 
@@ -968,8 +965,8 @@ msgid "Details"
 msgstr "Details"
 
 #. %s: error message from server
-#: admin/class-vanpos-admin-dashboard-page.php:98
-#: admin/class-vanpos-admin-dashboard-page.php:114
+#: admin/class-vanpos-admin-dashboard-page.php:97
+#: admin/class-vanpos-admin-dashboard-page.php:113
 #: admin/class-vanpos-admin-returns-queue-page.php:129
 #, php-format
 msgid "Details: %s"
@@ -1000,7 +997,7 @@ msgstr "Fahrerdetails"
 msgid "Driver details"
 msgstr "Fahrerdaten"
 
-#: admin/class-vanpos-admin-order-list.php:446
+#: admin/class-vanpos-admin-order-list.php:443
 #: frontend/class-vanpos-dashboard.php:562
 msgid "Due"
 msgstr "Fällig"
@@ -1009,9 +1006,9 @@ msgstr "Fällig"
 msgid "Due Before Pickup"
 msgstr "Fällig vor Abholung"
 
-#: admin/class-vanpos-admin-dashboard-page.php:347
-#: admin/class-vanpos-admin-order-list.php:358
-#: admin/class-vanpos-admin-order-list.php:367
+#: admin/class-vanpos-admin-dashboard-page.php:318
+#: admin/class-vanpos-admin-order-list.php:355
+#: admin/class-vanpos-admin-order-list.php:364
 #: admin/class-vanpos-aw-cron-debug.php:728
 #: frontend/class-vanpos-dashboard.php:484
 #: frontend/class-vanpos-order-display.php:242
@@ -1027,11 +1024,11 @@ msgstr "Fälligkeitsdatum"
 msgid "Due Date:"
 msgstr "Fälligkeitsdatum:"
 
-#: admin/class-vanpos-admin-dashboard-page.php:673
+#: admin/class-vanpos-admin-dashboard-page.php:642
 msgid "Due Payments"
 msgstr "Fällige Zahlungen"
 
-#: admin/class-vanpos-admin-order-list.php:442
+#: admin/class-vanpos-admin-order-list.php:439
 msgid "Due Today"
 msgstr "Heute fällig"
 
@@ -1045,7 +1042,7 @@ msgstr "Fällig: %s"
 msgid "Duration"
 msgstr "Dauer"
 
-#: admin/class-vanpos-admin-modify-booking.php:488
+#: admin/class-vanpos-admin-modify-booking.php:487
 msgid "Duration:"
 msgstr "Dauer:"
 
@@ -1065,7 +1062,7 @@ msgstr "Bestellung bearbeiten"
 msgid "Edit Product"
 msgstr "Produkt bearbeiten"
 
-#: admin/class-vanpos-admin-modify-booking.php:559
+#: admin/class-vanpos-admin-modify-booking.php:558
 msgid ""
 "Edit to re-rate this booking. Total becomes rate × rental days. Leave "
 "unchanged to keep the existing rate."
@@ -1128,11 +1125,11 @@ msgstr "Vormittag/Nachmittag-Zeitfenster aktivieren"
 msgid "Enable Time Slots"
 msgstr "Zeitfenster aktivieren"
 
-#: admin/class-vanpos-admin-dashboard-page.php:346
+#: admin/class-vanpos-admin-dashboard-page.php:317
 msgid "End Date"
 msgstr "Enddatum"
 
-#: admin/class-vanpos-admin-order-list.php:241
+#: admin/class-vanpos-admin-order-list.php:238
 msgid "End date"
 msgstr "Enddatum"
 
@@ -1288,6 +1285,12 @@ msgstr "Vollzahlung (kurzfristig)"
 msgid "Full Payment:"
 msgstr "Vollständige Zahlung:"
 
+#: includes/class-vanpos-change-manager.php:1212
+msgid "Full refund — remaining payment no longer required after date change."
+msgstr ""
+"Volle Rückerstattung — Restzahlung nach Datumsänderung nicht mehr "
+"erforderlich."
+
 #: admin/class-vanpos-bookings-calendar-admin.php:221
 msgid ""
 "FullCalendar bundle is missing. Reinstall the plugin or restore "
@@ -1296,7 +1299,7 @@ msgstr ""
 "FullCalendar-Bundle fehlt. Installieren Sie das Plugin neu oder stellen Sie "
 "admin/vendor/fullcalendar/index.global.min.js wieder her."
 
-#: admin/class-vanpos-admin-order-list.php:424
+#: admin/class-vanpos-admin-order-list.php:421
 msgid "Fully Paid"
 msgstr "Vollständig bezahlt"
 
@@ -1312,7 +1315,7 @@ msgstr "Deutschland"
 msgid "Grand total"
 msgstr "Gesamtbetrag"
 
-#: admin/class-vanpos-admin-dashboard-overview-query.php:809
+#: admin/class-vanpos-admin-dashboard-overview-query.php:498
 msgid "Guest"
 msgstr "Gast"
 
@@ -1394,8 +1397,8 @@ msgstr "Interne Notiz, nur für Administratoren sichtbar…"
 msgid "Invalid booking action."
 msgstr "Ungültige Buchungsaktion."
 
-#: admin/class-vanpos-admin-modify-booking.php:642
-#: admin/class-vanpos-admin-modify-booking.php:848
+#: admin/class-vanpos-admin-modify-booking.php:638
+#: admin/class-vanpos-admin-modify-booking.php:838
 msgid "Invalid date format. Expected YYYY-MM-DD."
 msgstr "Ungültiges Datumsformat. Erwartet: JJJJ-MM-TT."
 
@@ -1418,10 +1421,10 @@ msgstr "Ungültige Bestellnummer."
 msgid "Invalid order object."
 msgstr "Ungültiges Bestellobjekt."
 
-#: includes/class-vanpos-change-manager.php:241
-#: includes/class-vanpos-change-manager.php:1458
-#: includes/class-vanpos-change-manager.php:1478
-#: includes/class-vanpos-change-manager.php:1501
+#: includes/class-vanpos-change-manager.php:229
+#: includes/class-vanpos-change-manager.php:1383
+#: includes/class-vanpos-change-manager.php:1403
+#: includes/class-vanpos-change-manager.php:1426
 #: includes/class-vanpos-rental-returned.php:159
 msgid "Invalid order."
 msgstr "Ungültige Bestellung."
@@ -1459,8 +1462,8 @@ msgstr "Ungültiges Kautionsprodukt."
 msgid "Invalid security token."
 msgstr "Ungültiges Sicherheitstoken."
 
-#: admin/class-vanpos-admin-modify-booking.php:648
-#: admin/class-vanpos-admin-modify-booking.php:854
+#: admin/class-vanpos-admin-modify-booking.php:644
+#: admin/class-vanpos-admin-modify-booking.php:844
 msgid "Invalid time format. Expected HH:MM (24-hour)."
 msgstr "Ungültiges Zeitformat. Erwartet: HH:MM (24-Stunden)."
 
@@ -1553,12 +1556,12 @@ msgstr "Erwerbsdatum Führerschein:"
 msgid "Limited availability (1-2)"
 msgstr "Begrenzte Verfügbarkeit (1-2)"
 
-#: admin/class-vanpos-admin-dashboard-page.php:92
+#: admin/class-vanpos-admin-dashboard-page.php:91
 msgid "Linked orders that can be moved to Trash:"
 msgstr ""
 "Verknüpfte Bestellungen, die in den Papierkorb verschoben werden können:"
 
-#: admin/class-vanpos-admin-dashboard-page.php:108
+#: admin/class-vanpos-admin-dashboard-page.php:107
 msgid "Linked orders that can be set to Cancelled:"
 msgstr "Verknüpfte Bestellungen, die auf Storniert gesetzt werden können:"
 
@@ -1567,7 +1570,7 @@ msgstr "Verknüpfte Bestellungen, die auf Storniert gesetzt werden können:"
 msgid "Loading calendar…"
 msgstr "Kalender wird geladen …"
 
-#: admin/class-vanpos-admin-dashboard-page.php:79
+#: admin/class-vanpos-admin-dashboard-page.php:78
 msgid "Loading dashboard data..."
 msgstr "Dashboard-Daten werden geladen …"
 
@@ -1584,12 +1587,12 @@ msgstr "Status wird geladen …"
 msgid "Loading vans..."
 msgstr "Busse werden geladen..."
 
-#: admin/class-vanpos-admin-modify-booking.php:575
+#: admin/class-vanpos-admin-modify-booking.php:574
 msgid "Lock total price"
 msgstr "Gesamtpreis sperren"
 
 #. %s is the current formatted rental total
-#: admin/class-vanpos-admin-modify-booking.php:571
+#: admin/class-vanpos-admin-modify-booking.php:570
 #, php-format
 msgid "Lock total price (%s)"
 msgstr "Gesamtpreis sperren (%s)"
@@ -1620,10 +1623,10 @@ msgstr ""
 "nicht als zurückgegeben markiert sind. Das Markieren als zurückgegeben gibt "
 "den Bus im Buchungskalender sofort frei."
 
-#: admin/class-vanpos-admin-dashboard-overview-query.php:676
-#: admin/class-vanpos-admin-order-list.php:342
-#: admin/class-vanpos-admin-order-list.php:519
-#: admin/class-vanpos-admin-order-list.php:559
+#: admin/class-vanpos-admin-dashboard-overview-query.php:380
+#: admin/class-vanpos-admin-order-list.php:339
+#: admin/class-vanpos-admin-order-list.php:516
+#: admin/class-vanpos-admin-order-list.php:556
 #: includes/class-vanpos-order-title.php:177
 #: includes/class-vanpos-order-title.php:558
 #: includes/class-vanpos-order-title.php:616
@@ -1638,7 +1641,7 @@ msgstr "Hauptbestellung"
 msgid "Main order (WooCommerce)"
 msgstr "Hauptbestellung (WooCommerce)"
 
-#: admin/class-vanpos-admin-dashboard-page.php:692
+#: admin/class-vanpos-admin-dashboard-page.php:661
 msgid "Main orders only"
 msgstr "Nur Hauptbestellungen"
 
@@ -1723,7 +1726,6 @@ msgstr "Minimale Miettage"
 msgid "Minimum rental period is %d days."
 msgstr "Die Mindestmietdauer beträgt %d Tage."
 
-#: admin/class-vanpos-admin-dashboard-page.php:246
 #: includes/class-vanpos-rental-returned.php:206
 msgid "Missing order ID."
 msgstr "Bestell-ID fehlt."
@@ -1738,16 +1740,16 @@ msgid "Missing required dates."
 msgstr "Pflichtdaten fehlen."
 
 #: admin/class-vanpos-admin-add-order.php:566
-#: admin/class-vanpos-admin-modify-booking.php:636
-#: admin/class-vanpos-admin-modify-booking.php:842
+#: admin/class-vanpos-admin-modify-booking.php:632
+#: admin/class-vanpos-admin-modify-booking.php:832
 #: frontend/class-vanpos-frontend.php:424
 #: frontend/class-vanpos-frontend.php:528
 #: frontend/class-vanpos-remaining-slots.php:380
 msgid "Missing required fields."
 msgstr "Pflichtfelder fehlen."
 
-#: admin/class-vanpos-admin-modify-booking.php:392
-#: admin/class-vanpos-admin-modify-booking.php:509
+#: admin/class-vanpos-admin-modify-booking.php:391
+#: admin/class-vanpos-admin-modify-booking.php:508
 msgid "Modify Booking"
 msgstr "Buchung ändern"
 
@@ -1761,22 +1763,22 @@ msgid "Monday"
 msgstr "Montag"
 
 #. %s: order number
-#: admin/class-vanpos-admin-dashboard-page.php:517
+#: admin/class-vanpos-admin-dashboard-page.php:485
 #, php-format
 msgid "Move booking #%s to Trash (with optional linked orders)"
 msgstr ""
 "Buchung #%s in den Papierkorb verschieben (mit optionalen verknüpften "
 "Bestellungen)"
 
-#: admin/class-vanpos-admin-dashboard-page.php:85
+#: admin/class-vanpos-admin-dashboard-page.php:84
 msgid "Move booking to Trash"
 msgstr "Buchung in den Papierkorb verschieben"
 
-#: admin/class-vanpos-admin-dashboard-page.php:94
+#: admin/class-vanpos-admin-dashboard-page.php:93
 msgid "Move to Trash"
 msgstr "In den Papierkorb"
 
-#: admin/class-vanpos-admin-dashboard-page.php:93
+#: admin/class-vanpos-admin-dashboard-page.php:92
 msgid "Moving to Trash…"
 msgstr "Wird in den Papierkorb verschoben…"
 
@@ -1807,20 +1809,20 @@ msgstr "Niederlande"
 msgid "New values are the same as the current booking."
 msgstr "Die neuen Werte entsprechen der aktuellen Buchung."
 
-#: admin/class-vanpos-admin-dashboard-page.php:596
+#: admin/class-vanpos-admin-dashboard-page.php:565
 #: admin/class-vanpos-admin-returns-queue-page.php:469
 msgid "Next"
 msgstr "Weiter"
 
-#: admin/class-vanpos-admin-dashboard-page.php:683
+#: admin/class-vanpos-admin-dashboard-page.php:652
 msgid "Next 3 days"
 msgstr "Nächste 3 Tage"
 
-#: admin/class-vanpos-admin-dashboard-page.php:685
+#: admin/class-vanpos-admin-dashboard-page.php:654
 msgid "Next 30 days"
 msgstr "Nächste 30 Tage"
 
-#: admin/class-vanpos-admin-dashboard-page.php:684
+#: admin/class-vanpos-admin-dashboard-page.php:653
 msgid "Next 7 days"
 msgstr "Nächste 7 Tage"
 
@@ -1836,15 +1838,6 @@ msgstr "Nächste Ausführung (UTC)"
 msgid "Next year"
 msgstr "Nächstes Jahr"
 
-#: admin/class-vanpos-admin-modify-booking.php:68
-msgid ""
-"No automatic refund will be issued. If you apply this change, a note with "
-"refund details will be added to the order for manual review by support staff."
-msgstr ""
-"Es erfolgt keine automatische Rückerstattung. Wenn Sie diese Änderung "
-"vornehmen, wird der Bestellung ein Vermerk mit den Rückerstattungsdetails "
-"zur manuellen Überprüfung durch den Support hinzugefügt."
-
 #: admin/class-vanpos-admin-add-order.php:112
 msgid "No customers found."
 msgstr "Keine Kunden gefunden."
@@ -1854,7 +1847,7 @@ msgid "No equipment available"
 msgstr "Keine Ausstattung verfügbar"
 
 #. %s: main booking order number (highlighted in JavaScript)
-#: admin/class-vanpos-admin-dashboard-page.php:91
+#: admin/class-vanpos-admin-dashboard-page.php:90
 #, php-format
 msgid ""
 "No linked payment orders were found for booking %s. Only this <strong>main "
@@ -1864,7 +1857,7 @@ msgstr ""
 "diese <strong>Hauptbestellung</strong> wird in den Papierkorb verschoben."
 
 #. %s: main booking order number (highlighted in JavaScript)
-#: admin/class-vanpos-admin-dashboard-page.php:107
+#: admin/class-vanpos-admin-dashboard-page.php:106
 #, php-format
 msgid ""
 "No linked payment orders were found for booking %s. Only this <strong>main "
@@ -1898,8 +1891,8 @@ msgstr ""
 msgid "No payment orders created yet."
 msgstr "Noch keine Zahlungsbestellungen erstellt."
 
-#: admin/class-vanpos-admin-modify-booking.php:685
-#: includes/class-vanpos-change-manager.php:257
+#: admin/class-vanpos-admin-modify-booking.php:680
+#: includes/class-vanpos-change-manager.php:245
 msgid "No product found in order."
 msgstr "Kein Produkt in der Bestellung gefunden."
 
@@ -1908,16 +1901,6 @@ msgstr "Kein Produkt in der Bestellung gefunden."
 #: admin/class-vanpos-admin-order-edit.php:294
 msgid "No remaining amount to collect."
 msgstr "Kein Restbetrag einzuziehen."
-
-#. %s: refund amount
-#: includes/class-vanpos-change-manager.php:1213
-#, php-format
-msgid ""
-"No remaining payment order found. Consider issuing a refund of %s from this "
-"order."
-msgstr ""
-"Es wurde kein weiterer Zahlungsauftrag gefunden. Erwägen Sie eine "
-"Rückerstattung von %s aus diesem Auftrag."
 
 #: includes/class-vanpos-bookings-calendar-query.php:325
 msgid "No remaining rental balance on this booking."
@@ -1946,7 +1929,7 @@ msgstr ""
 msgid "No rentals waiting to be marked returned"
 msgstr "Keine Mieten, die auf die Markierung als zurückgegeben warten"
 
-#: admin/class-vanpos-admin-dashboard-page.php:544
+#: admin/class-vanpos-admin-dashboard-page.php:513
 msgid "No results found"
 msgstr "Keine Ergebnisse gefunden"
 
@@ -1954,7 +1937,7 @@ msgstr "Keine Ergebnisse gefunden"
 msgid "No security deposit amount configured for this booking."
 msgstr "Für diese Buchung ist kein Kautionsbetrag konfiguriert."
 
-#: includes/class-vanpos-change-manager.php:1516
+#: includes/class-vanpos-change-manager.php:1441
 msgid "No security deposit order found."
 msgstr "Keine Kautionsbestellung gefunden."
 
@@ -2003,7 +1986,7 @@ msgid "Not available - requires 3 days advance notice"
 msgstr "Nicht verfügbar - erfordert 3 Tage Vorlaufzeit"
 
 #. %s is a comma-separated list of extension order references
-#: includes/class-vanpos-change-manager.php:1345
+#: includes/class-vanpos-change-manager.php:1270
 #, php-format
 msgid ""
 "Note: paid extension order(s) %s exist from prior date changes. Review "
@@ -2063,7 +2046,7 @@ msgstr ""
 msgid "October"
 msgstr "Oktober"
 
-#: admin/class-vanpos-admin-order-list.php:404
+#: admin/class-vanpos-admin-order-list.php:401
 #, php-format
 msgid "on %s"
 msgstr "am %s"
@@ -2089,7 +2072,7 @@ msgstr "Optionen"
 msgid "or select a month"
 msgstr "oder Monat auswählen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:343
+#: admin/class-vanpos-admin-dashboard-page.php:314
 #: admin/class-vanpos-admin-order-edit.php:120
 #: admin/class-vanpos-admin-order-edit.php:295
 #: admin/class-vanpos-admin-returns-queue-page.php:277
@@ -2160,7 +2143,7 @@ msgstr "Bestelldatum"
 msgid "Order ID"
 msgstr "Bestellnummer"
 
-#: includes/class-vanpos-change-manager.php:246
+#: includes/class-vanpos-change-manager.php:234
 msgid "Order is not a primary rental order."
 msgstr "Bestellung ist keine primäre Mietbestellung."
 
@@ -2178,18 +2161,18 @@ msgstr "Bestell-Metadaten"
 
 #: admin/class-vanpos-admin-ajax.php:33 admin/class-vanpos-admin-ajax.php:132
 #: admin/class-vanpos-admin-ajax.php:167
-#: admin/class-vanpos-admin-modify-booking.php:654
+#: admin/class-vanpos-admin-modify-booking.php:650
 #: admin/class-vanpos-admin-order-edit.php:141
 #: includes/class-vanpos-order-deletion.php:88
 msgid "Order not found."
 msgstr "Bestellung nicht gefunden."
 
-#: admin/class-vanpos-admin-order-list.php:614
-#: admin/class-vanpos-admin-order-list.php:833
+#: admin/class-vanpos-admin-order-list.php:611
+#: admin/class-vanpos-admin-order-list.php:766
 msgid "Order number"
 msgstr "Bestellnummer"
 
-#: admin/class-vanpos-admin-dashboard-page.php:321
+#: admin/class-vanpos-admin-dashboard-page.php:292
 #| msgid "Order, product, customer"
 msgid "Order number, product, customer"
 msgstr "Bestellnummer, Produkt, Kunde"
@@ -2202,11 +2185,11 @@ msgstr "Auftragseinstellungen"
 msgid "Order status"
 msgstr "Auftragsstatus"
 
-#: admin/class-vanpos-admin-order-list.php:305
+#: admin/class-vanpos-admin-order-list.php:302
 msgid "Order Type"
 msgstr "Bestelltyp"
 
-#: admin/class-vanpos-admin-dashboard-page.php:324
+#: admin/class-vanpos-admin-dashboard-page.php:295
 #: admin/class-vanpos-bookings-calendar-admin.php:318
 msgid "Order type"
 msgstr "Bestelltyp"
@@ -2223,7 +2206,7 @@ msgstr "Bestellungen"
 msgid "Original price"
 msgstr "Originalpreis"
 
-#: admin/class-vanpos-admin-dashboard-page.php:695
+#: admin/class-vanpos-admin-dashboard-page.php:664
 msgid "Other payment orders"
 msgstr "Andere Zahlungsbestellungen"
 
@@ -2231,7 +2214,7 @@ msgstr "Andere Zahlungsbestellungen"
 msgid "Our vans"
 msgstr "Unsere Busse"
 
-#: admin/class-vanpos-admin-order-list.php:440
+#: admin/class-vanpos-admin-order-list.php:437
 #: frontend/class-vanpos-dashboard.php:532
 #: frontend/class-vanpos-dashboard.php:564
 #: frontend/class-vanpos-order-display.php:278
@@ -2247,7 +2230,7 @@ msgstr "Überfällig auf dieser Seite"
 msgid "Overdue only"
 msgstr "Nur überfällig"
 
-#: admin/class-vanpos-admin-modify-booking.php:591
+#: admin/class-vanpos-admin-modify-booking.php:590
 msgid "Override — apply changes despite unavailability"
 msgstr "Überschreiben — Änderungen trotz Nichtverfügbarkeit übernehmen"
 
@@ -2255,13 +2238,13 @@ msgstr "Überschreiben — Änderungen trotz Nichtverfügbarkeit übernehmen"
 msgid "Override — create order despite unavailability"
 msgstr "Überschreiben — Auftrag trotz Nichtverfügbarkeit erstellen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:595
+#: admin/class-vanpos-admin-dashboard-page.php:564
 #: admin/class-vanpos-admin-returns-queue-page.php:468
 #, php-format
 msgid "Page %1$d of %2$d"
 msgstr "Seite %1$d von %2$d"
 
-#: admin/class-vanpos-admin-order-list.php:399
+#: admin/class-vanpos-admin-order-list.php:396
 #: frontend/class-vanpos-dashboard.php:472
 #: frontend/class-vanpos-dashboard.php:548
 #: frontend/class-vanpos-order-display.php:296
@@ -2296,7 +2279,7 @@ msgstr "Informationen zur Hauptbestellung"
 msgid "Parent Orders — Issues"
 msgstr "Hauptbestellungen — Probleme"
 
-#: admin/class-vanpos-admin-order-list.php:336
+#: admin/class-vanpos-admin-order-list.php:333
 #, php-format
 msgid "Parent: %s"
 msgstr "Hauptbestellung: %s"
@@ -2365,7 +2348,7 @@ msgstr "Zahlung"
 msgid "Payment for order %s"
 msgstr "Zahlung für Bestellung %s"
 
-#: admin/class-vanpos-admin-dashboard-overview-query.php:689
+#: admin/class-vanpos-admin-dashboard-overview-query.php:393
 #: frontend/class-vanpos-order-display.php:345
 msgid "Payment Order"
 msgstr "Zahlungsbestellung"
@@ -2431,7 +2414,7 @@ msgstr "Ausstehend"
 msgid "Pending payment"
 msgstr "Zahlung ausstehend"
 
-#: admin/class-vanpos-admin-dashboard-page.php:397
+#: admin/class-vanpos-admin-dashboard-page.php:368
 #: frontend/class-vanpos-dashboard.php:353
 msgid "Pending Payments"
 msgstr "Ausstehende Zahlungen"
@@ -2453,10 +2436,9 @@ msgstr ""
 #: admin/class-vanpos-admin-add-order.php:639
 #: admin/class-vanpos-admin-ajax.php:25 admin/class-vanpos-admin-ajax.php:124
 #: admin/class-vanpos-admin-ajax.php:159
-#: admin/class-vanpos-admin-dashboard-page.php:208
-#: admin/class-vanpos-admin-dashboard-page.php:241
-#: admin/class-vanpos-admin-modify-booking.php:620
-#: admin/class-vanpos-admin-modify-booking.php:825
+#: admin/class-vanpos-admin-dashboard-page.php:207
+#: admin/class-vanpos-admin-modify-booking.php:616
+#: admin/class-vanpos-admin-modify-booking.php:815
 #: admin/class-vanpos-admin-order-delete-cascade.php:83
 #: admin/class-vanpos-admin-order-delete-cascade.php:160
 #: admin/class-vanpos-admin-returns-queue-page.php:184
@@ -2476,7 +2458,7 @@ msgstr "Telefon"
 msgid "Phone:"
 msgstr "Telefon:"
 
-#: admin/class-vanpos-admin-modify-booking.php:74
+#: admin/class-vanpos-admin-modify-booking.php:73
 #: admin/class-vanpos-aw-cron-debug.php:729
 #: admin/class-vanpos-bookings-calendar-admin.php:314
 #: admin/class-vanpos-meta-backfill.php:1834
@@ -2491,7 +2473,7 @@ msgstr ""
 "abgeschlossen."
 
 #: admin/class-vanpos-admin-add-order.php:361
-#: admin/class-vanpos-admin-modify-booking.php:531
+#: admin/class-vanpos-admin-modify-booking.php:530
 #: includes/class-vanpos-deposit-manager.php:1269
 #: includes/class-vanpos-deposit-manager.php:1275
 #: includes/class-vanpos-functions.php:1729
@@ -2522,8 +2504,8 @@ msgid "Pickup Time"
 msgstr "Abholzeit"
 
 #: admin/class-vanpos-admin-add-order.php:365
-#: admin/class-vanpos-admin-modify-booking.php:80
-#: admin/class-vanpos-admin-modify-booking.php:536
+#: admin/class-vanpos-admin-modify-booking.php:79
+#: admin/class-vanpos-admin-modify-booking.php:535
 #: includes/class-vanpos-deposit-manager.php:1271
 #: includes/class-vanpos-deposit-manager.php:1277
 #: includes/class-vanpos-functions.php:1746
@@ -2535,7 +2517,7 @@ msgstr "Abholzeit"
 msgid "Pickup/Return Days"
 msgstr "Abhol-/Rückgabetage"
 
-#: admin/class-vanpos-admin-modify-booking.php:474
+#: admin/class-vanpos-admin-modify-booking.php:473
 msgid "Pickup:"
 msgstr "Abholung:"
 
@@ -2545,7 +2527,7 @@ msgstr "Abholung:"
 msgid "Pickup: %s"
 msgstr "Abholung: %s"
 
-#: admin/class-vanpos-admin-dashboard-page.php:671
+#: admin/class-vanpos-admin-dashboard-page.php:640
 #: admin/class-vanpos-bookings-calendar-admin.php:303
 msgid "Pickups"
 msgstr "Abholungen"
@@ -2567,11 +2549,11 @@ msgstr "—"
 msgid "Please check console for details and refresh the page."
 msgstr "Bitte prüfe die Konsole für Details und aktualisiere die Seite."
 
-#: admin/class-vanpos-admin-modify-booking.php:83
+#: admin/class-vanpos-admin-modify-booking.php:82
 msgid "Please enter valid dates in YYYY-MM-DD format."
 msgstr "Bitte geben Sie gültige Daten im Format JJJJ-MM-TT ein."
 
-#: admin/class-vanpos-admin-modify-booking.php:84
+#: admin/class-vanpos-admin-modify-booking.php:83
 msgid "Please enter valid times in HH:MM 24-hour format."
 msgstr "Bitte geben Sie gültige Zeiten im 24-Stunden-Format HH:MM ein."
 
@@ -2595,11 +2577,11 @@ msgstr "Bitte wähle Abhol- und Rückgabezeitfenster."
 msgid "Postcode"
 msgstr "Postleitzahl"
 
-#: admin/class-vanpos-admin-dashboard-page.php:279
+#: admin/class-vanpos-admin-dashboard-page.php:250
 msgid "Premium operational overview for bookings, payments and pickups."
 msgstr "Premium-Betriebsübersicht für Buchungen, Zahlungen und Abholungen."
 
-#: admin/class-vanpos-admin-modify-booking.php:603
+#: admin/class-vanpos-admin-modify-booking.php:599
 msgid "Preview Impact"
 msgstr "Auswirkung anzeigen"
 
@@ -2607,7 +2589,7 @@ msgstr "Auswirkung anzeigen"
 msgid "Preview Orders"
 msgstr "Bestellungen anzeigen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:594
+#: admin/class-vanpos-admin-dashboard-page.php:563
 #: admin/class-vanpos-admin-returns-queue-page.php:467
 msgid "Previous"
 msgstr "Vorherige"
@@ -2628,8 +2610,10 @@ msgstr "Preisübersicht"
 
 #: admin/class-vanpos-admin-modify-booking.php:67
 #, php-format
-msgid "Price decreases by %s — rental shortened."
-msgstr "Preissenkungen um %s – Mietdauer verkürzt."
+msgid "Price decreases by %s — a refund will be issued on the parent order."
+msgstr ""
+"Preis sinkt um %s — eine Rückerstattung wird auf der Hauptbestellung "
+"ausgelöst."
 
 #: admin/trait-vanpos-admin-settings-fields.php:125
 msgid "Price for the cleaning service option."
@@ -2649,7 +2633,7 @@ msgid "Price per day"
 msgstr "Preis pro Tag"
 
 #: admin/class-vanpos-admin-add-order.php:390
-#: admin/class-vanpos-admin-modify-booking.php:551
+#: admin/class-vanpos-admin-modify-booking.php:550
 msgid "Price per day (incl. BTW)"
 msgstr "Preis pro Tag (inkl. MwSt.)"
 
@@ -2661,9 +2645,9 @@ msgstr "Preisübersicht"
 msgid "Processing"
 msgstr "In Bearbeitung"
 
-#: admin/class-vanpos-admin-dashboard-page.php:311
-#: admin/class-vanpos-admin-dashboard-page.php:348
-#: admin/class-vanpos-admin-order-list.php:239
+#: admin/class-vanpos-admin-dashboard-page.php:282
+#: admin/class-vanpos-admin-dashboard-page.php:319
+#: admin/class-vanpos-admin-order-list.php:236
 msgid "Product"
 msgstr "Produkt"
 
@@ -2696,11 +2680,11 @@ msgstr "Schnellstart"
 msgid "Quick summary"
 msgstr "Kurzübersicht"
 
-#: admin/class-vanpos-admin-dashboard-page.php:303
+#: admin/class-vanpos-admin-dashboard-page.php:274
 msgid "Range"
 msgstr "Bereich"
 
-#: admin/class-vanpos-admin-order-list.php:402
+#: admin/class-vanpos-admin-order-list.php:399
 msgid "Refunded — deposit returned"
 msgstr "Erstattet — Kaution zurückgegeben"
 
@@ -2709,7 +2693,7 @@ msgstr "Erstattet — Kaution zurückgegeben"
 msgid "Refunds cannot be handled here."
 msgstr "Rückerstattungen können hier nicht bearbeitet werden."
 
-#: admin/class-vanpos-admin-modify-booking.php:78
+#: admin/class-vanpos-admin-modify-booking.php:77
 msgid "Remaining"
 msgstr "Verbleibend"
 
@@ -2743,9 +2727,9 @@ msgstr "Verbleibend auf Buchung (geplant)"
 msgid "Remaining order #%s"
 msgstr "Restbestellung Nr. %s"
 
-#: admin/class-vanpos-admin-dashboard-overview-query.php:683
-#: admin/class-vanpos-admin-order-list.php:521
-#: admin/class-vanpos-admin-order-list.php:561
+#: admin/class-vanpos-admin-dashboard-overview-query.php:387
+#: admin/class-vanpos-admin-order-list.php:518
+#: admin/class-vanpos-admin-order-list.php:558
 #: frontend/class-vanpos-dashboard.php:502
 #: includes/class-vanpos-order-title.php:199
 #: includes/class-vanpos-order-title.php:554
@@ -2777,53 +2761,18 @@ msgstr "Restzahlung Tage vor Abholung"
 msgid "Remaining payment order"
 msgstr "Restzahlungsbestellung"
 
-#. 1: child order number, 2: initial payment amount, 3: overpayment amount
-#: includes/class-vanpos-change-manager.php:1245
-#, php-format
-msgid ""
-"Remaining payment order #%1$s has been cancelled. Initial payment (%2$s) "
-"exceeds the new total by %3$s. Consider issuing a refund of %3$s from this "
-"order."
-msgstr ""
-"Die verbleibende Zahlungsanweisung Nr. %1$s wurde storniert. Die erste "
-"Zahlung (%2$s) ist um %3$s höher als der neue Gesamtbetrag. Bitte erstatten "
-"Sie %3$s für diese Anweisung."
-
-#. 1: child order number, 2: child total, 3: initial payment, 4: overpayment
-#: includes/class-vanpos-change-manager.php:1294
-#, php-format
-msgid ""
-"Remaining payment order #%1$s was paid (%2$s) — full refund recommended. "
-"Initial payment (%3$s) also exceeds the new total by %4$s. Consider "
-"refunding %2$s from order #%1$s and %4$s from this order."
-msgstr ""
-"Die verbleibende Zahlung für Bestellung Nr. 1$s wurde geleistet (%2$s) – "
-"eine vollständige Rückerstattung wird empfohlen. Die erste Zahlung (%3$s) "
-"übersteigt den neuen Gesamtbetrag um %4$s. Wir empfehlen, %2$s von "
-"Bestellung Nr. 1$s und %4$s dieser Bestellung zurückzuerstatten."
-
-#. 1: child order number, 2: paid amount, 3: refund amount
-#: includes/class-vanpos-change-manager.php:1279
-#, php-format
-msgid ""
-"Remaining payment order #%1$s was paid (%2$s). Consider issuing a partial "
-"refund of %3$s from order #%1$s."
-msgstr ""
-"Der Restbetrag der Bestellung Nr. %1$s wurde bezahlt (%2$s). Bitte erwägen "
-"Sie eine Teilrückerstattung von %3$s der Bestellung Nr. %1$s."
-
 #: admin/class-vanpos-admin-order-edit.php:114
 #: admin/class-vanpos-admin-order-edit.php:294
 msgid "Remaining payment order already exists."
 msgstr "Restzahlungsbestellung existiert bereits."
 
 #. %1$s is the old amount, %2$s is the new amount
-#: includes/class-vanpos-change-manager.php:1155
+#: includes/class-vanpos-change-manager.php:1129
 #, php-format
 msgid "Remaining payment updated from %1$s to %2$s due to date change."
 msgstr "Restzahlung von %1$s auf %2$s aufgrund Datumsänderung aktualisiert."
 
-#: admin/class-vanpos-admin-dashboard-page.php:694
+#: admin/class-vanpos-admin-dashboard-page.php:663
 msgid "Remaining payments"
 msgstr "Restzahlungen"
 
@@ -2920,6 +2869,18 @@ msgstr "Mietauftrag #%s erfolgreich erstellt."
 msgid "Rental Payment Orders"
 msgstr "Miet-Zahlungsbestellungen"
 
+#: includes/class-vanpos-change-manager.php:1163
+#: includes/class-vanpos-change-manager.php:1203
+msgid "Rental period adjustment refund"
+msgstr "Rückerstattung Mietdaueranpassung"
+
+#: includes/class-vanpos-change-manager.php:1188
+#: includes/class-vanpos-change-manager.php:1221
+msgid "Rental period adjustment refund — initial payment exceeds new total."
+msgstr ""
+"Erstattung Anpassung Mietzeitraum — die Erstzahlung übersteigt die neue "
+"Gesamtsumme."
+
 #. %1$d is the minimum rental days, %2$d is the maximum rental days
 #: frontend/class-vanpos-frontend.php:197
 #, php-format
@@ -2930,28 +2891,6 @@ msgstr "Die Mietdauer muss zwischen %1$d und %2$d Tagen liegen."
 msgid "Rental price"
 msgstr "Mietpreis"
 
-#. 1: old booking total, 2: new booking total, 3: decrease amount
-#: includes/class-vanpos-change-manager.php:1201
-#, php-format
-msgid ""
-"Rental shortened — manual refund check required. Booking total: %1$s → %2$s "
-"(decrease: %3$s)."
-msgstr ""
-"Mietdauer verkürzt – manuelle Rückerstattung erforderlich. "
-"Buchungsgesamtbetrag: %1$s → %2$s (Ermäßigung: %3$s)."
-
-#. 1: old total, 2: new total, 3: decrease amount, 4: child order number
-#: includes/class-vanpos-change-manager.php:1257
-#, php-format
-msgid ""
-"Rental shortened. Booking total: %1$s → %2$s (decrease: %3$s). Remaining "
-"payment order #%4$s has been cancelled. Initial payment exactly covers the "
-"new total — no refund required."
-msgstr ""
-"Mietdauer verkürzt. Gesamtbuchungsbetrag: %1$s → %2$s (Reduzierung: %3$s). "
-"Die verbleibende Zahlungsanweisung Nr. %4$s wurde storniert. Die erste "
-"Zahlung deckt den neuen Gesamtbetrag ab – keine Rückerstattung erforderlich."
-
 #: frontend/class-vanpos-dashboard.php:417
 msgid "Rental Start"
 msgstr "Mietbeginn"
@@ -2960,7 +2899,7 @@ msgstr "Mietbeginn"
 msgid "Rental timeline"
 msgstr "Miet-Zeitachse"
 
-#: admin/class-vanpos-admin-dashboard-page.php:335
+#: admin/class-vanpos-admin-dashboard-page.php:306
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -2968,14 +2907,14 @@ msgstr "Zurücksetzen"
 msgid "Reset to default"
 msgstr "Auf Standardeinstellungen zurücksetzen"
 
-#: admin/class-vanpos-admin-modify-booking.php:75
+#: admin/class-vanpos-admin-modify-booking.php:74
 #: admin/class-vanpos-bookings-calendar-admin.php:315
 #: frontend/class-vanpos-frontend.php:179
 msgid "Return"
 msgstr "Rückgabe"
 
 #: admin/class-vanpos-admin-add-order.php:372
-#: admin/class-vanpos-admin-modify-booking.php:541
+#: admin/class-vanpos-admin-modify-booking.php:540
 #: admin/class-vanpos-admin-returns-queue-page.php:280
 #: includes/class-vanpos-deposit-manager.php:1270
 #: includes/class-vanpos-deposit-manager.php:1276
@@ -2986,12 +2925,12 @@ msgstr "Rückgabedatum"
 
 #: admin/class-vanpos-admin-add-order.php:584
 #: admin/class-vanpos-admin-add-order.php:722
-#: admin/class-vanpos-admin-modify-booking.php:705
-#: includes/class-vanpos-change-manager.php:293
+#: admin/class-vanpos-admin-modify-booking.php:700
+#: includes/class-vanpos-change-manager.php:281
 msgid "Return date must be after pickup date."
 msgstr "Rückgabedatum muss nach dem Abholdatum liegen."
 
-#: admin/class-vanpos-admin-modify-booking.php:79
+#: admin/class-vanpos-admin-modify-booking.php:78
 msgid "Return date must be after the pickup date."
 msgstr "Das Rückgabedatum muss nach dem Abholdatum liegen."
 
@@ -3010,8 +2949,8 @@ msgid "Return Time"
 msgstr "Rückgabezeit"
 
 #: admin/class-vanpos-admin-add-order.php:376
-#: admin/class-vanpos-admin-modify-booking.php:81
-#: admin/class-vanpos-admin-modify-booking.php:546
+#: admin/class-vanpos-admin-modify-booking.php:80
+#: admin/class-vanpos-admin-modify-booking.php:545
 #: includes/class-vanpos-deposit-manager.php:1272
 #: includes/class-vanpos-deposit-manager.php:1278
 #: includes/class-vanpos-functions.php:1755
@@ -3019,13 +2958,13 @@ msgstr "Rückgabezeit"
 msgid "Return time"
 msgstr "Rückgabezeit"
 
-#: admin/class-vanpos-admin-modify-booking.php:82
-#: admin/class-vanpos-admin-modify-booking.php:711
-#: includes/class-vanpos-change-manager.php:300
+#: admin/class-vanpos-admin-modify-booking.php:81
+#: admin/class-vanpos-admin-modify-booking.php:706
+#: includes/class-vanpos-change-manager.php:288
 msgid "Return time must be after pickup time on the same day."
 msgstr "Die Rückgabezeit muss nach der Abholzeit am selben Tag liegen."
 
-#: admin/class-vanpos-admin-modify-booking.php:481
+#: admin/class-vanpos-admin-modify-booking.php:480
 msgid "Return:"
 msgstr "Rückgabe:"
 
@@ -3035,7 +2974,7 @@ msgstr "Rückgabe:"
 msgid "Return: %s"
 msgstr "Rückgabe: %s"
 
-#: admin/class-vanpos-admin-dashboard-page.php:672
+#: admin/class-vanpos-admin-dashboard-page.php:641
 #: admin/class-vanpos-bookings-calendar-admin.php:304
 msgid "Returns"
 msgstr "Rückgaben"
@@ -3094,7 +3033,7 @@ msgstr "Bestellungen scannen"
 msgid "Scheduled"
 msgstr "Geplant"
 
-#: admin/class-vanpos-admin-dashboard-page.php:320
+#: admin/class-vanpos-admin-dashboard-page.php:291
 #: admin/class-vanpos-admin-returns-queue-page.php:255
 #: admin/class-vanpos-bookings-calendar-admin.php:308
 #: admin/class-vanpos-bookings-calendar-admin.php:394
@@ -3142,11 +3081,11 @@ msgstr "Sicherheitsprüfung fehlgeschlagen."
 msgid "Security check failed. Please refresh the page."
 msgstr "Sicherheitsprüfung fehlgeschlagen. Bitte aktualisiere die Seite."
 
-#: admin/class-vanpos-admin-dashboard-overview-query.php:680
+#: admin/class-vanpos-admin-dashboard-overview-query.php:384
 #: admin/class-vanpos-admin-order-edit.php:329
 #: admin/class-vanpos-admin-order-edit.php:330
-#: admin/class-vanpos-admin-order-list.php:520
-#: admin/class-vanpos-admin-order-list.php:560
+#: admin/class-vanpos-admin-order-list.php:517
+#: admin/class-vanpos-admin-order-list.php:557
 #: frontend/class-vanpos-dashboard.php:500
 #: frontend/class-vanpos-frontend.php:231
 #: includes/class-vanpos-order-title.php:183
@@ -3224,11 +3163,11 @@ msgstr "Kautionsprodukt nicht konfiguriert."
 msgid "Security Deposit:"
 msgstr "Kaution:"
 
-#: admin/class-vanpos-admin-dashboard-page.php:407
+#: admin/class-vanpos-admin-dashboard-page.php:378
 msgid "Security Deposits"
 msgstr "Kautionen"
 
-#: admin/class-vanpos-admin-dashboard-page.php:693
+#: admin/class-vanpos-admin-dashboard-page.php:662
 msgid "Security deposits"
 msgstr "Kautionen"
 
@@ -3352,8 +3291,8 @@ msgstr ""
 "Da Ihre Abholung innerhalb von %d Tagen liegt, ist die vollständige Zahlung "
 "jetzt erforderlich."
 
-#: admin/class-vanpos-admin-dashboard-page.php:96
-#: admin/class-vanpos-admin-dashboard-page.php:112
+#: admin/class-vanpos-admin-dashboard-page.php:95
+#: admin/class-vanpos-admin-dashboard-page.php:111
 #: frontend/class-vanpos-remaining-slots.php:82
 msgid "Something went wrong. Please try again."
 msgstr "Etwas ist schiefgelaufen. Bitte versuche es erneut."
@@ -3370,11 +3309,11 @@ msgstr "Spezifikationen"
 msgid "staff"
 msgstr "Mitarbeiter"
 
-#: admin/class-vanpos-admin-dashboard-page.php:345
+#: admin/class-vanpos-admin-dashboard-page.php:316
 msgid "Start Date"
 msgstr "Startdatum"
 
-#: admin/class-vanpos-admin-order-list.php:240
+#: admin/class-vanpos-admin-order-list.php:237
 msgid "Start date"
 msgstr "Startdatum"
 
@@ -3382,7 +3321,7 @@ msgstr "Startdatum"
 msgid "Start typing…"
 msgstr "Tippen Sie los…"
 
-#: admin/class-vanpos-admin-dashboard-page.php:350
+#: admin/class-vanpos-admin-dashboard-page.php:321
 #: admin/class-vanpos-admin-order-edit.php:120
 #: admin/class-vanpos-admin-order-edit.php:295
 #: admin/class-vanpos-admin-returns-queue-page.php:281
@@ -3467,8 +3406,8 @@ msgstr ""
 "Die auf dem Kalender und in Buchungsbestätigungen angezeigte Rückgabezeit. "
 "Standard: 11:00."
 
-#: admin/class-vanpos-admin-modify-booking.php:696
-#: includes/class-vanpos-change-manager.php:268
+#: admin/class-vanpos-admin-modify-booking.php:691
+#: includes/class-vanpos-change-manager.php:256
 msgid "The selected van does not exist."
 msgstr "Das ausgewählte Fahrzeug existiert nicht."
 
@@ -3505,14 +3444,14 @@ msgstr ""
 "Diese Bestellung scheint eine Mietbestellung zu sein, es fehlen jedoch "
 "einige Metadaten. Klicke auf die Schaltfläche unten, um sie zu aktualisieren."
 
-#: admin/class-vanpos-admin-modify-booking.php:557
+#: admin/class-vanpos-admin-modify-booking.php:556
 msgid ""
 "This order has been paid — the daily rate is locked and cannot be changed."
 msgstr ""
 "Diese Bestellung wurde bezahlt – der Tagessatz ist fixiert und kann nicht "
 "mehr geändert werden."
 
-#: admin/class-vanpos-admin-modify-booking.php:867
+#: admin/class-vanpos-admin-modify-booking.php:857
 msgid "This order has been paid — the price cannot be changed."
 msgstr ""
 "Diese Bestellung wurde bezahlt – der Preis kann nicht mehr geändert werden."
@@ -3580,7 +3519,7 @@ msgstr ""
 msgid "To van page"
 msgstr "Zur Busseite"
 
-#: admin/class-vanpos-admin-dashboard-page.php:682
+#: admin/class-vanpos-admin-dashboard-page.php:651
 #: admin/class-vanpos-bookings-calendar-admin.php:302
 msgid "Today"
 msgstr "Heute"
@@ -3593,7 +3532,7 @@ msgstr ""
 "Das heutige Datum liegt nicht in diesem Kalenderfenster — die erste Zeile "
 "zeigt weiterhin die realen Abholungen/Rückgaben von heute."
 
-#: admin/class-vanpos-admin-dashboard-page.php:351
+#: admin/class-vanpos-admin-dashboard-page.php:322
 #: admin/class-vanpos-aw-cron-debug.php:727
 #: admin/class-vanpos-bookings-calendar-admin.php:326
 #: frontend/class-vanpos-dashboard.php:485
@@ -3604,16 +3543,16 @@ msgstr "Gesamt"
 msgid "total"
 msgstr "gesamt"
 
-#: admin/class-vanpos-admin-dashboard-page.php:392
+#: admin/class-vanpos-admin-dashboard-page.php:363
 #: frontend/class-vanpos-dashboard.php:336
 msgid "Total Orders"
 msgstr "Bestellungen gesamt"
 
-#: admin/class-vanpos-admin-modify-booking.php:77
+#: admin/class-vanpos-admin-modify-booking.php:76
 msgid "Total price"
 msgstr "Gesamtpreis"
 
-#: admin/class-vanpos-admin-modify-booking.php:69
+#: admin/class-vanpos-admin-modify-booking.php:68
 msgid "Total price is unchanged."
 msgstr "Der Gesamtpreis ist unverändert."
 
@@ -3625,7 +3564,7 @@ msgstr "Gesamtmietpreis"
 msgid "Total to Pay Now"
 msgstr "Jetzt zu zahlender Gesamtbetrag"
 
-#: admin/class-vanpos-admin-modify-booking.php:501
+#: admin/class-vanpos-admin-modify-booking.php:500
 #: includes/class-vanpos-item-display.php:130
 msgid "Total:"
 msgstr "Gesamt:"
@@ -3634,7 +3573,7 @@ msgstr "Gesamt:"
 msgid "Transmission"
 msgstr "Getriebe"
 
-#: admin/class-vanpos-admin-dashboard-page.php:525
+#: admin/class-vanpos-admin-dashboard-page.php:494
 msgid "Trash booking"
 msgstr "Buchung in Papierkorb"
 
@@ -3646,7 +3585,7 @@ msgstr "Reisende"
 msgid "Trigger Registered"
 msgstr "Trigger registriert"
 
-#: admin/class-vanpos-admin-dashboard-page.php:545
+#: admin/class-vanpos-admin-dashboard-page.php:514
 msgid "Try changing filters or search query."
 msgstr "Versuchen Sie, die Filter oder Suchanfrage zu ändern."
 
@@ -3659,7 +3598,7 @@ msgstr "Di"
 msgid "Tuesday"
 msgstr "Dienstag"
 
-#: admin/class-vanpos-admin-dashboard-page.php:344
+#: admin/class-vanpos-admin-dashboard-page.php:315
 #: admin/class-vanpos-admin-order-edit.php:120
 #: admin/class-vanpos-admin-order-edit.php:295
 #: admin/class-vanpos-meta-backfill.php:1848
@@ -3671,7 +3610,7 @@ msgstr "Typ"
 msgid "United Kingdom"
 msgstr "Vereinigtes Königreich"
 
-#: admin/class-vanpos-admin-dashboard-page.php:402
+#: admin/class-vanpos-admin-dashboard-page.php:373
 msgid "Upcoming Pickups"
 msgstr "Kommende Abholungen"
 
@@ -3718,8 +3657,8 @@ msgid "Value"
 msgstr "Wert"
 
 #: admin/class-vanpos-admin-add-order.php:130
-#: admin/class-vanpos-admin-modify-booking.php:73
-#: admin/class-vanpos-admin-modify-booking.php:519
+#: admin/class-vanpos-admin-modify-booking.php:72
+#: admin/class-vanpos-admin-modify-booking.php:518
 msgid "Van"
 msgstr "Van"
 
@@ -3730,18 +3669,18 @@ msgstr "Van / Produkt"
 #: admin/class-vanpos-admin-add-order.php:124
 #: admin/class-vanpos-admin-add-order.php:1215
 #: admin/class-vanpos-admin-add-order.php:1226
-#: admin/class-vanpos-admin-modify-booking.php:71
-#: includes/class-vanpos-change-manager.php:609
-#: includes/class-vanpos-change-manager.php:621
+#: admin/class-vanpos-admin-modify-booking.php:70
+#: includes/class-vanpos-change-manager.php:583
+#: includes/class-vanpos-change-manager.php:595
 msgid "Van is available for the selected dates."
 msgstr "Van ist für die gewählten Daten verfügbar."
 
 #: admin/class-vanpos-admin-add-order.php:125
 #: admin/class-vanpos-admin-add-order.php:1216
 #: admin/class-vanpos-admin-add-order.php:1227
-#: admin/class-vanpos-admin-modify-booking.php:72
-#: includes/class-vanpos-change-manager.php:610
-#: includes/class-vanpos-change-manager.php:622
+#: admin/class-vanpos-admin-modify-booking.php:71
+#: includes/class-vanpos-change-manager.php:584
+#: includes/class-vanpos-change-manager.php:596
 msgid "Van is not available for the selected dates."
 msgstr "Van ist für die gewählten Daten nicht verfügbar."
 
@@ -3771,11 +3710,11 @@ msgstr ""
 msgid "VAN-Jorn Rental POS sections"
 msgstr "VAN-Jorn Rental POS-Bereiche"
 
-#: admin/class-vanpos-admin-dashboard-page.php:278
+#: admin/class-vanpos-admin-dashboard-page.php:249
 msgid "VAN-Jorn Rentals Dashboard"
 msgstr "VAN-Jorn Rental Dashboard"
 
-#: admin/class-vanpos-admin-modify-booking.php:470
+#: admin/class-vanpos-admin-modify-booking.php:469
 msgid "Van:"
 msgstr "Fahrzeug:"
 
@@ -3795,12 +3734,12 @@ msgstr "VanPOS-Metadaten"
 msgid "VanPOS Meta Backfill"
 msgstr "VanPOS Meta-Nachpflege"
 
-#: admin/class-vanpos-admin-modify-booking.php:720
+#: admin/class-vanpos-admin-modify-booking.php:715
 msgid "VanPOS_Functions not available."
 msgstr "VanPOS_Functions nicht verfügbar."
 
 #. %d is the WooCommerce tax rate ID
-#: includes/class-vanpos-change-manager.php:1141
+#: includes/class-vanpos-change-manager.php:1115
 msgid "VAT-%d"
 msgstr "MwSt.-%d"
 
@@ -3808,7 +3747,7 @@ msgstr "MwSt.-%d"
 msgid "Vehicle"
 msgstr "Bus"
 
-#: admin/class-vanpos-admin-dashboard-page.php:295
+#: admin/class-vanpos-admin-dashboard-page.php:266
 msgid "View"
 msgstr "Ansehen"
 
@@ -3841,7 +3780,7 @@ msgstr "WooCommerce-Protokolle anzeigen"
 msgid "Visible period"
 msgstr "Sichtbarer Zeitraum"
 
-#: includes/class-vanpos-change-manager.php:515
+#: includes/class-vanpos-change-manager.php:489
 msgid ""
 "Warning: Kestrel reservation rows could not be created for the new dates. "
 "The van may appear available to other bookings. Please check the reservation "
@@ -3874,7 +3813,7 @@ msgstr "Wochenende (inklusive)"
 msgid "Welcome back, %s!"
 msgstr "Willkommen zurück, %s!"
 
-#: admin/class-vanpos-admin-modify-booking.php:580
+#: admin/class-vanpos-admin-modify-booking.php:579
 msgid ""
 "When checked, the rental total stays exactly as-is regardless of date "
 "changes."
@@ -3936,7 +3875,7 @@ msgid "You don't have any active rental bookings at the moment."
 msgstr "du hast derzeit keine aktiven Mietbuchungen."
 
 #. %s: main booking order number (e.g. #5259-A), wrapped in a highlight in JavaScript
-#: admin/class-vanpos-admin-dashboard-page.php:87
+#: admin/class-vanpos-admin-dashboard-page.php:86
 #, php-format
 msgid ""
 "You selected booking order %s — the <strong>main rental booking</strong>. "
@@ -3949,7 +3888,7 @@ msgstr ""
 "ein."
 
 #. %s: main booking order number (e.g. #5259-A), wrapped in a highlight in JavaScript
-#: admin/class-vanpos-admin-dashboard-page.php:103
+#: admin/class-vanpos-admin-dashboard-page.php:102
 #, php-format
 msgid ""
 "You selected booking order %s — the <strong>main rental booking</strong>. "

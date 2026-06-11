@@ -183,14 +183,14 @@ class VanPOS_Order_Title_Manager {
 				$type_label = __( 'Security Deposit', 'vanjorn-rental-pos' );
 				break;
 
-			case 'deposit_payment':
+			case 'initial_payment':
 				$base_number = self::get_parent_base_number( $order );
-				$suffix_letter = 'D';
+				$suffix_letter = 'I';
 				$deposit_pct = class_exists( 'VanPOS_Functions' )
 					? (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 )
 					: 50;
-				/* translators: %d is the deposit percentage */
-				$type_label = sprintf( __( 'Deposit Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
+				/* translators: %d is the initial payment percentage */
+				$type_label = sprintf( __( 'Initial Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
 				break;
 
 			case 'remaining_payment':
@@ -419,13 +419,13 @@ class VanPOS_Order_Title_Manager {
 			return 'security_deposit';
 		}
 
-		// Check for 50% initial deposit payment
-		if ( $payment_type === 'deposit' ) {
-			return 'deposit_payment';
+		// Check for initial payment (upfront percentage)
+		if ( $payment_type === 'initial' ) {
+			return 'initial_payment';
 		}
 
 		// Check for remaining payment
-		if ( in_array( $payment_type, array( 'remaining', 'second_payment' ), true ) ) {
+		if ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			return 'remaining_payment';
 		}
 
@@ -542,12 +542,12 @@ class VanPOS_Order_Title_Manager {
 					$type_label = __( 'Security Deposit', 'vanjorn-rental-pos' );
 					break;
 
-				case 'deposit_payment':
+				case 'initial_payment':
 					$deposit_pct = class_exists( 'VanPOS_Functions' )
 						? (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 )
 						: 50;
-					/* translators: %d is the deposit percentage */
-					$type_label = sprintf( __( 'Deposit Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
+					/* translators: %d is the initial payment percentage */
+					$type_label = sprintf( __( 'Initial Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
 					break;
 
 				case 'remaining_payment':
@@ -624,13 +624,13 @@ class VanPOS_Order_Title_Manager {
 				$base_number   = self::get_parent_base_number( $order );
 				break;
 
-			case 'deposit_payment':
-				$suffix_letter = 'D';
+			case 'initial_payment':
+				$suffix_letter = 'I';
 				$deposit_pct   = class_exists( 'VanPOS_Functions' )
 					? (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 )
 					: 50;
-				/* translators: %d is the deposit percentage */
-				$type_label  = sprintf( __( 'Deposit Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
+				/* translators: %d is the initial payment percentage */
+				$type_label  = sprintf( __( 'Initial Payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct );
 				$base_number = self::get_parent_base_number( $order );
 				break;
 

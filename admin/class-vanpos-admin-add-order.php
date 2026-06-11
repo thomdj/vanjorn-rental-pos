@@ -972,7 +972,14 @@ class VanPOS_Admin_Add_Order {
 		// Explicit VAT tax item row
 		if ( $initial_tax > 0 ) {
 			$tax_item = new WC_Order_Item_Tax();
-			$tax_item->set_name( 'VAT-1' );
+			// Resolve the rate label from WC tax tables (e.g. "BTW 21%") so the
+			// parent order matches child orders built by update_child_order_amount().
+			$rate_label = class_exists( 'WC_Tax' ) ? WC_Tax::get_rate_label( $vat_rate_id ) : '';
+			if ( ! $rate_label ) {
+				/* translators: %d is the WooCommerce tax rate ID */
+				$rate_label = sprintf( __( 'VAT-%d', 'vanjorn-rental-pos' ), $vat_rate_id );
+			}
+			$tax_item->set_name( $rate_label );
 			$tax_item->set_rate_id( $vat_rate_id );
 			$tax_item->set_tax_total( $initial_tax );
 			$tax_item->set_shipping_tax_total( 0 );
@@ -990,7 +997,12 @@ class VanPOS_Admin_Add_Order {
 		$order->update_meta_data( '_vanpos_rental_days', $days );
 		$order->update_meta_data( '_vanpos_rental_nights', $nights );
 		$order->update_meta_data( '_vanpos_total_price', $total_price );
-		$order->update_meta_data( '_vanpos_initial_payment', $deposit_payment );
+		// _vanpos_initial_payment must record what the parent order actually charges.
+		// When $create_remaining is true this equals $deposit_payment (the split half);
+		// when false (full payment collected now) it equals $total_price. Using
+		// $deposit_payment here instead would cause update_missing_rental_metadata()
+		// to back-derive a phantom 50% remaining that was never owed.
+		$order->update_meta_data( '_vanpos_initial_payment', $initial_payment );
 		$order->update_meta_data( '_vanpos_remaining_payment', $remaining_payment );
 		// Explicit false defaults; the child-order factories flip these to 'yes' when
 		// the corresponding remaining / security-deposit child is actually created.
@@ -1024,9 +1036,9 @@ class VanPOS_Admin_Add_Order {
 		if ( $return_date ) {
 			$order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'd-m-Y', strtotime( $return_date ) ) );
 		}
-		$order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( $total_price ) ) );
-		$order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( $deposit_payment ) ) );
-		$order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( $remaining_payment ) ) );
+		$order->update_meta_data( '_vanpos_total_price_formatted', VanPOS_Order_Manager::format_price( $total_price ) );
+		$order->update_meta_data( '_vanpos_initial_payment_formatted', VanPOS_Order_Manager::format_price( $initial_payment ) );
+		$order->update_meta_data( '_vanpos_remaining_payment_formatted', VanPOS_Order_Manager::format_price( $remaining_payment ) );
 
 		// NOTE: _vanpos_custom_order_title is NOT set here deliberately.
 		// VanPOS_Order_Title_Manager hooks into woocommerce_after_order_object_save

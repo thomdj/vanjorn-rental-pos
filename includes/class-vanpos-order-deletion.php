@@ -12,33 +12,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 class VanPOS_Order_Deletion {
 
 	/**
-	 * CMIT CODE - UPDATED - 05 MAY 2026
-	 * Same rules as admin order-edit: primary rental vs payment order vs heuristic.
+	 * Delegate to the single source of truth: VanPOS_Order_Manager::is_primary_rental_order().
+	 *
+	 * Previously carried its own copy of the detection logic with a subtly looser
+	 * order_type gate — only 'payment_order' triggered an early false, while
+	 * VanPOS_Order_Manager returns false for any non-empty non-'primary_rental' type.
+	 * Both callers (this class and VanPOS_Admin_Order_Edit) now route through
+	 * Order Manager so the rules are defined and maintained in one place.
 	 *
 	 * @param WC_Order $order Order object.
 	 * @return bool
 	 */
 	public static function is_primary_rental_order( $order ) {
-		if ( ! $order || ! is_a( $order, 'WC_Order' ) ) {
-			return false;
+		// Single source of truth lives in VanPOS_Order_Manager.
+		if ( class_exists( 'VanPOS_Order_Manager' ) ) {
+			return VanPOS_Order_Manager::is_primary_rental_order( $order );
 		}
 
-		$order_type = $order->get_meta( '_vanpos_order_type' );
-		if ( 'primary_rental' === $order_type ) {
+		// Fallback: mirrors VanPOS_Order_Manager::is_primary_rental_order() exactly,
+		// including the stricter '' !== $type gate — any set-but-unrecognised
+		// _vanpos_order_type returns false rather than falling through to heuristics.
+		// Keep in sync if Order Manager's detection logic ever changes.
+		if ( ! $order instanceof WC_Order ) {
+			return false;
+		}
+		$type = (string) $order->get_meta( '_vanpos_order_type' );
+		if ( 'primary_rental' === $type ) {
 			return true;
 		}
-		if ( 'payment_order' === $order_type ) {
+		if ( '' !== $type ) {
 			return false;
 		}
 		if ( $order->get_meta( '_vanpos_pickup_date' ) || $order->get_meta( '_vanpos_return_date' ) || $order->get_meta( '_vanpos_total_price' ) ) {
 			return true;
 		}
 		foreach ( $order->get_items() as $item ) {
-			if ( $item->get_meta( 'vanpos_pickup_date' ) || $item->get_meta( 'vanpos_return_date' ) || $item->get_meta( 'wcrp_rental_products_rent_from' ) || $item->get_meta( 'wcrp_rental_products_rent_to' ) || $item->get_meta( '_vanpos_original_price' ) ) {
+			if ( $item->get_meta( 'vanpos_pickup_date' )
+				|| $item->get_meta( 'vanpos_return_date' )
+				|| $item->get_meta( 'wcrp_rental_products_rent_from' )
+				|| $item->get_meta( 'wcrp_rental_products_rent_to' )
+				|| $item->get_meta( '_vanpos_original_price' ) ) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -124,9 +140,6 @@ class VanPOS_Order_Deletion {
 
 		foreach ( VanPOS_Order_Manager::get_payment_orders( $primary_order_id ) as $child_order ) {
 			if ( ! is_a( $child_order, 'WC_Order' ) ) {
-				continue;
-			}
-			if ( $child_order instanceof WC_Order_Refund ) {
 				continue;
 			}
 			$child_id = (int) $child_order->get_id();

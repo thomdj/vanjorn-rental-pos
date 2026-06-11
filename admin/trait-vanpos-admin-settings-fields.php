@@ -159,12 +159,22 @@ trait VanPOS_Admin_Settings_Fields {
 	}
 
 	public function render_due_date_days_field() {
-		$settings = VanPOS_Functions::get_settings();
-		$value    = isset( $settings['vanpos_due_date_days'] ) ? $settings['vanpos_due_date_days'] : 7;
+		$settings    = VanPOS_Functions::get_settings();
+		$value       = isset( $settings['vanpos_due_date_days'] ) ? $settings['vanpos_due_date_days'] : 7;
+		$deposit_pct = isset( $settings['vanpos_deposit_percentage'] ) ? (int) $settings['vanpos_deposit_percentage'] : 50;
+		$remaining   = 100 - $deposit_pct;
 		?>
 		<input type="number" name="vanpos_settings[vanpos_due_date_days]" value="<?php echo esc_attr( $value ); ?>" min="0" step="1">
 		<span><?php esc_html_e( 'days', 'vanjorn-rental-pos' ); ?></span>
-		<p class="description"><?php esc_html_e( 'Number of days before pickup date that the remaining (second 50%) payment is due. Default: 7 days.', 'vanjorn-rental-pos' ); ?></p>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %d is the remaining payment percentage */
+				esc_html__( 'Number of days before pickup date that the remaining %d%% payment is due. Default: 7 days.', 'vanjorn-rental-pos' ),
+				$remaining
+			);
+			?>
+		</p>
 		<?php
 	}
 
@@ -199,19 +209,4 @@ trait VanPOS_Admin_Settings_Fields {
 		<?php
 	}
 
-	public function render_logging_enabled_field() {
-		$settings = VanPOS_Functions::get_settings();
-		$value    = isset( $settings['vanpos_logging_enabled'] ) ? $settings['vanpos_logging_enabled'] : 'no';
-		$logs_url = class_exists( 'VanPOS_Logger' ) ? VanPOS_Logger::get_logs_url() : admin_url( 'admin.php?page=wc-status&tab=logs' );
-		?>
-		<label>
-			<input type="checkbox" name="vanpos_settings[vanpos_logging_enabled]" value="yes" <?php checked( $value, 'yes' ); ?>>
-			<?php esc_html_e( 'Enable debug logging', 'vanjorn-rental-pos' ); ?>
-		</label>
-		<p class="description"><?php esc_html_e( 'When enabled, detailed debug information will be logged to WooCommerce logs. Logs are stored in wp-content/uploads/wc-logs/ and can be viewed from the WooCommerce status page.', 'vanjorn-rental-pos' ); ?></p>
-		<?php if ( 'yes' === $value ) : ?>
-			<p><a href="<?php echo esc_url( $logs_url ); ?>" class="button button-secondary" target="_blank"><?php esc_html_e( 'View Logs', 'vanjorn-rental-pos' ); ?></a></p>
-		<?php endif; ?>
-		<?php
-	}
 }

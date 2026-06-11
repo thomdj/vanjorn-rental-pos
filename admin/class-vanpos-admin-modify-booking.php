@@ -63,7 +63,7 @@ class VanPOS_Admin_Modify_Booking {
 				'error'             => __( 'Error', 'vanjorn-rental-pos' ),
 				'noChange'          => __( 'New values are the same as the current booking.', 'vanjorn-rental-pos' ),
 				'selectBothDates'   => __( 'Please select both a pickup date and a return date.', 'vanjorn-rental-pos' ),
-				'priceIncrease'     => __( 'Price increases by %s — an extension payment order will be created.', 'vanjorn-rental-pos' ),
+				'priceIncrease'     => __( 'Price increases by %s — an extension payment order will be created if the remaining payment order has already been paid.', 'vanjorn-rental-pos' ),
 				'priceDecrease'     => __( 'Price decreases by %s — rental shortened.', 'vanjorn-rental-pos' ),
 				'shorteningRefundNote' => __( 'No automatic refund will be issued. If you apply this change, a note with refund details will be added to the order for manual review by support staff.', 'vanjorn-rental-pos' ),
 				'priceUnchanged'    => __( 'Total price is unchanged.', 'vanjorn-rental-pos' ),
@@ -407,16 +407,14 @@ class VanPOS_Admin_Modify_Booking {
 			return;
 		}
 
-		// Only show on primary rental orders
-		$order_type = $order->get_meta( '_vanpos_order_type' );
-		if ( 'primary_rental' !== $order_type ) {
-			// Also check the broader detection
-			$pickup = $order->get_meta( '_vanpos_pickup_date' );
-			$return = $order->get_meta( '_vanpos_return_date' );
-			if ( 'payment_order' === $order_type || ( ! $pickup && ! $return ) ) {
-				echo '<p class="description">' . esc_html__( 'Booking modifications are only available for primary rental orders.', 'vanjorn-rental-pos' ) . '</p>';
-				return;
-			}
+		// Delegate to the single source of truth so detection is consistent with
+		// VanPOS_Admin_Ajax and VanPOS_Admin_Order_Edit. The Order Manager correctly
+		// handles typed orders ('primary_rental'), legacy untyped orders with rental
+		// dates, and explicitly non-rental types (returns false for any non-empty
+		// type that isn't 'primary_rental', e.g. 'payment_order').
+		if ( ! class_exists( 'VanPOS_Order_Manager' ) || ! VanPOS_Order_Manager::is_primary_rental_order( $order ) ) {
+			echo '<p class="description">' . esc_html__( 'Booking modifications are only available for primary rental orders.', 'vanjorn-rental-pos' ) . '</p>';
+			return;
 		}
 
 		$pickup_date = $order->get_meta( '_vanpos_pickup_date' );
@@ -548,7 +546,7 @@ class VanPOS_Admin_Modify_Booking {
 			</div>
 
 			<div class="vanpos-cd-field">
-				<label for="vanpos-cd-price-per-day"><?php esc_html_e( 'Price per day (incl. BTW)', 'vanjorn-rental-pos' ); ?></label>
+				<label for="vanpos-cd-price-per-day"><?php esc_html_e( 'Price per day (incl. VAT)', 'vanjorn-rental-pos' ); ?></label>
 				<input type="number" id="vanpos-cd-price-per-day" step="0.01" min="0" inputmode="decimal"
 					value="<?php echo esc_attr( $current_daily_rate ? number_format( $current_daily_rate, 2, '.', '' ) : '' ); ?>"
 					data-suggested="<?php echo esc_attr( $current_daily_rate ? number_format( $current_daily_rate, 2, '.', '' ) : '' ); ?>"
@@ -667,8 +665,8 @@ class VanPOS_Admin_Modify_Booking {
 		$old_pickup_time = $order->get_meta( '_vanpos_pickup_time' ) ?: $this->get_default_pickup_time();
 		$old_return_time = $order->get_meta( '_vanpos_return_time' ) ?: $this->get_default_return_time();
 		$old_total       = (float) $order->get_meta( '_vanpos_total_price' );
-		// Delta fix: pricing now uses inclusive calendar days, matching change_dates() and
-		// calculate_modification_price_for_order(). Switch both sides of the comparison.
+		// Delta fix: price is now calculated on inclusive calendar days, matching the
+		// unit used in calculate_modification_price_for_order() and change_dates().
 		$old_days = class_exists( 'VanPOS_Functions' )
 			? VanPOS_Functions::rental_days_for_order( $order )
 			: max( 1, (int) $order->get_meta( '_vanpos_rental_days' ) );
@@ -722,7 +720,7 @@ class VanPOS_Admin_Modify_Booking {
 		}
 
 		// When the price is locked, skip calculation entirely and return the stored total.
-		// Otherwise use the locked per-night rate (or catalogue) via calculate_modification_price_for_order().
+		// Otherwise use the delta approach (stored daily rate or catalogue) via calculate_modification_price_for_order().
 		if ( $lock_price ) {
 			$new_total  = $old_total;
 			$price_diff = 0;
@@ -784,13 +782,16 @@ class VanPOS_Admin_Modify_Booking {
 			'new_product_id'     => $effective_product_id,
 			'new_product_name'   => $product->get_name(),
 			'product_changed'    => $product_changed,
-			// Combined change detection
+			// Combined change detection.
+			// Include price diff so an admin-supplied rate change with no date/van
+			// change still surfaces in the preview table and enables the Apply button.
 			'booking_changed'    => (
 				$old_pickup !== $new_pickup_date
 				|| $old_return !== $new_return_date
 				|| $old_pickup_time !== $new_pickup_time
 				|| $old_return_time !== $new_return_time
 				|| $product_changed
+				|| abs( $price_diff ) > 0.01
 			),
 			'dates_changed'      => (
 				$old_pickup !== $new_pickup_date
@@ -811,9 +812,7 @@ class VanPOS_Admin_Modify_Booking {
 			'old_days_display'   => $old_days,
 			'new_days_display'   => $new_days,
 			// Signals the JS to show the manual-refund reminder below the price decrease line.
-			// Set for any price decrease regardless of child order payment status — the
-			// reminder is slightly over-cautious for the unpaid+still-positive case
-			// (where only an amount reduction occurs) but that is harmless.
+			// Set for any price decrease regardless of child order payment status.
 			'refund_warning'     => $price_diff < -0.01,
 		) );
 	}

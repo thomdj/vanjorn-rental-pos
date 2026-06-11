@@ -38,8 +38,6 @@ trait VanPOS_Admin_Settings_Registration {
 		add_settings_field( 'vanpos_due_date_days', __( 'Remaining Payment Days Before Pickup', 'vanjorn-rental-pos' ), array( $this, 'render_due_date_days_field' ), 'vanjorn-rental-pos', 'vanpos_deposit_section' );
 		add_settings_field( 'vanpos_security_deposit_product_id', __( 'Security Deposit Product', 'vanjorn-rental-pos' ), array( $this, 'render_security_deposit_product_field' ), 'vanjorn-rental-pos', 'vanpos_deposit_section' );
 
-		add_settings_section( 'vanpos_logging_section', __( 'Logging Settings', 'vanjorn-rental-pos' ), array( $this, 'render_logging_section' ), 'vanjorn-rental-pos' );
-		add_settings_field( 'vanpos_logging_enabled', __( 'Enable Debug Logging', 'vanjorn-rental-pos' ), array( $this, 'render_logging_enabled_field' ), 'vanjorn-rental-pos', 'vanpos_logging_section' );
 	}
 
 	/**
@@ -99,8 +97,6 @@ trait VanPOS_Admin_Settings_Registration {
 		} else {
 			$sanitized['vanpos_security_deposit_product_id'] = isset( $existing['vanpos_security_deposit_product_id'] ) ? $existing['vanpos_security_deposit_product_id'] : '';
 		}
-		$sanitized['vanpos_logging_enabled'] = isset( $input['vanpos_logging_enabled'] ) ? 'yes' : 'no';
-
 		return $sanitized;
 	}
 
@@ -139,12 +135,4 @@ trait VanPOS_Admin_Settings_Registration {
 		echo '<p>' . esc_html__( 'Configure deposit payment settings for rental products. When enabled, customers will pay a percentage deposit at checkout, with the remaining amount due later.', 'vanjorn-rental-pos' ) . '</p>';
 	}
 
-	/**
-	 * Render section intro copy.
-	 *
-	 * @return void
-	 */
-	public function render_logging_section() {
-		echo '<p>' . esc_html__( 'Enable debug logging to troubleshoot issues. Logs are stored in WooCommerce logs and can be viewed from the WooCommerce status page.', 'vanjorn-rental-pos' ) . '</p>';
-	}
 }

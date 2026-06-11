@@ -155,7 +155,7 @@ class VanPOS_Discount_Manager {
 		if ( 'primary_rental' === $order_type ) {
 			self::sync_primary( $order );
 			return true;
-		} elseif ( 'remaining' === $payment_type || 'second_payment' === $payment_type ) {
+		} elseif ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			self::sync_remaining( $order );
 			return true;
 		} elseif ( 'security_deposit' === $payment_type ) {
@@ -191,10 +191,19 @@ class VanPOS_Discount_Manager {
 		$order->update_meta_data( '_vanpos_total_price', $new_total );
 		$order->update_meta_data( '_vanpos_total_price_formatted', self::money( $new_total ) );
 
-		// Fees (cleaning, dog) are €100 each, loaded entirely onto the initial
-		// payment, and are NOT part of the item line (which is van-only).
-		$fee_total = ( '1' === (string) $order->get_meta( '_vanpos_include_cleaning' ) ? 100 : 0 )
-			+ ( '1' === (string) $order->get_meta( '_vanpos_include_dog' ) ? 100 : 0 );
+		// Fees (cleaning, dog) are loaded entirely onto the initial payment and
+		// are NOT part of the item line (which is van-only). Read the live admin
+		// settings rather than hardcoding €100 so the split stays correct if
+		// either fee is ever reconfigured. The meta flags are present on all
+		// creation paths (frontend checkout, admin add-order, POS API) even
+		// when no fee line item was written to the order.
+		$fee_total = 0.0;
+		if ( '1' === (string) $order->get_meta( '_vanpos_include_cleaning' ) ) {
+			$fee_total += (float) VanPOS_Functions::get_setting( 'vanpos_cleaning_price', 100 );
+		}
+		if ( '1' === (string) $order->get_meta( '_vanpos_include_dog' ) ) {
+			$fee_total += (float) VanPOS_Functions::get_setting( 'vanpos_dog_price', 100 );
+		}
 
 		// Item-level keys track the VAN only (fees live at order level):
 		//   _vanpos_deposit_amount   = initial payment − fees
@@ -407,10 +416,16 @@ class VanPOS_Discount_Manager {
 				$changes[] = self::change( 'this', $order->get_id(), '_vanpos_total_price', $old_total, $new_total );
 			}
 
-			// Item level tracks the VAN only; fees (cleaning/dog, €100 each) load
-			// onto the initial payment and are excluded from the item line.
-			$fee_total = ( '1' === (string) $order->get_meta( '_vanpos_include_cleaning' ) ? 100 : 0 )
-				+ ( '1' === (string) $order->get_meta( '_vanpos_include_dog' ) ? 100 : 0 );
+			// Item level tracks the VAN only; fees (cleaning/dog) load onto the
+			// initial payment and are excluded from the item line. Read live
+			// settings — same logic as sync_primary().
+			$fee_total = 0.0;
+			if ( '1' === (string) $order->get_meta( '_vanpos_include_cleaning' ) ) {
+				$fee_total += (float) VanPOS_Functions::get_setting( 'vanpos_cleaning_price', 100 );
+			}
+			if ( '1' === (string) $order->get_meta( '_vanpos_include_dog' ) ) {
+				$fee_total += (float) VanPOS_Functions::get_setting( 'vanpos_dog_price', 100 );
+			}
 			$van_deposit   = $new_initial - $fee_total;
 			// Same clamp as sync_primary: a negative remaining is an over-refund artefact
 			// and must never be proposed as a new item-level remaining_amount or folded
@@ -437,7 +452,7 @@ class VanPOS_Discount_Manager {
 			return $changes;
 		}
 
-		if ( 'remaining' === $payment_type || 'second_payment' === $payment_type ) {
+		if ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			if ( ! $order->meta_exists( '_vanpos_remaining_payment' ) ) {
 				return $changes;
 			}
@@ -537,12 +552,16 @@ class VanPOS_Discount_Manager {
 	}
 
 	/**
-	 * Format a monetary amount as plain text for AutomateWoo templates.
+	 * Format a monetary amount as plain text for stored meta / AutomateWoo templates.
+	 *
+	 * Delegates to VanPOS_Order_Manager::format_price() — the single source used
+	 * by all other VanPOS meta-writing paths — so the output format stays consistent
+	 * across checkout, child-order creation, and discount reconciliation.
 	 *
 	 * @param float $amount Amount.
 	 * @return string
 	 */
 	private static function money( $amount ) {
-		return wp_strip_all_tags( wc_price( (float) $amount ) );
+		return VanPOS_Order_Manager::format_price( (float) $amount );
 	}
 }

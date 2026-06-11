@@ -26,17 +26,27 @@ class VanPOS_Customer_Account {
 		// (priority 10) which needs _vanpos_order_type to already be set.
 		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'set_rental_order_type' ), 5, 1 );
 		
-		// Create child order when primary order payment is completed
+		// Backfill: create child orders when payment settles or an admin manually
+		// completes an order. Security deposit and remaining orders are already created
+		// at checkout (priority 10/15 above), so these only fire for edge cases
+		// (e.g. POS orders, or a checkout where the priority-15 hook was bypassed).
+		// woocommerce_order_status_processing is intentionally omitted: Mollie/iDEAL
+		// fires woocommerce_payment_complete for all successful payments, which covers
+		// the same transition without running on every admin status change.
 		add_action( 'woocommerce_payment_complete', array( __CLASS__, 'create_child_order_on_payment_complete' ), 20, 1 );
 		add_action( 'woocommerce_order_status_completed', array( __CLASS__, 'create_child_order_on_payment_complete' ), 20, 1 );
-		add_action( 'woocommerce_order_status_processing', array( __CLASS__, 'create_child_order_on_payment_complete' ), 20, 1 );
 
-		// Include child orders in customer account orders list
-		add_filter( 'woocommerce_my_account_my_orders_query', array( __CLASS__, 'include_child_orders_in_query' ), 10, 1 );
-		
-		// Modify orders query results to include child orders
-		add_action( 'woocommerce_before_account_orders', array( __CLASS__, 'add_child_orders_to_account_orders' ), 10, 1 );
-		
+		// Create the security deposit child at checkout time (classic + Store API)
+		// so it no longer depends on the off-site gateway firing payment_complete
+		// reliably — that webhook is unreliable for redirect gateways (e.g. Mollie
+		// iDEAL) on a failed-then-retried payment. Idempotent via has_payment_order(),
+		// so create_child_order_on_payment_complete() above stays as a safe backfill.
+		// Priority 15 runs after set_rental_order_type (5) and
+		// Deposit_Manager::process_deposit_order (10), so the order type and any
+		// remaining child are already in place.
+		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'create_security_deposit_on_checkout' ), 15, 1 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'create_security_deposit_on_checkout' ), 15, 1 );
+
 		// Add due date column to orders table
 		add_filter( 'woocommerce_account_orders_columns', array( __CLASS__, 'add_due_date_column' ), 10, 1 );
 		add_action( 'woocommerce_my_account_my_orders_column_due_date', array( __CLASS__, 'display_due_date_column' ), 10, 1 );
@@ -70,37 +80,12 @@ class VanPOS_Customer_Account {
 				return; // Already set
 			}
 
-			// Check if order has rental items
-			$has_rental_items = false;
-			$items = $order->get_items();
-			
-			if ( ! empty( $items ) ) {
-				foreach ( $items as $item ) {
-					// Check for rental metadata in item
-					$pickup_date = $item->get_meta( 'vanpos_pickup_date' );
-					$return_date = $item->get_meta( 'vanpos_return_date' );
-					$rent_from = $item->get_meta( 'wcrp_rental_products_rent_from' );
-					$rent_to = $item->get_meta( 'wcrp_rental_products_rent_to' );
-					$original_price = $item->get_meta( '_vanpos_original_price' );
-					
-					if ( $pickup_date || $return_date || $rent_from || $rent_to || $original_price ) {
-						$has_rental_items = true;
-						break;
-					}
-				}
-			}
-			
-			// Also check order meta for rental dates
-			if ( ! $has_rental_items ) {
-				$pickup_date = $order->get_meta( '_vanpos_pickup_date' );
-				$return_date = $order->get_meta( '_vanpos_return_date' );
-				if ( $pickup_date || $return_date ) {
-					$has_rental_items = true;
-				}
-			}
-			
-			// If it has rental items, set order type
-			if ( $has_rental_items ) {
+			// Stamp the order type when the order has rental items/dates. Detection
+			// is centralised in VanPOS_Order_Manager::is_primary_rental_order(); the
+			// early return above guarantees the type is still unset here, so the
+			// helper takes its metadata-probe path. Wrapped in this method's
+			// try/catch, so a missing class can never break checkout.
+			if ( VanPOS_Order_Manager::is_primary_rental_order( $order ) ) {
 				$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
 				$order->save(); // Save the order with the new meta
 			}
@@ -132,44 +117,18 @@ class VanPOS_Customer_Account {
 			return;
 		}
 
-		// Check if it's a primary rental order (check order type or rental metadata)
-		$order_type = $order->get_meta( '_vanpos_order_type' );
-		$is_rental_order = false;
-		
-		if ( 'primary_rental' === $order_type ) {
-			$is_rental_order = true;
-		} elseif ( empty( $order_type ) ) {
-			// Check for rental metadata even if order type isn't set
-			$pickup_date = $order->get_meta( '_vanpos_pickup_date' );
-			$return_date = $order->get_meta( '_vanpos_return_date' );
-			
-			// Also check item meta
-			if ( ! $pickup_date && ! $return_date ) {
-				foreach ( $order->get_items() as $item ) {
-					$pickup_date = $item->get_meta( 'vanpos_pickup_date' );
-					$return_date = $item->get_meta( 'vanpos_return_date' );
-					$rent_from = $item->get_meta( 'wcrp_rental_products_rent_from' );
-					$rent_to = $item->get_meta( 'wcrp_rental_products_rent_to' );
-					$original_price = $item->get_meta( '_vanpos_original_price' );
-					
-					if ( $pickup_date || $return_date || $rent_from || $rent_to || $original_price ) {
-						$is_rental_order = true;
-						// Set order type for future reference
-						$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
-						$order->save();
-						break;
-					}
-				}
-			} else {
-				$is_rental_order = true;
-				// Set order type for future reference
-				$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
-				$order->save();
-			}
-		}
-		
-		if ( ! $is_rental_order ) {
+		// Check if it's a primary rental order (type stamp or rental metadata).
+		// is_primary_rental_order() returns false for non-rental types such as
+		// 'payment_order', so this handler correctly ignores child payment orders
+		// even though they carry rental dates copied from the parent.
+		if ( ! VanPOS_Order_Manager::is_primary_rental_order( $order ) ) {
 			return;
+		}
+
+		// Detected via metadata (type not yet stamped) — record it for future reads.
+		if ( '' === (string) $order->get_meta( '_vanpos_order_type' ) ) {
+			$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
+			$order->save();
 		}
 
 		// Check if child order already exists
@@ -191,7 +150,7 @@ class VanPOS_Customer_Account {
 			}
 		}
 
-		if ( VanPOS_Order_Manager::has_payment_order( $order_id, 'remaining' ) || VanPOS_Order_Manager::has_payment_order( $order_id, 'second_payment' ) ) {
+		if ( VanPOS_Order_Manager::has_remaining_payment_order( $order_id ) ) {
 			return; // Already created (typically by Deposit_Manager::create_partial_payment_orders at checkout)
 		}
 
@@ -226,184 +185,69 @@ class VanPOS_Customer_Account {
 
 		// Only create if there's a remaining amount
 		if ( $remaining_amount > 0 ) {
-			// Create remaining payment child order (due date is set correctly in create_payment_order based on vanpos_due_date_days setting)
-			$deposit_pct     = (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 );
-			$remaining_pct   = 100 - $deposit_pct;
-			$child_order_id = VanPOS_Order_Manager::create_payment_order(
+			// create_payment_order() handles all meta (dates, booking reference,
+			// due date, VAT, AutomateWoo flags, status) internally — no
+			// supplementary copy needed here.
+			VanPOS_Order_Manager::create_payment_order(
 				$order_id,
 				'remaining',
-				$remaining_amount,
-				/* translators: %d is the remaining payment percentage */
-				sprintf( __( 'Remaining rental payment (%d%%)', 'vanjorn-rental-pos' ), $remaining_pct )
+				$remaining_amount
 			);
-
-			if ( ! is_wp_error( $child_order_id ) ) {
-				$child_order = wc_get_order( $child_order_id );
-				if ( $child_order ) {
-					// Due date is already set correctly in create_payment_order (7 days before pickup by default)
-					
-					// Copy important metadata from parent for payment processing
-					$pickup_date = $order->get_meta( '_vanpos_pickup_date' );
-					$return_date = $order->get_meta( '_vanpos_return_date' );
-					$booking_ref = $order->get_meta( '_vanpos_booking_reference' );
-					
-					if ( $pickup_date ) {
-						$child_order->update_meta_data( '_vanpos_pickup_date', $pickup_date );
-					}
-					if ( $return_date ) {
-						$child_order->update_meta_data( '_vanpos_return_date', $return_date );
-					}
-					if ( $booking_ref ) {
-						$child_order->update_meta_data( '_vanpos_booking_reference', $booking_ref );
-					}
-					
-					// Ensure order is ready for payment
-					$child_order->set_status( 'pending' );
-					$child_order->save();
-				}
-			}
 		}
 	}
 
 	/**
-	 * Include child orders in customer account orders query
+	 * Create the security deposit child order at checkout time.
 	 *
-	 * @param array $args Query arguments.
-	 * @return array
-	 */
-	public static function include_child_orders_in_query( $args ) {
-		// Get current customer ID
-		$customer_id = get_current_user_id();
-		if ( ! $customer_id ) {
-			return $args;
-		}
-
-		// Get all primary orders for this customer
-		$primary_orders = wc_get_orders( array(
-			'customer_id' => $customer_id,
-			'meta_key'    => '_vanpos_order_type',
-			'meta_value'  => 'primary_rental',
-			'limit'       => -1,
-			'return'      => 'ids',
-		) );
-
-		if ( empty( $primary_orders ) ) {
-			return $args;
-		}
-
-		// Get all child orders for these primary orders
-		$child_order_ids = array();
-		foreach ( $primary_orders as $primary_order_id ) {
-			if ( ! class_exists( 'VanPOS_Order_Manager' ) ) {
-				continue;
-			}
-			$child_orders = VanPOS_Order_Manager::get_payment_orders( $primary_order_id );
-			foreach ( $child_orders as $child_order ) {
-				// Skip refund objects — they lack methods like get_customer_id()
-				if ( $child_order instanceof WC_Order_Refund ) {
-					continue;
-				}
-				// Verify child order belongs to same customer
-				if ( $child_order->get_customer_id() === $customer_id ) {
-					$child_order_ids[] = $child_order->get_id();
-				}
-			}
-		}
-
-		// If we have child orders, include them in the query
-		// Note: Since child orders have the same customer_id, they should already be included
-		// But we store the IDs for the action hook to merge them if needed
-		if ( ! empty( $child_order_ids ) ) {
-			// Store for later use in the action hook
-			$args['vanpos_include_child_orders'] = $child_order_ids;
-		}
-
-		return $args;
-	}
-
-	/**
-	 * Add child orders to customer account orders
-	 * This modifies the global $customer_orders variable used in the template
+	 * Runs for both short- and long-term bookings — unlike
+	 * VanPOS_Deposit_Manager::process_deposit_order(), which is gated on the
+	 * deposit split ( _vanpos_order_has_remaining_payment === 'yes' ) and so never
+	 * runs for short-term / full-payment bookings. Creating the security deposit
+	 * here removes the dependency on the gateway's payment-complete webhook, which
+	 * is unreliable for off-site redirect gateways (e.g. Mollie iDEAL) on a
+	 * failed-then-retried payment.
 	 *
-	 * @param bool $has_orders Whether customer has orders.
+	 * Idempotent: create_child_order_on_payment_complete() remains hooked as a
+	 * backfill, and create_security_deposit_order() self-guards via
+	 * has_payment_order(), so double-firing never produces a duplicate.
+	 *
+	 * Classic checkout ( woocommerce_checkout_order_processed ) passes an order ID;
+	 * the Store API ( woocommerce_store_api_checkout_order_processed ) passes a
+	 * WC_Order object. Accept either.
+	 *
+	 * @param int|WC_Order $order_or_id Order ID or order object.
 	 * @return void
 	 */
-	public static function add_child_orders_to_account_orders( $has_orders ) {
-		global $customer_orders;
-		
-		if ( ! isset( $customer_orders ) || ! is_object( $customer_orders ) || ! isset( $customer_orders->orders ) ) {
+	public static function create_security_deposit_on_checkout( $order_or_id ) {
+		$order = ( $order_or_id instanceof WC_Order ) ? $order_or_id : wc_get_order( $order_or_id );
+		if ( ! $order || ! class_exists( 'VanPOS_Order_Manager' ) ) {
 			return;
 		}
 
-		$customer_id = get_current_user_id();
-		if ( ! $customer_id ) {
+		// Admin-created orders manage their own child orders (mirrors the guard in
+		// create_child_order_on_payment_complete).
+		if ( 'yes' === $order->get_meta( '_vanpos_admin_created' ) ) {
 			return;
 		}
 
-		// Get all primary orders for this customer
-		$primary_orders = wc_get_orders( array(
-			'customer_id' => $customer_id,
-			'meta_key'    => '_vanpos_order_type',
-			'meta_value'  => 'primary_rental',
-			'limit'       => -1,
-			'return'      => 'ids',
-		) );
-
-		if ( empty( $primary_orders ) ) {
+		// Only act on primary rental orders. Detection is centralised in
+		// is_primary_rental_order() (type stamp, with order/item metadata fallback).
+		if ( ! VanPOS_Order_Manager::is_primary_rental_order( $order ) ) {
 			return;
 		}
 
-		// Get all child orders for these primary orders
-		$child_order_ids = array();
-		foreach ( $primary_orders as $primary_order_id ) {
-			if ( ! class_exists( 'VanPOS_Order_Manager' ) ) {
-				continue;
-			}
-			$child_orders = VanPOS_Order_Manager::get_payment_orders( $primary_order_id );
-			foreach ( $child_orders as $child_order ) {
-				// Skip refund objects — they lack methods like get_customer_id()
-				if ( $child_order instanceof WC_Order_Refund ) {
-					continue;
-				}
-				// Verify child order belongs to same customer
-				if ( $child_order->get_customer_id() === $customer_id ) {
-					$child_order_ids[] = $child_order->get_id();
-				}
-			}
+		// Idempotent: skip if a security deposit child already exists (created by a
+		// retry, the payment-complete backfill, or a duplicate checkout submission).
+		if ( VanPOS_Order_Manager::has_payment_order( $order->get_id(), 'security_deposit' ) ) {
+			return;
 		}
 
-		// Get child orders and merge with existing orders
-		if ( ! empty( $child_order_ids ) ) {
-			$existing_ids = array_map( function( $order ) {
-				$order_obj = is_object( $order ) ? $order : wc_get_order( $order );
-				return $order_obj ? $order_obj->get_id() : 0;
-			}, $customer_orders->orders );
-
-			$child_orders = wc_get_orders( array(
-				'include' => $child_order_ids,
-				'limit'   => -1,
-			) );
-
-			foreach ( $child_orders as $child_order ) {
-				if ( ! in_array( $child_order->get_id(), $existing_ids, true ) ) {
-					$customer_orders->orders[] = $child_order;
-				}
-			}
-
-			// Update total count and sort orders by date (newest first)
-			$customer_orders->total = count( $customer_orders->orders );
-			
-			// Sort orders by date (newest first)
-			usort( $customer_orders->orders, function( $a, $b ) {
-				$order_a = is_object( $a ) ? $a : wc_get_order( $a );
-				$order_b = is_object( $b ) ? $b : wc_get_order( $b );
-				if ( ! $order_a || ! $order_b ) {
-					return 0;
-				}
-				$date_a = $order_a->get_date_created()->getTimestamp();
-				$date_b = $order_b->get_date_created()->getTimestamp();
-				return $date_b - $date_a; // Descending order
-			} );
+		$result = VanPOS_Order_Manager::create_security_deposit_order( $order->get_id() );
+		if ( is_wp_error( $result ) && function_exists( 'wc_get_logger' ) ) {
+			wc_get_logger()->error(
+				'Checkout-time security deposit creation failed for order ' . $order->get_id() . ': ' . $result->get_error_message(),
+				array( 'source' => 'vanjorn-rental-pos' )
+			);
 		}
 	}
 
@@ -434,8 +278,13 @@ class VanPOS_Customer_Account {
 	public static function display_due_date_column( $order ) {
 		$due_date = $order->get_meta( '_vanpos_due_date' );
 		if ( $due_date ) {
-			$due_datetime = new DateTime( $due_date );
-			echo esc_html( date_i18n( get_option( 'date_format' ), $due_datetime->getTimestamp() ) );
+			$due_datetime = date_create( $due_date );
+			if ( $due_datetime ) {
+				echo esc_html( date_i18n( get_option( 'date_format' ), $due_datetime->getTimestamp() ) );
+			} else {
+				// Corrupt meta value — render raw rather than throw.
+				echo esc_html( $due_date );
+			}
 		} else {
 			echo esc_html_x( '—', 'placeholder for empty due date', 'vanjorn-rental-pos' );
 		}

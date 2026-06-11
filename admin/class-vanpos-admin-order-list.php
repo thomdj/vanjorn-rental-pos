@@ -91,25 +91,10 @@ class VanPOS_Admin_Order_List {
 	// =============================================================================
 
 	private function is_primary_rental_order( $order ) {
-		if ( ! $order || ! is_a( $order, 'WC_Order' ) ) {
-			return false;
-		}
-		$order_type = $order->get_meta( '_vanpos_order_type' );
-		if ( 'primary_rental' === $order_type ) {
-			return true;
-		}
-		if ( 'payment_order' === $order_type ) {
-			return false;
-		}
-		if ( $order->get_meta( '_vanpos_pickup_date' ) || $order->get_meta( '_vanpos_return_date' ) || $order->get_meta( '_vanpos_total_price' ) ) {
-			return true;
-		}
-		foreach ( $order->get_items() as $item ) {
-			if ( $item->get_meta( 'vanpos_pickup_date' ) || $item->get_meta( 'vanpos_return_date' ) || $item->get_meta( 'wcrp_rental_products_rent_from' ) || $item->get_meta( 'wcrp_rental_products_rent_to' ) || $item->get_meta( '_vanpos_original_price' ) ) {
-				return true;
-			}
-		}
-		return false;
+		// Delegates to the single source of truth. The logic (type guard, then
+		// order-level date/total-price probe, then item-level markers) lives in
+		// VanPOS_Order_Manager::is_primary_rental_order(); see the note there.
+		return VanPOS_Order_Manager::is_primary_rental_order( $order );
 	}
 
 	private function get_rental_summary_source_order( $order ) {
@@ -532,7 +517,7 @@ class VanPOS_Admin_Order_List {
 				$query_args['meta_query'][] = array( 'key' => '_vanpos_payment_type', 'value' => array( 'deposit', 'security_deposit' ), 'compare' => 'IN' );
 				break;
 			case 'remaining_payment':
-				$query_args['meta_query'][] = array( 'key' => '_vanpos_payment_type', 'value' => array( 'remaining', 'second_payment' ), 'compare' => 'IN' );
+				$query_args['meta_query'][] = array( 'key' => '_vanpos_payment_type', 'value' => VanPOS_Order_Manager::remaining_payment_types(), 'compare' => 'IN' );
 				break;
 			case 'rental_order':
 				$query_args['meta_query'][] = array(
@@ -574,7 +559,7 @@ class VanPOS_Admin_Order_List {
 				$meta_query[] = array( 'key' => '_vanpos_payment_type', 'value' => array( 'deposit', 'security_deposit' ), 'compare' => 'IN' );
 				break;
 			case 'remaining_payment':
-				$meta_query[] = array( 'key' => '_vanpos_payment_type', 'value' => array( 'remaining', 'second_payment' ), 'compare' => 'IN' );
+				$meta_query[] = array( 'key' => '_vanpos_payment_type', 'value' => VanPOS_Order_Manager::remaining_payment_types(), 'compare' => 'IN' );
 				break;
 			case 'rental_order':
 				$meta_query[] = array(

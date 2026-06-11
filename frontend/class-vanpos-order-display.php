@@ -525,7 +525,7 @@ class VanPOS_Order_Display {
 		if ( 'payment_order' === $order_type ) {
 			return true;
 		}
-		if ( in_array( $payment_type, array( 'deposit', 'security_deposit', 'remaining', 'second_payment' ), true ) ) {
+		if ( VanPOS_Order_Manager::is_payment_order_type( $payment_type ) ) {
 			return true;
 		}
 		if ( $order->get_parent_id() || $order->get_meta( '_vanpos_primary_order_id' ) ) {

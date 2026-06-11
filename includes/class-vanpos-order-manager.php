@@ -93,6 +93,53 @@ class VanPOS_Order_Manager {
 	}
 
 	/**
+	 * Split a tax-inclusive gross amount into net (ex-VAT) and VAT components.
+	 *
+	 * Single source for the inclusive-VAT split used wherever a gross rental amount
+	 * is recorded as a WooCommerce line item: child payment orders, the deposit
+	 * line item at checkout, and re-rated child orders after a date change. A
+	 * non-positive rate or gross yields zero tax (tax-exempt).
+	 *
+	 * @param float $gross Tax-inclusive amount.
+	 * @param float $rate  Fractional VAT rate (e.g. 0.21).
+	 * @return array{excl:float,tax:float} Net amount and the included VAT.
+	 */
+	public static function split_inclusive_vat( $gross, $rate ) {
+		$gross = (float) $gross;
+		$rate  = (float) $rate;
+		if ( $rate <= 0 || $gross <= 0 ) {
+			return array( 'excl' => round( $gross, 2 ), 'tax' => 0.0 );
+		}
+		$excl = round( $gross / ( 1 + $rate ), 2 );
+		return array( 'excl' => $excl, 'tax' => round( $gross - $excl, 2 ) );
+	}
+
+	/**
+	 * Apply an inclusive-VAT split to a product line item.
+	 *
+	 * Sets the net amount as subtotal/total, the included VAT as subtotal/total tax,
+	 * and the per-rate tax array — the structure WooCommerce expects so a later
+	 * recalculation does not add VAT on top of the gross figure. Centralises the
+	 * set_taxes() shape used by every inclusive-VAT line item.
+	 *
+	 * @param WC_Order_Item_Product $item    Line item to write to.
+	 * @param float                 $excl    Net (ex-VAT) amount.
+	 * @param float                 $tax     Included VAT amount.
+	 * @param int                   $rate_id WC tax rate row id.
+	 * @return void
+	 */
+	public static function apply_inclusive_vat_to_item( $item, $excl, $tax, $rate_id ) {
+		$item->set_subtotal( $excl );
+		$item->set_total( $excl );
+		$item->set_subtotal_tax( $tax );
+		$item->set_total_tax( $tax );
+		$item->set_taxes( array(
+			'total'    => array( $rate_id => $tax ),
+			'subtotal' => array( $rate_id => $tax ),
+		) );
+	}
+
+	/**
 	 * Create primary rental order
 	 *
 	 * @param int    $product_id Product ID.
@@ -123,12 +170,16 @@ class VanPOS_Order_Manager {
 				'phone'      => get_user_meta( $customer_id, 'billing_phone', true ),
 			);
 		} else {
-			// Get from session if available
-			$customer_email = WC()->session->get( 'billing_email' );
-			if ( $customer_email ) {
-				$customer_data = array(
-					'email' => $customer_email,
-				);
+			// Get from session if available.
+			// WC()->session is null in non-frontend contexts (admin AJAX, REST API, WP-CLI,
+			// cron). Guard before dereferencing so a programmatic call doesn't fatal.
+			if ( WC()->session ) {
+				$customer_email = WC()->session->get( 'billing_email' );
+				if ( $customer_email ) {
+					$customer_data = array(
+						'email' => $customer_email,
+					);
+				}
 			}
 		}
 
@@ -199,7 +250,7 @@ class VanPOS_Order_Manager {
 		$order->update_meta_data( '_vanpos_rental_nights', $nights );
 		$order->update_meta_data( '_vanpos_total_price', $total_price );
 		$order->update_meta_data( '_vanpos_initial_payment', $initial_payment );
-		$order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( $initial_payment ) ) );
+		$order->update_meta_data( '_vanpos_initial_payment_formatted', self::format_price( $initial_payment ) );
 		$order->update_meta_data( '_vanpos_remaining_payment', $remaining_payment );
 		// Explicit false defaults; the child-order factories flip these to 'yes' when
 		// the corresponding remaining / security-deposit child is actually created.
@@ -237,8 +288,9 @@ class VanPOS_Order_Manager {
 		// Save order
 		$order->save();
 
-		// Note: Child payment orders (security deposit + remaining) are created
-		// automatically by VanPOS_Customer_Account on payment complete.
+		// Note: The security deposit child order is created at checkout processing
+		// (woocommerce_checkout_order_processed). The remaining payment child is
+		// created by VanPOS_Customer_Account on payment complete.
 
 		return $order->get_id();
 	}
@@ -273,7 +325,9 @@ class VanPOS_Order_Manager {
 	 * Create child payment order
 	 *
 	 * @param int    $primary_order_id Primary order ID.
-	 * @param string $payment_type Payment type (initial, deposit, remaining, extension).
+	 * @param string $payment_type Payment type. Live types: 'remaining', 'security_deposit', 'extension'.
+	 *                             'initial' and 'deposit' are vestigial — no live code path creates
+	 *                             child orders of those types.
 	 * @param float  $amount Payment amount.
 	 * @param string $description Payment description.
 	 * @return int|WP_Error Order ID or error.
@@ -291,12 +345,9 @@ class VanPOS_Order_Manager {
 		// create_security_deposit_order() — and return the existing child's id
 		// instead of minting a duplicate. Idempotent: callers already treat a
 		// non-error return as success.
-		if ( self::has_payment_order( $primary_order_id, $payment_type ) ) {
-			foreach ( self::get_payment_orders( $primary_order_id ) as $existing_order ) {
-				if ( $existing_order->get_meta( '_vanpos_payment_type' ) === $payment_type ) {
-					return $existing_order->get_id();
-				}
-			}
+		$existing = self::find_payment_order( $primary_order_id, $payment_type );
+		if ( $existing ) {
+			return $existing->get_id();
 		}
 
 		// Create child order
@@ -321,7 +372,7 @@ class VanPOS_Order_Manager {
 		$order->set_billing_country( $primary_order->get_billing_country() );
 
 		// Determine whether this child order is a taxable rental payment.
-		// Security deposits are VAT-exempt; deposit and remaining are taxable.
+		// Security deposits are VAT-exempt; remaining and extension are taxable.
 		$is_taxable      = ( 'security_deposit' !== $payment_type );
 		$prices_incl_tax = ( 'yes' === get_option( 'woocommerce_prices_include_tax' ) );
 
@@ -362,19 +413,9 @@ class VanPOS_Order_Manager {
 
 			if ( $is_taxable && $prices_incl_tax && $item_amount > 0 ) {
 				// Prices include BTW — split into ex-VAT + tax using the item's own rate.
-				$rate    = self::get_vat_rate_fraction( $item );
 				$rate_id = self::get_vat_rate_id( $item );
-				$excl    = round( $item_amount / ( 1 + $rate ), 2 );
-				$tax     = round( $item_amount - $excl, 2 );
-
-				$product_item->set_subtotal( $excl );
-				$product_item->set_total( $excl );
-				$product_item->set_subtotal_tax( $tax );
-				$product_item->set_total_tax( $tax );
-				$product_item->set_taxes( array(
-					'total'    => array( $rate_id => $tax ),
-					'subtotal' => array( $rate_id => $tax ),
-				) );
+				$split   = self::split_inclusive_vat( $item_amount, self::get_vat_rate_fraction( $item ) );
+				self::apply_inclusive_vat_to_item( $product_item, $split['excl'], $split['tax'], $rate_id );
 			} else {
 				$product_item->set_subtotal( $item_amount );
 				$product_item->set_total( $item_amount );
@@ -433,11 +474,17 @@ class VanPOS_Order_Manager {
 			$rate_src = $rate_item ? $rate_item : '';
 			$rate     = self::get_vat_rate_fraction( $rate_src );
 			$rate_id  = self::get_vat_rate_id( $rate_src );
-			$excl = round( $amount / ( 1 + $rate ), 2 );
-			$tax  = round( $amount - $excl, 2 );
+			$split = self::split_inclusive_vat( $amount, $rate );
+			$excl  = $split['excl'];
+			$tax   = $split['tax'];
 			if ( $tax > 0 ) {
-				$tax_item = new WC_Order_Item_Tax();
-				$tax_item->set_name( 'VAT-1' );
+				$tax_item   = new WC_Order_Item_Tax();
+				$rate_label = class_exists( 'WC_Tax' ) ? WC_Tax::get_rate_label( $rate_id ) : '';
+				if ( ! $rate_label ) {
+					/* translators: %d is the WooCommerce tax rate ID */
+					$rate_label = sprintf( __( 'VAT-%d', 'vanjorn-rental-pos' ), $rate_id );
+				}
+				$tax_item->set_name( $rate_label );
 				$tax_item->set_rate_id( $rate_id );
 				$tax_item->set_tax_total( $tax );
 				$tax_item->set_shipping_tax_total( 0 );
@@ -470,53 +517,15 @@ class VanPOS_Order_Manager {
 			$order->update_meta_data( '_vanpos_return_time', $return_time );
 		}
 
-		// Copy email-friendly formatted meta from parent (for AutomateWoo templates).
-		// If the parent is missing formatted values, generate them from raw data.
-		$email_meta_keys = array(
-			'_vanpos_camper_name',
-			'_vanpos_pickup_date_formatted',
-			'_vanpos_return_date_formatted',
-			'_vanpos_total_price',
-			'_vanpos_total_price_formatted',
-			'_vanpos_initial_payment',
-			'_vanpos_initial_payment_formatted',
-			'_vanpos_remaining_payment',
-			'_vanpos_remaining_payment_formatted',
-		);
-		foreach ( $email_meta_keys as $meta_key ) {
-			$value = $primary_order->get_meta( $meta_key );
-			if ( $value !== '' && $value !== false ) {
-				$order->update_meta_data( $meta_key, $value );
-			}
-		}
-
-		// Generate any formatted meta the parent may be missing.
-		if ( ! $order->get_meta( '_vanpos_camper_name' ) ) {
-			foreach ( $primary_order->get_items() as $pi ) {
-				if ( is_a( $pi, 'WC_Order_Item_Product' ) ) {
-					$prod = $pi->get_product();
-					$name = $prod ? $prod->get_title() : $pi->get_name();
-					if ( $name ) {
-						$order->update_meta_data( '_vanpos_camper_name', $name );
-					}
-					break;
-				}
-			}
-		}
-		if ( $pickup_date && ! $order->get_meta( '_vanpos_pickup_date_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_pickup_date_formatted', date_i18n( 'd-m-Y', strtotime( $pickup_date ) ) );
-		}
-		if ( $return_date && ! $order->get_meta( '_vanpos_return_date_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'd-m-Y', strtotime( $return_date ) ) );
-		}
-		$parent_total = $primary_order->get_meta( '_vanpos_total_price' );
-		if ( $parent_total !== '' && $parent_total !== false && ! $order->get_meta( '_vanpos_total_price_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( (float) $parent_total ) ) );
-		}
-		$parent_remaining = $primary_order->get_meta( '_vanpos_remaining_payment' );
-		if ( $parent_remaining !== '' && $parent_remaining !== false && ! $order->get_meta( '_vanpos_remaining_payment_formatted' ) ) {
-			$order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( (float) $parent_remaining ) ) );
-		}
+		// Copy email-friendly formatted meta from parent (for AutomateWoo templates),
+		// then fill any formatted keys the parent itself was missing.
+		self::copy_email_meta( $primary_order, $order );
+		self::stamp_missing_formatted_meta( $order, array(
+			'pickup_date'       => $pickup_date,
+			'return_date'       => $return_date,
+			'total_price'       => $primary_order->get_meta( '_vanpos_total_price' ),
+			'remaining_payment' => $primary_order->get_meta( '_vanpos_remaining_payment' ),
+		) );
 
 		// Copy short-term booking flag from parent (for AutomateWoo triggers).
 		// Only set on rental payment orders (deposit/remaining), not security deposits
@@ -529,12 +538,12 @@ class VanPOS_Order_Manager {
 		// Check if short-term booking (used for due date calculation below)
 		$is_short_term = $is_short_term_val === 'yes';
 
-		// Calculate and set due date based on payment type and booking type
-		// Note: 'deposit' (50% initial) is paid at checkout — no future due date needed.
-		// Only 'security_deposit' and 'remaining' need due dates.
+		// Calculate and set due date based on payment type and booking type.
+		// 'initial' is collected at checkout — no future due date needed.
+		// 'remaining', 'extension', and 'security_deposit' all need due dates.
 		$due_date_str = null;
-		if ( $payment_type === 'deposit' ) {
-			// 50% initial deposit is paid at checkout — no due date
+		if ( $payment_type === 'initial' ) {
+			// Initial payment is collected at checkout — no due date
 			$due_date_str = null;
 		} elseif ( $is_short_term && $payment_type === 'security_deposit' ) {
 			// Short-term booking security deposit: Due date = Order date + 1 day (tomorrow)
@@ -548,7 +557,7 @@ class VanPOS_Order_Manager {
 			$order->update_meta_data( '_is_short_term_deposit', 'yes' );
 		} elseif ( $pickup_date ) {
 			// Standard booking: Calculate based on pickup date using admin settings
-			if ( $payment_type === 'remaining' ) {
+			if ( $payment_type === 'remaining' || $payment_type === 'extension' ) {
 				$due_date_str = VanPOS_Functions::calculate_due_date_from_pickup( $pickup_date, 'remaining' );
 			} elseif ( $payment_type === 'security_deposit' ) {
 				$due_date_str = VanPOS_Functions::calculate_due_date_from_pickup( $pickup_date, 'security_deposit' );
@@ -562,7 +571,7 @@ class VanPOS_Order_Manager {
 		if ( $due_date_str ) {
 			$order->update_meta_data( '_vanpos_due_date', $due_date_str );
 			$order->update_meta_data( '_payment_due_date', $due_date_str );
-			$order->update_meta_data( '_payment_due_date_formatted', date_i18n( 'd-m-Y', strtotime( $due_date_str ) ) );
+			$order->update_meta_data( '_payment_due_date_formatted', self::format_meta_date( $due_date_str ) );
 		}
 
 		// Add new meta keys for AutomateWoo
@@ -575,19 +584,28 @@ class VanPOS_Order_Manager {
 		// the other flag is not relevant to this child order.
 		if ( $payment_type === 'security_deposit' ) {
 			$order->update_meta_data( '_security_deposit_sent', 'no' );
-		} elseif ( $payment_type === 'deposit' || $payment_type === 'remaining' ) {
+		} elseif ( $payment_type === 'initial' || $payment_type === 'remaining' ) {
 			$order->update_meta_data( '_remaining_sent', 'no' );
+		} elseif ( $payment_type === 'extension' ) {
+			$order->update_meta_data( '_extension_sent', 'no' );
 		}
 
 		// Set payment amount type
-		if ( $payment_type === 'security_deposit' ) {
+		if ( $payment_type === 'security_deposit' || $payment_type === 'extension' ) {
 			$order->update_meta_data( '_payment_amount_type', 'fixed' );
-		} elseif ( $payment_type === 'deposit' || $payment_type === 'remaining' ) {
+		} elseif ( $payment_type === 'initial' || $payment_type === 'remaining' ) {
 			$order->update_meta_data( '_payment_amount_type', 'percentage' );
 		}
 
+		// Extension orders: store the charge amount as dedicated meta for email
+		// templates and the backfill tool. $amount is the extension charge itself.
+		if ( $payment_type === 'extension' ) {
+			$order->update_meta_data( '_vanpos_extension_amount', round( $amount, 2 ) );
+			$order->update_meta_data( '_vanpos_extension_amount_formatted', self::format_price( $amount ) );
+		}
+
 		// Only the refundable security deposit is VAT-exempt
-		// The 50% rental deposit ('deposit') is a payment for services and includes VAT
+		// The initial payment ('initial') is a payment for services and includes VAT
 		if ( $payment_type === 'security_deposit' ) {
 			$order->update_meta_data( '_vanpos_no_vat', true );
 		}
@@ -632,26 +650,24 @@ class VanPOS_Order_Manager {
 			false // Not a customer note, admin only
 		);
 		
-		// Also add note to parent order
-		if ( $primary_order ) {
-			$primary_order->add_order_note(
-				sprintf(
-					/* translators: %1$s is the payment type, %2$s is the child order number */
-					__( 'Child payment order #%2$s created for %1$s', 'vanjorn-rental-pos' ),
-					$payment_type_label,
-					$order->get_order_number()
-				),
-				false,
-				false
-			);
-			// A remaining child order now exists for this parent — record it explicitly
-			// so downstream reads never depend on absence-means-false.
-			if ( $payment_type === 'remaining' || $payment_type === 'second_payment' ) {
-				$primary_order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
-			}
-			$primary_order->save();
+		// Add note to parent order and record that a remaining child now exists.
+		$primary_order->add_order_note(
+			sprintf(
+				/* translators: %1$s is the payment type, %2$s is the child order number */
+				__( 'Child payment order #%2$s created for %1$s', 'vanjorn-rental-pos' ),
+				$payment_type_label,
+				$order->get_order_number()
+			),
+			false,
+			false
+		);
+		// A remaining child order now exists for this parent — record it explicitly
+		// so downstream reads never depend on absence-means-false.
+		if ( self::is_remaining_payment( $payment_type ) ) {
+			$primary_order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
 		}
-		
+		$primary_order->save();
+
 		$order->save();
 
 		return $order->get_id();
@@ -670,13 +686,9 @@ class VanPOS_Order_Manager {
 		}
 
 		// Check if security deposit order already exists
-		if ( self::has_payment_order( $primary_order_id, 'security_deposit' ) ) {
-			$all_orders = self::get_payment_orders( $primary_order_id );
-			foreach ( $all_orders as $existing_order ) {
-				if ( $existing_order->get_meta( '_vanpos_payment_type' ) === 'security_deposit' ) {
-					return $existing_order->get_id();
-				}
-			}
+		$existing = self::find_payment_order( $primary_order_id, 'security_deposit' );
+		if ( $existing ) {
+			return $existing->get_id();
 		}
 
 		// Get security deposit product
@@ -734,7 +746,7 @@ class VanPOS_Order_Manager {
 		$order->update_meta_data( '_vanpos_booking_reference', $primary_order->get_meta( '_vanpos_booking_reference' ) );
 		$order->update_meta_data( '_vanpos_no_vat', true ); // Security deposit is not subject to VAT
 		$order->update_meta_data( '_vanpos_security_deposit_payment', $security_deposit_amount );
-		$order->update_meta_data( '_vanpos_security_deposit_payment_formatted', wp_strip_all_tags( wc_price( $security_deposit_amount ) ) );
+		$order->update_meta_data( '_vanpos_security_deposit_payment_formatted', self::format_price( $security_deposit_amount ) );
 
 		// Copy important metadata from parent
 		$pickup_date = $primary_order->get_meta( '_vanpos_pickup_date' );
@@ -742,7 +754,33 @@ class VanPOS_Order_Manager {
 		$pickup_time = $primary_order->get_meta( '_vanpos_pickup_time' );
 		$return_time = $primary_order->get_meta( '_vanpos_return_time' );
 		$booking_ref = $primary_order->get_meta( '_vanpos_booking_reference' );
-		
+
+		// Item-level fallback for rental dates. On the short-term frontend checkout
+		// path, VanPOS_Deposit_Manager::promote_rental_meta_to_order() never runs
+		// (it is gated on the deposit split), so the parent has no order-level
+		// _vanpos_pickup_date yet when this factory is called at checkout time.
+		// Read the first rental item's dates so the due-date and short-term
+		// derivation below are correct for short-term bookings too.
+		if ( empty( $pickup_date ) || empty( $return_date ) ) {
+			foreach ( $primary_order->get_items() as $pi ) {
+				if ( empty( $pickup_date ) ) {
+					$pickup_date = $pi->get_meta( 'vanpos_pickup_date' );
+					if ( empty( $pickup_date ) ) {
+						$pickup_date = $pi->get_meta( 'wcrp_rental_products_rent_from' );
+					}
+				}
+				if ( empty( $return_date ) ) {
+					$return_date = $pi->get_meta( 'vanpos_return_date' );
+					if ( empty( $return_date ) ) {
+						$return_date = $pi->get_meta( 'wcrp_rental_products_rent_to' );
+					}
+				}
+				if ( $pickup_date && $return_date ) {
+					break;
+				}
+			}
+		}
+
 		if ( $pickup_date ) {
 			$order->update_meta_data( '_vanpos_pickup_date', $pickup_date );
 		}
@@ -759,27 +797,37 @@ class VanPOS_Order_Manager {
 			$order->update_meta_data( '_vanpos_booking_reference', $booking_ref );
 		}
 
-		// Copy email-friendly formatted meta from parent (for AutomateWoo templates)
-		$email_meta_keys = array(
-			'_vanpos_camper_name',
-			'_vanpos_pickup_date_formatted',
-			'_vanpos_return_date_formatted',
-			'_vanpos_total_price',
-			'_vanpos_total_price_formatted',
-			'_vanpos_initial_payment',
-			'_vanpos_initial_payment_formatted',
-			'_vanpos_remaining_payment',
-			'_vanpos_remaining_payment_formatted',
-		);
-		foreach ( $email_meta_keys as $meta_key ) {
-			$value = $primary_order->get_meta( $meta_key );
-			if ( $value !== '' && $value !== false ) {
-				$order->update_meta_data( $meta_key, $value );
-			}
-		}
+		// Copy email-friendly formatted meta from parent (for AutomateWoo templates),
+		// then fill any formatted keys the parent itself was missing. The fill step
+		// is new for security deposits: previously, a short-term booking whose parent
+		// lacked formatted meta produced a deposit child with blank values in
+		// AutomateWoo emails. copy_email_meta() + stamp_missing_formatted_meta()
+		// closes that gap, mirroring create_payment_order().
+		self::copy_email_meta( $primary_order, $order );
+		self::stamp_missing_formatted_meta( $order, array(
+			'pickup_date'       => $pickup_date,
+			'return_date'       => $return_date,
+			'total_price'       => $primary_order->get_meta( '_vanpos_total_price' ),
+			'remaining_payment' => $primary_order->get_meta( '_vanpos_remaining_payment' ),
+		) );
 
-		// Check if short-term booking
-		$is_short_term = $primary_order->get_meta( '_is_short_term_booking' ) === 'yes';
+		// Check if short-term booking. The short-term frontend checkout path never
+		// records _is_short_term_booking on the parent (promote_rental_meta_to_order
+		// is gated on the deposit split), so when the flag is absent, derive it from
+		// the pickup date using the same threshold as the deposit-split decision.
+		// More-than-threshold days away = long-term; otherwise short-term.
+		$is_short_term_meta = $primary_order->get_meta( '_is_short_term_booking' );
+		if ( '' === (string) $is_short_term_meta && $pickup_date ) {
+			if ( class_exists( 'VanPOS_Deposit_Manager' ) ) {
+				$is_short_term = ! VanPOS_Deposit_Manager::is_pickup_beyond_security_deposit_threshold( $pickup_date );
+			} else {
+				$threshold  = (int) VanPOS_Functions::get_setting( 'vanpos_security_deposit_days_before_pickup', 14 );
+				$days_until = ( strtotime( $pickup_date ) - current_time( 'U' ) ) / DAY_IN_SECONDS;
+				$is_short_term = ( $days_until <= $threshold );
+			}
+		} else {
+			$is_short_term = ( 'yes' === $is_short_term_meta );
+		}
 
 		$due_date = null;
 		$due_date_str = null;
@@ -817,7 +865,7 @@ class VanPOS_Order_Manager {
 		if ( $due_date_str ) {
 			$order->update_meta_data( '_vanpos_due_date', $due_date_str );
 			$order->update_meta_data( '_payment_due_date', $due_date_str );
-			$order->update_meta_data( '_payment_due_date_formatted', date_i18n( 'd-m-Y', strtotime( $due_date_str ) ) );
+			$order->update_meta_data( '_payment_due_date_formatted', self::format_meta_date( $due_date_str ) );
 		}
 
 		// Add new meta keys for AutomateWoo
@@ -868,7 +916,7 @@ class VanPOS_Order_Manager {
 		// Save security deposit order ID to parent order
 		$primary_order->update_meta_data( '_vanpos_security_deposit_order_id', $order->get_id() );
 		$primary_order->update_meta_data( '_vanpos_security_deposit_payment', $security_deposit_amount );
-		$primary_order->update_meta_data( '_vanpos_security_deposit_payment_formatted', wp_strip_all_tags( wc_price( $security_deposit_amount ) ) );
+		$primary_order->update_meta_data( '_vanpos_security_deposit_payment_formatted', self::format_price( $security_deposit_amount ) );
 		$primary_order->update_meta_data( '_vanpos_order_has_security_deposit', 'yes' );
 		$primary_order->update_meta_data( '_vanpos_security_deposit_paid', 'no' );
 		if ( isset( $due_date ) && $due_date ) {
@@ -898,6 +946,19 @@ class VanPOS_Order_Manager {
 	 *   - `order->get_total()` (gross) is used rather than `get_subtotal()` (net of
 	 *     tax, excludes fees) so that VAT and fee amounts are not silently stripped
 	 *     from the recorded price.
+	 *
+	 * NOT to be merged with VanPOS_Deposit_Manager::promote_rental_meta_to_order().
+	 * They look similar but are deliberately separate operations with incompatible
+	 * invariants:
+	 *   - Source of truth for finances: this method BACK-DERIVES total/initial/
+	 *     remaining (the canonical amounts are exactly what is missing here); the
+	 *     checkout promoter READS the canonical amounts checkout just wrote.
+	 *   - Overwrite semantics: this method is fill-if-empty and returns whether it
+	 *     changed anything (admin callers re-save on true); the checkout promoter
+	 *     runs once on a fresh order and writes unconditionally.
+	 *   - Rental-item detection: this method also probes the wcrp_rental_products_*
+	 *     fallback keys; the checkout promoter keys solely off vanpos_pickup_date.
+	 * A unified method would just branch into both behaviours behind a flag.
 	 *
 	 * @param WC_Order $order Order to backfill.
 	 * @return bool True if any meta was updated and saved.
@@ -1023,22 +1084,147 @@ class VanPOS_Order_Manager {
 	}
 
 	/**
-	 * Get payment type label
+	 * Format a numeric value as a plain-text price string for stored meta.
+	 *
+	 * Single source for the price format used in all *_formatted meta
+	 * (AutomateWoo templates, admin, PDF): the active WooCommerce currency format,
+	 * stripped of HTML. Change it here once rather than at every wc_price() call.
+	 *
+	 * @param mixed $value Numeric value.
+	 * @return string e.g. "€ 2.100,00".
+	 */
+	public static function format_price( $value ) {
+		return wp_strip_all_tags( wc_price( (float) $value ) );
+	}
+
+	/**
+	 * Format a date string as the canonical DD-MM-YYYY stored-meta date.
+	 *
+	 * Single source for the *_formatted date format used across admin, PDF, and
+	 * AutomateWoo templates so the format choice lives in one place.
+	 *
+	 * @param string $date Any strtotime-parseable date.
+	 * @return string e.g. "31-07-2026" (empty string if unparseable).
+	 */
+	public static function format_meta_date( $date ) {
+		$ts = strtotime( (string) $date );
+		return $ts ? date_i18n( 'd-m-Y', $ts ) : '';
+	}
+
+	/**
+	 * Copy the email-friendly meta block from one order to another.
+	 *
+	 * Single source for the parent→child copy of AutomateWoo display meta. A value
+	 * is copied only when the source actually has it (non-empty, not false); blanks
+	 * are never propagated. Use stamp_missing_formatted_meta() afterwards to fill
+	 * any keys the source itself was missing.
+	 *
+	 * @param WC_Order $from Source order (typically the primary rental).
+	 * @param WC_Order $to   Destination order (typically a child payment order).
+	 * @return void
+	 */
+	public static function copy_email_meta( $from, $to ) {
+		$keys = array(
+			'_vanpos_camper_name',
+			'_vanpos_pickup_date_formatted',
+			'_vanpos_return_date_formatted',
+			'_vanpos_total_price',
+			'_vanpos_total_price_formatted',
+			'_vanpos_initial_payment',
+			'_vanpos_initial_payment_formatted',
+			'_vanpos_remaining_payment',
+			'_vanpos_remaining_payment_formatted',
+			'_vanpos_booking_reference',          // Aligns with VanPOS_Meta_Backfill::EMAIL_META_KEYS.
+		);
+		foreach ( $keys as $key ) {
+			$value = $from->get_meta( $key );
+			if ( $value !== '' && $value !== false ) {
+				$to->update_meta_data( $key, $value );
+			}
+		}
+	}
+
+	/**
+	 * Fill any missing email-friendly formatted meta on an order from raw values.
+	 *
+	 * Generates only the keys the order does not already have (never overwrites),
+	 * so it is safe to call after copy_email_meta(). Camper name falls back to the
+	 * first product line item's title when not supplied.
+	 *
+	 * @param WC_Order $order Order to fill.
+	 * @param array    $args  Optional raw values: camper_name, pickup_date,
+	 *                        return_date, total_price, remaining_payment.
+	 * @return void
+	 */
+	public static function stamp_missing_formatted_meta( $order, $args = array() ) {
+		if ( ! $order->get_meta( '_vanpos_camper_name' ) ) {
+			$name = isset( $args['camper_name'] ) ? (string) $args['camper_name'] : '';
+			if ( '' === $name ) {
+				foreach ( $order->get_items() as $pi ) {
+					if ( is_a( $pi, 'WC_Order_Item_Product' ) ) {
+						$prod = $pi->get_product();
+						$name = $prod ? $prod->get_title() : $pi->get_name();
+						break;
+					}
+				}
+			}
+			if ( '' !== (string) $name ) {
+				$order->update_meta_data( '_vanpos_camper_name', $name );
+			}
+		}
+
+		$pickup = isset( $args['pickup_date'] ) ? $args['pickup_date'] : '';
+		if ( $pickup && ! $order->get_meta( '_vanpos_pickup_date_formatted' ) ) {
+			$order->update_meta_data( '_vanpos_pickup_date_formatted', self::format_meta_date( $pickup ) );
+		}
+
+		$return = isset( $args['return_date'] ) ? $args['return_date'] : '';
+		if ( $return && ! $order->get_meta( '_vanpos_return_date_formatted' ) ) {
+			$order->update_meta_data( '_vanpos_return_date_formatted', self::format_meta_date( $return ) );
+		}
+
+		if ( array_key_exists( 'total_price', $args ) ) {
+			$t = $args['total_price'];
+			if ( $t !== '' && $t !== false && ! $order->get_meta( '_vanpos_total_price_formatted' ) ) {
+				$order->update_meta_data( '_vanpos_total_price_formatted', self::format_price( $t ) );
+			}
+		}
+
+		if ( array_key_exists( 'remaining_payment', $args ) ) {
+			$r = $args['remaining_payment'];
+			if ( $r !== '' && $r !== false && ! $order->get_meta( '_vanpos_remaining_payment_formatted' ) ) {
+				$order->update_meta_data( '_vanpos_remaining_payment_formatted', self::format_price( $r ) );
+			}
+		}
+	}
+
+	/**
+	 * Get the human-readable label for a child payment-order type.
+	 *
+	 * SINGLE SOURCE OF TRUTH for child-order labels. Callers do not build these
+	 * strings themselves — create_payment_order() applies this label whenever it is
+	 * given an empty description, so the deposit flow (empty payment_schedule title)
+	 * and the payment-complete handler (no description arg) both resolve here. This
+	 * keeps one translatable string per type instead of the divergent
+	 * "Remaining payment" / "Remaining rental payment" wording that existed before.
+	 *
+	 * Visibility changed from private to public (2026-06) so that
+	 * VanPOS_Admin_Order_Edit can delegate here instead of maintaining a diverging
+	 * duplicate. Any future display path that needs a label should call this method
+	 * rather than building its own label map.
 	 *
 	 * @param string $payment_type Payment type.
 	 * @return string
 	 */
-	private static function get_payment_type_label( $payment_type ) {
+	public static function get_payment_type_label( $payment_type ) {
 		$deposit_pct   = (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 );
 		$remaining_pct = 100 - $deposit_pct;
 		$labels = array(
 			/* translators: %d is the initial payment percentage */
 			'initial'          => sprintf( __( 'Initial rental payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct ),
-			/* translators: %d is the deposit percentage */
-			'deposit'          => sprintf( __( 'Deposit payment (%d%%)', 'vanjorn-rental-pos' ), $deposit_pct ),
 			'security_deposit' => __( 'Security deposit', 'vanjorn-rental-pos' ),
 			/* translators: %d is the remaining payment percentage */
-			'remaining'        => sprintf( __( 'Remaining rental payment (%d%%)', 'vanjorn-rental-pos' ), $remaining_pct ),
+			'remaining'        => sprintf( __( 'Remaining payment (%d%%)', 'vanjorn-rental-pos' ), $remaining_pct ),
 			'extension'        => __( 'Rental extension', 'vanjorn-rental-pos' ),
 		);
 
@@ -1093,6 +1279,18 @@ class VanPOS_Order_Manager {
 		$seen_ids = array();
 
 		foreach ( $all_orders as $order ) {
+			// Drop refund objects. The 'parent' query above surfaces
+			// WC_Order_Refund records under HPOS (a refund's parent is the order
+			// it refunds). Callers treat every result as a child payment order and
+			// call WC_Order-only methods on them — add_order_note(),
+			// get_date_paid() — which fatals. WC_Order_Refund is a sibling of
+			// WC_Order under WC_Abstract_Order, not a subclass, so this instanceof
+			// check filters refunds at the single source rather than at each call
+			// site. Per-call-site guards elsewhere become redundant but harmless.
+			if ( ! $order instanceof WC_Order ) {
+				continue;
+			}
+
 			$order_id = $order->get_id();
 			if ( ! in_array( $order_id, $seen_ids, true ) ) {
 				$unique_orders[] = $order;
@@ -1104,6 +1302,29 @@ class VanPOS_Order_Manager {
 	}
 
 	/**
+	 * Find the existing child payment order of a given type for a primary order.
+	 *
+	 * Single helper behind the "is there already a child of this type, and if so
+	 * which one" question. The child-order factories use it as an idempotency
+	 * self-guard (return the existing id instead of minting a duplicate), and
+	 * has_payment_order() is a thin boolean wrapper over it.
+	 *
+	 * @param int    $primary_order_id Primary order ID.
+	 * @param string $payment_type     Payment type to match on _vanpos_payment_type.
+	 * @return WC_Order|null The existing child order, or null if none.
+	 */
+	public static function find_payment_order( $primary_order_id, $payment_type ) {
+		foreach ( self::get_payment_orders( $primary_order_id ) as $order ) {
+			if ( $payment_type === $order->get_meta( '_vanpos_payment_type' )
+				&& ! $order->has_status( array( 'cancelled', 'refunded' ) ) ) {
+				return $order;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Check if a payment order of specific type exists for a primary order
 	 *
 	 * @param int    $primary_order_id Primary order ID.
@@ -1111,11 +1332,155 @@ class VanPOS_Order_Manager {
 	 * @return bool
 	 */
 	public static function has_payment_order( $primary_order_id, $payment_type ) {
-		$payment_orders = self::get_payment_orders( $primary_order_id );
+		return null !== self::find_payment_order( $primary_order_id, $payment_type );
+	}
 
-		foreach ( $payment_orders as $order ) {
-			$order_payment_type = $order->get_meta( '_vanpos_payment_type' );
-			if ( $payment_type === $order_payment_type ) {
+	/**
+	 * Accepted _vanpos_payment_type values for the remaining rental payment.
+	 *
+	 * SINGLE SOURCE OF TRUTH for the remaining-payment classification. PHP code
+	 * calls is_remaining_payment(); SQL and WP_Query meta_query builders read this
+	 * array directly (e.g. implode into an IN list, or pass as a meta_query value)
+	 * so the accepted set is defined in exactly one place across the whole plugin.
+	 *
+	 * Historical note: 'second_payment' was a legacy alias here for orders created
+	 * by older builds. A DB audit (2026-06) confirmed no stored order — across HPOS
+	 * order meta, post meta, or line-item meta — carried it, and no code path writes
+	 * it, so the alias was retired. Do not re-add it; the type is 'remaining'.
+	 *
+	 * @return string[]
+	 */
+	public static function remaining_payment_types() {
+		return array( 'remaining' );
+	}
+
+	/**
+	 * All child payment-order types (initial, security deposit, remaining, extension).
+	 *
+	 * Used by "is this any payment order" checks and by the dashboard / order-list
+	 * "payment_other" NOT-IN filters. Sourced from remaining_payment_types() so the
+	 * accepted set stays defined in only one place.
+	 *
+	 * Type notes:
+	 *   'initial'          — vestigial; no live code path creates child orders of this type.
+	 *   'security_deposit' — active; refundable damage hold, VAT-exempt.
+	 *   'remaining'        — active; balance due before pickup.
+	 *   'extension'        — active; price-increase adjustment created by change_dates()
+	 *                        when the remaining child is already paid.
+	 *
+	 * The 'extension' type is present here so is_payment_order_type() returns true for
+	 * it and the customer-facing dashboard/order-display guards work correctly. Extension
+	 * orders still land in the "payment_other" dashboard bucket (the NOT-IN filter uses
+	 * this array) — that is intentional.
+	 *
+	 * @return string[]
+	 */
+	public static function payment_order_types() {
+		return array_merge( array( 'initial', 'security_deposit', 'extension' ), self::remaining_payment_types() );
+	}
+
+	/**
+	 * Whether a payment type represents the remaining rental payment.
+	 *
+	 * @param string $payment_type Payment type.
+	 * @return bool
+	 */
+	public static function is_remaining_payment( $payment_type ) {
+		return in_array( $payment_type, self::remaining_payment_types(), true );
+	}
+
+	/**
+	 * Whether a payment type is any recognised child payment-order type.
+	 *
+	 * @param string $payment_type Payment type.
+	 * @return bool
+	 */
+	public static function is_payment_order_type( $payment_type ) {
+		return in_array( $payment_type, self::payment_order_types(), true );
+	}
+
+	/**
+	 * Whether a payment type represents the refundable security deposit.
+	 *
+	 * Note: 'initial' is the initial rental payment (e.g. 50%), NOT the refundable
+	 * security deposit — only 'security_deposit' matches here.
+	 *
+	 * @param string $payment_type Payment type.
+	 * @return bool
+	 */
+	public static function is_security_deposit( $payment_type ) {
+		return 'security_deposit' === $payment_type;
+	}
+
+	/**
+	 * Whether a remaining-payment child order already exists for a primary order.
+	 *
+	 * Routes through is_remaining_payment() so the accepted set lives in exactly
+	 * one place. Replaces the prior pattern of calling
+	 * has_payment_order() once per accepted type at the call site.
+	 *
+	 * @param int $primary_order_id Primary order ID.
+	 * @return bool
+	 */
+	public static function has_remaining_payment_order( $primary_order_id ) {
+		foreach ( self::get_payment_orders( $primary_order_id ) as $order ) {
+			if ( self::is_remaining_payment( $order->get_meta( '_vanpos_payment_type' ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether an order is a primary rental order.
+	 *
+	 * SINGLE SOURCE for primary-rental detection — replaces the inline
+	 * pickup/return/rent_from/_original_price probes duplicated across
+	 * Customer_Account (set_rental_order_type, create_child_order_on_payment_complete,
+	 * create_security_deposit_on_checkout) and VanPOS_Admin_Order_List (which now
+	 * delegates here).
+	 *
+	 * Semantics, in order:
+	 *   1. order_type === 'primary_rental'  → true.
+	 *   2. order_type is set but something else (e.g. 'payment_order') → false.
+	 *      This is deliberate and load-bearing: child payment orders carry rental
+	 *      dates and a copied _vanpos_total_price from the parent, so probing their
+	 *      metadata would false-positive and treat a child as a primary rental.
+	 *   3. order_type unset → probe order-level dates / total price, then item-level
+	 *      rental markers, and return true if any are present.
+	 *
+	 * Read-only: never mutates the order. Callers that want to stamp
+	 * _vanpos_order_type do so themselves after a true result.
+	 *
+	 * @param WC_Order $order Order to inspect.
+	 * @return bool
+	 */
+	public static function is_primary_rental_order( $order ) {
+		if ( ! $order instanceof WC_Order ) {
+			return false;
+		}
+
+		$type = (string) $order->get_meta( '_vanpos_order_type' );
+		if ( 'primary_rental' === $type ) {
+			return true;
+		}
+		if ( '' !== $type ) {
+			return false; // Explicitly another type (e.g. payment_order) — not a primary rental.
+		}
+
+		// Type unset: detect via rental metadata. _vanpos_total_price is included
+		// as an order-level signal so a primary rental that recorded a price but no
+		// dates is still detected (the type guard above keeps child orders out).
+		if ( $order->get_meta( '_vanpos_pickup_date' ) || $order->get_meta( '_vanpos_return_date' ) || $order->get_meta( '_vanpos_total_price' ) ) {
+			return true;
+		}
+		foreach ( $order->get_items() as $item ) {
+			if ( $item->get_meta( 'vanpos_pickup_date' )
+				|| $item->get_meta( 'vanpos_return_date' )
+				|| $item->get_meta( 'wcrp_rental_products_rent_from' )
+				|| $item->get_meta( 'wcrp_rental_products_rent_to' )
+				|| $item->get_meta( '_vanpos_original_price' ) ) {
 				return true;
 			}
 		}

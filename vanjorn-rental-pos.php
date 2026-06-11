@@ -3,7 +3,7 @@
  * Plugin Name: VAN-Jorn Rental POS
  * Plugin URI: https://www.cmitexperts.com
  * Description: A POS system for rental VAN booking where customers can check date availability, choose dates, pick the van, and add to cart for payment.
- * Version: 1.9.2
+ * Version: 1.9.3
  * Author: CMITEXPERTS TEAM
  * Author URI: https://www.cmitexperts.com
  * Text Domain: vanjorn-rental-pos
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define plugin constants
 // CMITX UPDATE 2026-04-21: Feedback 8 code-structure release tag.
-define( 'VANPOS_VERSION', '1.9.2' );
+define( 'VANPOS_VERSION', '1.9.3' );
 define( 'VANPOS_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VANPOS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'VANPOS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -280,19 +280,21 @@ class VJ_Rental_POS {
 	public function activate() {
 		// Set default options
 		$default_options = array(
-			'vanpos_pickup_days' => array( 4, 5 ), // Thursday, Friday
-			'vanpos_min_rental_days' => 6,
-			'vanpos_max_rental_days' => 22,
-			'vanpos_time_slots_enabled' => 'yes',
-			'vanpos_dog_enabled' => 'yes',
-			'vanpos_dog_price' => 100,
-			'vanpos_cleaning_enabled' => 'yes',
-			'vanpos_cleaning_price' => 100,
-			'vanpos_deposit_enabled' => 'yes',
-			'vanpos_deposit_percentage' => 50,
-			'vanpos_due_date_days' => 7, // Remaining payment: 7 days before pickup
+			'vanpos_pickup_days'                       => array( 4, 5 ), // Thursday, Friday
+			'vanpos_min_rental_days'                   => 6,
+			'vanpos_max_rental_days'                   => 22,
+			'vanpos_time_slots_enabled'                => 'yes',
+			'vanpos_pickup_time'                       => '15:00',
+			'vanpos_return_time'                       => '11:00',
+			'vanpos_dog_enabled'                       => 'yes',
+			'vanpos_dog_price'                         => 100,
+			'vanpos_cleaning_enabled'                  => 'yes',
+			'vanpos_cleaning_price'                    => 100,
+			'vanpos_deposit_enabled'                   => 'yes',
+			'vanpos_deposit_percentage'                => 50,
+			'vanpos_due_date_days'                     => 7,  // Remaining payment: 7 days before pickup
 			'vanpos_security_deposit_days_before_pickup' => 14, // Security deposit: 14 days before pickup
-			'vanpos_security_deposit_product_id' => '', // Empty by default, admin must select a product
+			'vanpos_security_deposit_product_id'       => '', // Empty by default, admin must select a product
 		);
 
 		// add_option() is a no-op when the option already exists (reactivation).

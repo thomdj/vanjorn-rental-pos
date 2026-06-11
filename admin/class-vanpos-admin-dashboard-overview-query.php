@@ -261,13 +261,17 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 				$type_cond = "( px.pay_type IS NULL OR px.pay_type = '' ) AND ( px.order_type_meta IS NULL OR px.order_type_meta <> 'payment_order' )";
 				break;
 			case 'security_deposit':
-				$type_cond = "px.pay_type IN ('deposit','security_deposit')";
+				// 'initial' is the upfront rental payment percentage, not the refundable
+				// security deposit. Including it here would pull initial-payment child
+				// orders into the Security Deposit tab once 'initial' is written as a live
+				// child-order type (see: deposit→initial type retirement).
+				$type_cond = "px.pay_type IN ('security_deposit')";
 				break;
 			case 'remaining_payment':
-				$type_cond = "px.pay_type IN ('remaining','second_payment')";
+				$type_cond = "px.pay_type IN ('" . implode( "','", VanPOS_Order_Manager::remaining_payment_types() ) . "')";
 				break;
 			case 'payment_other':
-				$type_cond = "px.order_type_meta = 'payment_order' AND ( px.pay_type IS NULL OR px.pay_type = '' OR px.pay_type NOT IN ('deposit','security_deposit','remaining','second_payment') )";
+				$type_cond = "px.order_type_meta = 'payment_order' AND ( px.pay_type IS NULL OR px.pay_type = '' OR px.pay_type NOT IN ('" . implode( "','", VanPOS_Order_Manager::payment_order_types() ) . "') )";
 				break;
 		}
 
@@ -514,7 +518,8 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 				return array(
 					array(
 						'key'     => '_vanpos_payment_type',
-						'value'   => array( 'deposit', 'security_deposit' ),
+						// 'initial' removed — same reasoning as the HPOS path above.
+					'value'   => array( 'security_deposit' ),
 						'compare' => 'IN',
 					),
 				);
@@ -522,7 +527,7 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 				return array(
 					array(
 						'key'     => '_vanpos_payment_type',
-						'value'   => array( 'remaining', 'second_payment' ),
+						'value'   => VanPOS_Order_Manager::remaining_payment_types(),
 						'compare' => 'IN',
 					),
 				);
@@ -534,7 +539,7 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 						array( 'key' => '_vanpos_payment_type', 'compare' => 'NOT EXISTS' ),
 						array(
 							'key'     => '_vanpos_payment_type',
-							'value'   => array( 'deposit', 'security_deposit', 'remaining', 'second_payment' ),
+							'value'   => VanPOS_Order_Manager::payment_order_types(),
 							'compare' => 'NOT IN',
 						),
 					),
@@ -675,10 +680,13 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 		$type_key   = 'main';
 		$type_label = __( 'Main Order', 'vanjorn-rental-pos' );
 		if ( 'payment_order' === $order_type || '' !== $pay_type ) {
-			if ( in_array( $pay_type, array( 'deposit', 'security_deposit' ), true ) ) {
+			// 'initial' removed from the security_deposit bucket — see filter comments
+			// above. An 'initial' pay_type falls through to payment_other (label
+			// auto-derived as "Initial"), keeping it distinct from the refundable deposit.
+			if ( in_array( $pay_type, array( 'security_deposit' ), true ) ) {
 				$type_key   = 'security_deposit';
 				$type_label = __( 'Security Deposit', 'vanjorn-rental-pos' );
-			} elseif ( in_array( $pay_type, array( 'remaining', 'second_payment' ), true ) ) {
+			} elseif ( VanPOS_Order_Manager::is_remaining_payment( $pay_type ) ) {
 				$type_key   = 'remaining_payment';
 				$type_label = __( 'Remaining Payment', 'vanjorn-rental-pos' );
 			} elseif ( '' !== $pay_type ) {
@@ -857,9 +865,12 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 	 * @return array{from:int,to:int}
 	 */
 	public static function resolve_date_window( array $filters ) {
-		$today = current_time( 'timestamp' );
-		$start = strtotime( gmdate( 'Y-m-d', $today ) . ' 00:00:00' );
-		$end   = strtotime( gmdate( 'Y-m-d', $today ) . ' 23:59:59' );
+		// wp_date() returns the date in the site's configured timezone without
+		// the deprecated current_time('timestamp') + gmdate() anti-pattern that
+		// was used here previously (current_time('timestamp') is deprecated since WP 5.3).
+		$today_date = wp_date( 'Y-m-d' );
+		$start      = strtotime( $today_date . ' 00:00:00' );
+		$end        = strtotime( $today_date . ' 23:59:59' );
 
 		switch ( $filters['range'] ?? 'today' ) {
 			case '3days':

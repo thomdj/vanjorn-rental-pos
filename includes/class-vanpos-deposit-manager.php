@@ -88,7 +88,7 @@ class VanPOS_Deposit_Manager {
 	 * @param string $pickup_date Pickup date in Y-m-d format.
 	 * @return bool
 	 */
-	public static function is_pickup_more_than_14_days( $pickup_date ) {
+	public static function is_pickup_beyond_security_deposit_threshold( $pickup_date ) {
 		if ( empty( $pickup_date ) ) {
 			return false;
 		}
@@ -124,8 +124,8 @@ class VanPOS_Deposit_Manager {
 			$pickup_date = $cart_item['wcrp_rental_products_rent_from'];
 		}
 
-		// Only apply deposit if pickup is more than 14 days away
-		return self::is_pickup_more_than_14_days( $pickup_date );
+		// Only apply deposit if pickup is beyond the security deposit threshold.
+		return self::is_pickup_beyond_security_deposit_threshold( $pickup_date );
 	}
 
 	/**
@@ -219,8 +219,8 @@ class VanPOS_Deposit_Manager {
 			$pickup_date = sanitize_text_field( $_REQUEST['data']['pickup_date'] );
 		}
 
-		// Enable deposit only if pickup is more than 14 days away
-		$enable_deposit = self::is_pickup_more_than_14_days( $pickup_date );
+		// Enable deposit only if pickup is beyond the security deposit threshold.
+		$enable_deposit = self::is_pickup_beyond_security_deposit_threshold( $pickup_date );
 
 		$cart_item_data['vanpos_deposit'] = array(
 			'enable' => $enable_deposit,
@@ -850,21 +850,9 @@ class VanPOS_Deposit_Manager {
 			if ( get_option( 'woocommerce_prices_include_tax' ) === 'yes'
 				&& class_exists( 'VanPOS_Order_Manager' )
 				&& (float) $deposit > 0 ) {
-				$rate = VanPOS_Order_Manager::get_vat_rate_fraction( $item );
-				$excl = round( (float) $deposit / ( 1 + $rate ), 2 );
-				$tax  = round( (float) $deposit - $excl, 2 );
-
-				$item->set_subtotal( $excl );
-				$item->set_total( $excl );
-				$item->set_subtotal_tax( $tax );
-				$item->set_total_tax( $tax );
-				if ( is_callable( array( $item, 'set_taxes' ) ) ) {
-					$rate_id = VanPOS_Order_Manager::get_vat_rate_id( $item );
-					$item->set_taxes( array(
-						'subtotal' => array( $rate_id => $tax ),
-						'total'    => array( $rate_id => $tax ),
-					) );
-				}
+				$rate_id = VanPOS_Order_Manager::get_vat_rate_id( $item );
+				$split   = VanPOS_Order_Manager::split_inclusive_vat( (float) $deposit, VanPOS_Order_Manager::get_vat_rate_fraction( $item ) );
+				VanPOS_Order_Manager::apply_inclusive_vat_to_item( $item, $split['excl'], $split['tax'], $rate_id );
 			} else {
 				$item->set_subtotal( $deposit );
 				$item->set_total( $deposit );
@@ -912,13 +900,13 @@ class VanPOS_Deposit_Manager {
 		// Create payment schedule
 		// The main/parent order IS the deposit payment (paid at checkout),
 		// so only a 'remaining' child order needs to be created.
-		$deposit_pct    = (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 );
-		$remaining_pct  = 100 - $deposit_pct;
 		$payment_schedule = array(
 			'remaining' => array(
 				'id'    => '',
-				/* translators: %d is the remaining payment percentage */
-				'title' => sprintf( __( 'Remaining payment (%d%%)', 'vanjorn-rental-pos' ), $remaining_pct ),
+				// Title intentionally empty: the human label is applied centrally by
+				// VanPOS_Order_Manager::create_payment_order() from the payment type,
+				// the single source of truth for child-order labels.
+				'title' => '',
 				'type'  => 'remaining',
 				'total' => $second_payment,
 			),
@@ -1000,13 +988,13 @@ class VanPOS_Deposit_Manager {
 		// Create payment schedule
 		// The main/parent order IS the deposit payment (paid at checkout),
 		// so only a 'remaining' child order needs to be created.
-		$deposit_pct    = (int) VanPOS_Functions::get_setting( 'vanpos_deposit_percentage', 50 );
-		$remaining_pct  = 100 - $deposit_pct;
 		$payment_schedule = array(
 			'remaining' => array(
 				'id'    => '',
-				/* translators: %d is the remaining payment percentage */
-				'title' => sprintf( __( 'Remaining payment (%d%%)', 'vanjorn-rental-pos' ), $remaining_pct ),
+				// Title intentionally empty: the human label is applied centrally by
+				// VanPOS_Order_Manager::create_payment_order() from the payment type,
+				// the single source of truth for child-order labels.
+				'title' => '',
 				'type'  => 'remaining',
 				'total' => $second_payment,
 			),
@@ -1044,14 +1032,11 @@ class VanPOS_Deposit_Manager {
 		foreach ( $payment_schedule as $partial_key => $payment ) {
 			// Dedup guard: skip if a child order of this type already exists.
 			// Prevents duplicates from payment gateway retries or webhook replays.
-			if ( class_exists( 'VanPOS_Order_Manager' ) && VanPOS_Order_Manager::has_payment_order( $order->get_id(), $payment['type'] ) ) {
-				$existing_orders = VanPOS_Order_Manager::get_payment_orders( $order->get_id() );
-				foreach ( $existing_orders as $existing_order ) {
-					if ( $existing_order->get_meta( '_vanpos_payment_type' ) === $payment['type'] ) {
-						$payment_schedule[ $partial_key ]['id'] = $existing_order->get_id();
-						break;
-					}
-				}
+			$existing = class_exists( 'VanPOS_Order_Manager' )
+				? VanPOS_Order_Manager::find_payment_order( $order->get_id(), $payment['type'] )
+				: null;
+			if ( $existing ) {
+				$payment_schedule[ $partial_key ]['id'] = $existing->get_id();
 				continue;
 			}
 
@@ -1084,6 +1069,14 @@ class VanPOS_Deposit_Manager {
 	 * This method reads the first rental item's meta and promotes it to
 	 * order-level meta, matching what VanPOS_Order_Manager::create_primary_rental_order()
 	 * does for the POS flow.
+	 *
+	 * NOT to be merged with VanPOS_Order_Manager::update_missing_rental_metadata().
+	 * That method is the admin backfill for legacy/broken orders and BACK-DERIVES
+	 * the financial meta because the canonical amounts are missing there; this
+	 * method READS the canonical initial/remaining amounts that checkout just wrote
+	 * and is fill-on-fresh-order only. See the note on that method for the full
+	 * list of incompatible invariants. They already share the leaf helpers
+	 * (generate_booking_reference, format_price, format_meta_date).
 	 *
 	 * @param WC_Order $order The parent rental order.
 	 * @return void
@@ -1169,8 +1162,8 @@ class VanPOS_Deposit_Manager {
 		}
 
 		// Short-term booking flag.
-		$is_more_than_14 = self::is_pickup_more_than_14_days( $pickup_date );
-		$order->update_meta_data( '_is_short_term_booking', $is_more_than_14 ? 'no' : 'yes' );
+		$is_long_term = self::is_pickup_beyond_security_deposit_threshold( $pickup_date );
+		$order->update_meta_data( '_is_short_term_booking', $is_long_term ? 'no' : 'yes' );
 
 		// Financial meta. The initial/remaining amounts are written canonically at
 		// checkout (create_order / block_checkout_create_order); read them back here.
@@ -1189,17 +1182,17 @@ class VanPOS_Deposit_Manager {
 
 		// Human-readable dates in DD-MM-YYYY format for admin/PDF consistency.
 		if ( $pickup_date ) {
-			$order->update_meta_data( '_vanpos_pickup_date_formatted', date_i18n( 'd-m-Y', strtotime( $pickup_date ) ) );
+			$order->update_meta_data( '_vanpos_pickup_date_formatted', VanPOS_Order_Manager::format_meta_date( $pickup_date ) );
 		}
 		if ( $return_date ) {
-			$order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'd-m-Y', strtotime( $return_date ) ) );
+			$order->update_meta_data( '_vanpos_return_date_formatted', VanPOS_Order_Manager::format_meta_date( $return_date ) );
 		}
 
 		// Pre-formatted prices (plain text, e.g. "€ 2.100,00").
 		// Always write - even for €0 - so AutomateWoo templates never render blank.
-		$order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( $total_price ) ) );
-		$order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( $deposit_amount ) ) );
-		$order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( $second_payment ) ) );
+		$order->update_meta_data( '_vanpos_total_price_formatted', VanPOS_Order_Manager::format_price( $total_price ) );
+		$order->update_meta_data( '_vanpos_initial_payment_formatted', VanPOS_Order_Manager::format_price( $deposit_amount ) );
+		$order->update_meta_data( '_vanpos_remaining_payment_formatted', VanPOS_Order_Manager::format_price( $second_payment ) );
 
 		// Add-ons.
 		if ( $include_dog ) {
@@ -1246,9 +1239,9 @@ class VanPOS_Deposit_Manager {
 			return;
 		}
 
-		if ( $payment_type === 'remaining' || $payment_type === 'second_payment' ) {
+		if ( class_exists( 'VanPOS_Order_Manager' ) && VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			$parent_order->update_meta_data( '_vanpos_remaining_payment_paid', 'yes' );
-		} elseif ( $payment_type === 'security_deposit' ) {
+		} elseif ( 'security_deposit' === $payment_type ) {
 			$parent_order->update_meta_data( '_vanpos_security_deposit_paid', 'yes' );
 		}
 

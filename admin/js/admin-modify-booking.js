@@ -400,7 +400,7 @@
 
 	// Helpers
 	function money(n) {
-		return cfg.currency + parseFloat(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		return cfg.currency + parseFloat(n).toLocaleString( 'nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 } );
 	}
 
 	/**

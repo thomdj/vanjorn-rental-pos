@@ -18,92 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class VanPOS_Change_Manager {
 
 	/**
-	 * Look up the WooCommerce tax rate ID for the order's applicable tax rate.
-	 *
-	 * Resolution order:
-	 *  1. Extract from existing tax items on the order (most reliable).
-	 *  2. Look up the shop's standard tax rate from the WC tax rates table.
-	 *  3. Fallback to rate ID 1.
-	 *
-	 * @param WC_Order|null $order Optional order to extract rate ID from existing tax items.
-	 * @return int Tax rate ID.
-	 */
-	private static function get_vat_rate_id( $order = null ) {
-		// 1. Try to extract from existing tax items on the order
-		if ( $order ) {
-			foreach ( $order->get_items( 'tax' ) as $tax_item ) {
-				$rate_id = $tax_item->get_rate_id();
-				if ( $rate_id > 0 ) {
-					return (int) $rate_id;
-				}
-			}
-		}
-
-		// 2. Look up the shop's standard tax rate from the WC tax rates table
-		$shop_country = function_exists( 'WC' ) && WC()->countries
-			? WC()->countries->get_base_country()
-			: '';
-
-		global $wpdb;
-		if ( $shop_country ) {
-			$rate_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT tax_rate_id FROM {$wpdb->prefix}woocommerce_tax_rates
-					 WHERE tax_rate_country = %s
-					 ORDER BY tax_rate_priority ASC, tax_rate_order ASC
-					 LIMIT 1",
-					$shop_country
-				)
-			);
-		} else {
-			// No country available — grab the first active rate
-			$rate_id = $wpdb->get_var(
-				"SELECT tax_rate_id FROM {$wpdb->prefix}woocommerce_tax_rates
-				 ORDER BY tax_rate_priority ASC, tax_rate_order ASC
-				 LIMIT 1"
-			);
-		}
-
-		if ( $rate_id ) {
-			return (int) $rate_id;
-		}
-
-		// 3. Fallback to rate ID 1
-		return 1;
-	}
-
-	/**
-	 * Get the tax rate percentage for a given WC tax rate ID.
-	 *
-	 * @param int $rate_id WooCommerce tax rate ID.
-	 * @return float Tax rate as a decimal (e.g. 0.21 for 21%). Returns 0 if not found.
-	 */
-	private static function get_tax_rate_percentage( $rate_id ) {
-		// Try WC_Tax API first (available since WC 3.x)
-		if ( class_exists( 'WC_Tax' ) ) {
-			$percent_str = WC_Tax::get_rate_percent_value( $rate_id );
-			if ( $percent_str > 0 ) {
-				return (float) $percent_str / 100;
-			}
-		}
-
-		// Direct DB lookup as fallback
-		global $wpdb;
-		$rate = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d",
-				$rate_id
-			)
-		);
-
-		if ( $rate !== null ) {
-			return (float) $rate / 100;
-		}
-
-		return 0;
-	}
-
-	/**
 	 * Whether an explicit admin-supplied daily rate was provided.
 	 *
 	 * A numeric value >= 0 counts as provided (0 is a valid free/comped rate).
@@ -164,8 +78,6 @@ class VanPOS_Change_Manager {
 			// Delta approach: old_total + rate × Δdays.
 			// Never back-calculates rate from stored total, so legacy day-billed orders
 			// (where total ÷ nights would produce a ghost rate) are handled correctly.
-			// $stored_rate is resolved by the caller from _vanpos_price_per_day or the
-			// product catalogue price — it is always the same unit as $old_days / $new_days.
 			if ( $stored_rate > 0 ) {
 				return round( (float) $old_total + (float) $stored_rate * ( $new_days - (int) $old_days ), wc_get_price_decimals() );
 			}
@@ -367,7 +279,10 @@ class VanPOS_Change_Manager {
 		$new_remaining_amount = 0;
 		$raw_remaining        = 0;
 		$new_total_price      = 0;
-		$old_total_price      = (float) $order->get_meta( '_vanpos_total_price' );
+		// Reuse $old_total_for_lock so we inherit its _vanpos_original_price fallback:
+		// for legacy orders where _vanpos_total_price = 0, $price_diff would otherwise
+		// treat the entire new total as an increase and create a full-amount extension.
+		$old_total_price = $old_total_for_lock;
 		$price_diff           = 0;
 
 		if ( $product_id && class_exists( 'VanPOS_Functions' ) ) {
@@ -410,9 +325,9 @@ class VanPOS_Change_Manager {
 						sprintf(
 							/* translators: 1: daily rate, 2: days, 3: total */
 							__( 'Custom rate applied on modification: %1$s/day × %2$d days = %3$s (incl. VAT).', 'vanjorn-rental-pos' ),
-							wp_strip_all_tags( wc_price( $price_per_day ) ),
+							VanPOS_Order_Manager::format_price( $price_per_day ),
 							$days,
-							wp_strip_all_tags( wc_price( $new_total_price ) )
+							VanPOS_Order_Manager::format_price( $new_total_price )
 						),
 						false,
 						true
@@ -472,12 +387,12 @@ class VanPOS_Change_Manager {
 		if ( $product ) {
 			$order->update_meta_data( '_vanpos_camper_name', $product->get_name() );
 		}
-		$order->update_meta_data( '_vanpos_pickup_date_formatted', date_i18n( 'd-m-Y', strtotime( $new_pickup_date ) ) );
-		$order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'd-m-Y', strtotime( $new_return_date ) ) );
+		$order->update_meta_data( '_vanpos_pickup_date_formatted', VanPOS_Order_Manager::format_meta_date( $new_pickup_date ) );
+		$order->update_meta_data( '_vanpos_return_date_formatted', VanPOS_Order_Manager::format_meta_date( $new_return_date ) );
 
-		$order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( $new_total_price ) ) );
-		$order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( (float) $order->get_meta( '_vanpos_initial_payment' ) ) ) );
-		$order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( $new_remaining_amount ) ) );
+		$order->update_meta_data( '_vanpos_total_price_formatted', VanPOS_Order_Manager::format_price( $new_total_price ) );
+		$order->update_meta_data( '_vanpos_initial_payment_formatted', VanPOS_Order_Manager::format_price( (float) $order->get_meta( '_vanpos_initial_payment' ) ) );
+		$order->update_meta_data( '_vanpos_remaining_payment_formatted', VanPOS_Order_Manager::format_price( $new_remaining_amount ) );
 
 		// ── Update item-level meta ────────────────────────────────────────
 		self::update_item_meta( $order, $product_id, $new_pickup_date, $new_return_date, $new_pickup_time, $new_return_time, $days, $new_total_price, $new_remaining_amount );
@@ -958,7 +873,7 @@ class VanPOS_Change_Manager {
 				$child_order->update_meta_data( '_payment_due_date', $new_due_date );
 
 				// Update formatted due date for email templates
-				$child_order->update_meta_data( '_payment_due_date_formatted', date_i18n( 'd-m-Y', strtotime( $new_due_date ) ) );
+				$child_order->update_meta_data( '_payment_due_date_formatted', VanPOS_Order_Manager::format_meta_date( $new_due_date ) );
 			}
 
 			// --- 3. Reset AutomateWoo reminder flags ---
@@ -970,15 +885,15 @@ class VanPOS_Change_Manager {
 			if ( $product ) {
 				$child_order->update_meta_data( '_vanpos_camper_name', $product->get_name() );
 			}
-			$child_order->update_meta_data( '_vanpos_pickup_date_formatted', date_i18n( 'd-m-Y', strtotime( $new_pickup_date ) ) );
-			$child_order->update_meta_data( '_vanpos_return_date_formatted', date_i18n( 'd-m-Y', strtotime( $new_return_date ) ) );
+			$child_order->update_meta_data( '_vanpos_pickup_date_formatted', VanPOS_Order_Manager::format_meta_date( $new_pickup_date ) );
+			$child_order->update_meta_data( '_vanpos_return_date_formatted', VanPOS_Order_Manager::format_meta_date( $new_return_date ) );
 
 			$child_order->update_meta_data( '_vanpos_total_price', $new_total_price );
-			$child_order->update_meta_data( '_vanpos_total_price_formatted', wp_strip_all_tags( wc_price( $new_total_price ) ) );
+			$child_order->update_meta_data( '_vanpos_total_price_formatted', VanPOS_Order_Manager::format_price( $new_total_price ) );
 			$child_order->update_meta_data( '_vanpos_initial_payment', $parent_initial_payment );
-			$child_order->update_meta_data( '_vanpos_initial_payment_formatted', wp_strip_all_tags( wc_price( $parent_initial_payment ) ) );
+			$child_order->update_meta_data( '_vanpos_initial_payment_formatted', VanPOS_Order_Manager::format_price( $parent_initial_payment ) );
 			$child_order->update_meta_data( '_vanpos_remaining_payment', $new_remaining_amount );
-			$child_order->update_meta_data( '_vanpos_remaining_payment_formatted', wp_strip_all_tags( wc_price( $new_remaining_amount ) ) );
+			$child_order->update_meta_data( '_vanpos_remaining_payment_formatted', VanPOS_Order_Manager::format_price( $new_remaining_amount ) );
 
 			// --- 5. Update remaining payment amount with proper VAT if changed ---
 			if ( $new_remaining_amount > 0 && self::is_remaining_payment( $payment_type ) ) {
@@ -988,7 +903,7 @@ class VanPOS_Change_Manager {
 			// --- 6. Update line item meta on remaining payment children ---
 			// Security_deposit children carry their own deposit product line
 			// item (not the rental van), so skip — they don't represent a
-			// rental booking. For all other payment types (remaining, deposit,
+			// rental booking. For all other payment types (remaining, initial,
 			// extension), propagate the new dates to the line item's vanpos_*
 			// meta and the Kestrel-compatibility fields so the frontend
 			// calendar query and email templates see consistent values.
@@ -1052,7 +967,7 @@ class VanPOS_Change_Manager {
 			return null;
 		}
 
-		if ( self::is_remaining_payment( $payment_type ) ) {
+		if ( self::is_remaining_payment( $payment_type ) || 'extension' === $payment_type ) {
 			return VanPOS_Functions::calculate_due_date_from_pickup( $new_pickup_date, 'remaining' );
 		}
 
@@ -1094,19 +1009,17 @@ class VanPOS_Change_Manager {
 			return;
 		}
 
-		// VAT breakdown — derive the rate dynamically from WooCommerce
-		// Capture the tax rate ID from existing items before removing them
-		$tax_rate_id  = self::get_vat_rate_id( $child_order );
-		$tax_rate_pct = self::get_tax_rate_percentage( $tax_rate_id );
+		// VAT breakdown — read the rate from the existing product item before stripping,
+		// then delegate to VanPOS_Order_Manager (the canonical resolution path used by
+		// all child-order creation) so rate-lookup has a single source of truth.
+		$existing_items = $child_order->get_items();
+		$rate_src       = $existing_items ? reset( $existing_items ) : '';
+		$tax_rate_id    = VanPOS_Order_Manager::get_vat_rate_id( $rate_src );
+		$tax_rate_pct   = VanPOS_Order_Manager::get_vat_rate_fraction( $rate_src );
 
-		if ( $tax_rate_pct > 0 ) {
-			$child_excl = round( $new_amount / ( 1 + $tax_rate_pct ), 2 );
-			$child_tax  = round( $new_amount - $child_excl, 2 );
-		} else {
-			// No tax rate found — treat as tax-exempt
-			$child_excl = $new_amount;
-			$child_tax  = 0;
-		}
+		$split      = VanPOS_Order_Manager::split_inclusive_vat( $new_amount, $tax_rate_pct );
+		$child_excl = $split['excl'];
+		$child_tax  = $split['tax'];
 
 		// Remove all existing line items and tax items
 		foreach ( $child_order->get_items() as $old_item ) {
@@ -1121,16 +1034,18 @@ class VanPOS_Change_Manager {
 		if ( $product ) {
 			$item->set_product( $product );
 			$item->set_name( $product->get_name() );
+		} else {
+			// Product was deleted or unavailable — fall back to the payment-type label
+			// so the rebuilt line item doesn't surface as blank in admin after a date
+			// change. get_payment_type_label() is public since 2026-06.
+			$payment_type  = $child_order->get_meta( '_vanpos_payment_type' );
+			$fallback_name = class_exists( 'VanPOS_Order_Manager' )
+				? VanPOS_Order_Manager::get_payment_type_label( $payment_type )
+				: $payment_type;
+			$item->set_name( $fallback_name );
 		}
 		$item->set_quantity( 1 );
-		$item->set_subtotal( $child_excl );
-		$item->set_total( $child_excl );
-		$item->set_subtotal_tax( $child_tax );
-		$item->set_total_tax( $child_tax );
-		$item->set_taxes( array(
-			'total'    => array( $tax_rate_id => $child_tax ),
-			'subtotal' => array( $tax_rate_id => $child_tax ),
-		) );
+		VanPOS_Order_Manager::apply_inclusive_vat_to_item( $item, $child_excl, $child_tax, $tax_rate_id );
 		$child_order->add_item( $item );
 
 		// Add explicit tax item row
@@ -1337,7 +1252,7 @@ class VanPOS_Change_Manager {
 			if ( $order ) {
 				$ext_refs = array();
 				foreach ( $paid_extensions as $ext ) {
-					$ext_refs[] = '#' . $ext->get_order_number() . ' (' . wp_strip_all_tags( wc_price( $ext->get_total() ) ) . ')';
+					$ext_refs[] = '#' . $ext->get_order_number() . ' (' . VanPOS_Order_Manager::format_price( $ext->get_total() ) . ')';
 				}
 				$order->add_order_note(
 					sprintf(
@@ -1366,7 +1281,8 @@ class VanPOS_Change_Manager {
 		$child_orders = VanPOS_Order_Manager::get_payment_orders( $order_id );
 		foreach ( $child_orders as $child ) {
 			$payment_type = $child->get_meta( '_vanpos_payment_type' );
-			if ( self::is_remaining_payment( $payment_type ) ) {
+			if ( self::is_remaining_payment( $payment_type )
+				&& ! $child->has_status( array( 'cancelled', 'refunded' ) ) ) {
 				return $child;
 			}
 		}
@@ -1426,7 +1342,12 @@ class VanPOS_Change_Manager {
 	 * @return bool
 	 */
 	private static function is_remaining_payment( $payment_type ) {
-		return in_array( $payment_type, array( 'remaining', 'second_payment' ), true );
+		// Delegate to the single source of truth so the accepted values are defined
+		// in exactly one place. ('second_payment' was retired after a 2026-06 audit.)
+		if ( class_exists( 'VanPOS_Order_Manager' ) ) {
+			return VanPOS_Order_Manager::is_remaining_payment( $payment_type );
+		}
+		return in_array( $payment_type, array( 'remaining' ), true );
 	}
 
 	/**
@@ -1436,8 +1357,10 @@ class VanPOS_Change_Manager {
 	 * @return bool
 	 */
 	private static function is_security_deposit( $payment_type ) {
-		// Only the refundable security deposit matches here.
-		// 'deposit' is the 50% initial rental payment — not the same thing.
+		if ( class_exists( 'VanPOS_Order_Manager' ) ) {
+			return VanPOS_Order_Manager::is_security_deposit( $payment_type );
+		}
+		// 'initial' is the initial rental payment — not the refundable deposit.
 		return $payment_type === 'security_deposit';
 	}
 

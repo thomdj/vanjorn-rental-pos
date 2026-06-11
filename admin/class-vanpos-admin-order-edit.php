@@ -119,7 +119,7 @@ class VanPOS_Admin_Order_Edit {
 			<table class="wp-list-table widefat fixed striped table-view-list orders wc-orders-list-table wc-orders-list-table-shop_order" style="margin-top: 10px;">
 				<thead><tr><th><?php esc_html_e( 'Order', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Type', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Amount', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Status', 'vanjorn-rental-pos' ); ?></th></tr></thead>
 				<tbody>
-				<?php foreach ( $child_orders as $child_order ) : if ( 'shop_order_refund' === $child_order->get_type() ) { continue; } $payment_type = $child_order->get_meta( '_vanpos_payment_type' ); $payment_type_label = $this->get_payment_type_label( $payment_type ); $parent_id = $child_order->get_parent_id(); if ( ! $parent_id ) { $parent_id = $child_order->get_meta( '_vanpos_primary_order_id' ); } $parent_order = $parent_id ? wc_get_order( $parent_id ) : null; $parent_order_number = $parent_order ? $parent_order->get_order_number() : $parent_id; ?>
+				<?php foreach ( $child_orders as $child_order ) : $payment_type = $child_order->get_meta( '_vanpos_payment_type' ); $payment_type_label = $this->get_payment_type_label( $payment_type ); $parent_id = $child_order->get_parent_id(); if ( ! $parent_id ) { $parent_id = $child_order->get_meta( '_vanpos_primary_order_id' ); } $parent_order = $parent_id ? wc_get_order( $parent_id ) : null; $parent_order_number = $parent_order ? $parent_order->get_order_number() : $parent_id; ?>
 					<tr><td><a href="<?php echo esc_url( admin_url( 'admin.php?page=wc-orders&action=edit&id=' . $child_order->get_id() ) ); ?>">#<?php echo esc_html( $child_order->get_order_number() ); ?></a><?php if ( $parent_id && $parent_order ) : ?><br><small style="color: #666;"><?php printf( esc_html__( 'Child order of %s', 'vanjorn-rental-pos' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-orders&action=edit&id=' . $parent_id ) ) . '" style="color: #3858e9;">#' . esc_html( $parent_order_number ) . '</a>' ); ?></small><?php endif; ?></td><td><?php echo esc_html( $payment_type_label ); ?></td><td><?php echo wp_kses_post( $child_order->get_formatted_order_total() ); ?></td><td><mark class="order-status status-<?php echo esc_attr( $child_order->get_status() ); ?>"><?php echo esc_html( wc_get_order_status_name( $child_order->get_status() ) ); ?></mark></td></tr>
 				<?php endforeach; ?>
 				</tbody>
@@ -293,7 +293,7 @@ class VanPOS_Admin_Order_Edit {
 			<?php if ( $metadata_missing ) : ?><div class="notice notice-warning inline" style="margin: 10px 0;"><p><strong><?php esc_html_e( 'Missing Rental Metadata', 'vanjorn-rental-pos' ); ?></strong><br><?php esc_html_e( 'This order appears to be a rental order but is missing some metadata. Click the button below to update it.', 'vanjorn-rental-pos' ); ?></p><p><button type="button" class="button vanpos-update-metadata" data-order-id="<?php echo esc_attr( $order->get_id() ); ?>"><?php esc_html_e( 'Update Rental Metadata', 'vanjorn-rental-pos' ); ?></button></p></div><?php endif; ?>
 			<?php if ( ! $has_remaining_order && $remaining_amount > 0 ) : ?><p><button type="button" class="button button-primary vanpos-create-child-order" data-order-id="<?php echo esc_attr( $order->get_id() ); ?>" data-payment-type="remaining"><?php esc_html_e( 'Create Remaining Payment Order', 'vanjorn-rental-pos' ); ?></button><span class="description" style="display: block; margin-top: 5px;"><?php printf( esc_html__( 'Remaining amount: %s', 'vanjorn-rental-pos' ), wc_price( $remaining_amount ) ); ?></span></p><?php elseif ( $has_remaining_order ) : ?><p class="description"><?php esc_html_e( 'Remaining payment order already exists.', 'vanjorn-rental-pos' ); ?></p><?php elseif ( $remaining_amount <= 0 && ! $metadata_missing ) : ?><p class="description"><?php esc_html_e( 'No remaining amount to collect.', 'vanjorn-rental-pos' ); ?></p><?php endif; ?>
 			<?php if ( ! empty( $child_orders ) ) : ?><table class="widefat striped" style="margin-top: 10px;"><thead><tr><th><?php esc_html_e( 'Order', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Type', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Amount', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Status', 'vanjorn-rental-pos' ); ?></th><th><?php esc_html_e( 'Date', 'vanjorn-rental-pos' ); ?></th></tr></thead><tbody>
-			<?php foreach ( $child_orders as $child_order ) : if ( 'shop_order_refund' === $child_order->get_type() ) { continue; } $payment_type = $child_order->get_meta( '_vanpos_payment_type' ); $payment_type_label = $this->get_payment_type_label( $payment_type ); $parent_id = $child_order->get_parent_id(); if ( ! $parent_id ) { $parent_id = $child_order->get_meta( '_vanpos_primary_order_id' ); } $parent_order = $parent_id ? wc_get_order( $parent_id ) : null; $parent_order_number = $parent_order ? $parent_order->get_order_number() : $parent_id; ?>
+			<?php foreach ( $child_orders as $child_order ) : $payment_type = $child_order->get_meta( '_vanpos_payment_type' ); $payment_type_label = $this->get_payment_type_label( $payment_type ); $parent_id = $child_order->get_parent_id(); if ( ! $parent_id ) { $parent_id = $child_order->get_meta( '_vanpos_primary_order_id' ); } $parent_order = $parent_id ? wc_get_order( $parent_id ) : null; $parent_order_number = $parent_order ? $parent_order->get_order_number() : $parent_id; ?>
 				<tr><td><a href="<?php echo esc_url( admin_url( 'admin.php?page=wc-orders&action=edit&id=' . $child_order->get_id() ) ); ?>">#<?php echo esc_html( $child_order->get_order_number() ); ?></a><?php if ( $parent_id && $parent_order ) : ?><br><small style="color: #666;"><?php printf( esc_html__( 'Child order of %s', 'vanjorn-rental-pos' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wc-orders&action=edit&id=' . $parent_id ) ) . '" style="color: #3858e9;">#' . esc_html( $parent_order_number ) . '</a>' ); ?></small><?php endif; ?></td><td><?php echo esc_html( $payment_type_label ); ?></td><td><?php echo wp_kses_post( $child_order->get_formatted_order_total() ); ?></td><td><mark class="order-status status-<?php echo esc_attr( $child_order->get_status() ); ?>"><?php echo esc_html( wc_get_order_status_name( $child_order->get_status() ) ); ?></mark></td><td><?php echo esc_html( $child_order->get_date_created()->date_i18n( get_option( 'date_format' ) ) ); ?></td></tr>
 			<?php endforeach; ?>
 			</tbody></table><?php else : ?><p class="description"><?php esc_html_e( 'No payment orders created yet.', 'vanjorn-rental-pos' ); ?></p><?php endif; ?>
@@ -302,13 +302,19 @@ class VanPOS_Admin_Order_Edit {
 	}
 
 	/**
-	 * CMIT CODE - UPDATED - 05 MAY 2026 — single source of truth in VanPOS_Order_Deletion.
+	 * Delegate to the single source of truth: VanPOS_Order_Manager::is_primary_rental_order().
+	 *
+	 * Previously delegated to VanPOS_Order_Deletion, which carried its own copy of the
+	 * detection logic with a subtly looser order_type gate — only 'payment_order' triggered
+	 * the early false, while Order Manager returns false for any non-empty non-'primary_rental'
+	 * type. Both are now routed through Order Manager so the rules live in one place.
 	 *
 	 * @param WC_Order $order Order object.
 	 * @return bool
 	 */
 	private function is_primary_rental_order( $order ) {
-		return class_exists( 'VanPOS_Order_Deletion' ) && VanPOS_Order_Deletion::is_primary_rental_order( $order );
+		return class_exists( 'VanPOS_Order_Manager' )
+			&& VanPOS_Order_Manager::is_primary_rental_order( $order );
 	}
 
 	/**
@@ -323,15 +329,22 @@ class VanPOS_Admin_Order_Edit {
 			: false;
 	}
 
+	/**
+	 * Delegate to the single source of truth: VanPOS_Order_Manager::get_payment_type_label().
+	 *
+	 * The previous local copy duplicated the label strings and had already drifted
+	 * (Title Case here vs. Sentence case in Order Manager, and different fallback
+	 * behaviour). Now that Order Manager exposes this as public static (2026-06),
+	 * we delegate directly. The ucfirst() fallback is preserved for the case where
+	 * VanPOS_Order_Manager is unavailable.
+	 *
+	 * @param string $payment_type Payment type.
+	 * @return string
+	 */
 	private function get_payment_type_label( $payment_type ) {
-		$labels = array(
-			'initial'          => __( 'Initial Payment (50%)', 'vanjorn-rental-pos' ),
-			'deposit'          => __( 'Security Deposit', 'vanjorn-rental-pos' ),
-			'security_deposit' => __( 'Security Deposit', 'vanjorn-rental-pos' ),
-			'remaining'        => __( 'Remaining Payment (50%)', 'vanjorn-rental-pos' ),
-			'extension'        => __( 'Rental Extension', 'vanjorn-rental-pos' ),
-		);
-		return isset( $labels[ $payment_type ] ) ? $labels[ $payment_type ] : ucfirst( $payment_type );
+		return class_exists( 'VanPOS_Order_Manager' )
+			? VanPOS_Order_Manager::get_payment_type_label( $payment_type )
+			: ucfirst( $payment_type );
 	}
 
 	private function render_parent_order_info( $order ) {

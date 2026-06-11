@@ -444,7 +444,7 @@ class VanPOS_Dashboard {
 								$cached_children = isset( $stats['child_orders_cache'][ $order->get_id() ] ) ? $stats['child_orders_cache'][ $order->get_id() ] : array();
 								foreach ( $cached_children as $child_order ) {
 									$payment_type = $child_order->get_meta( '_vanpos_payment_type' );
-									if ( in_array( $payment_type, array( 'remaining', 'second_payment', 'deposit', 'security_deposit' ), true ) ) {
+									if ( VanPOS_Order_Manager::is_payment_order_type( $payment_type ) ) {
 										$payment_orders[] = $child_order;
 									}
 								}
@@ -498,7 +498,7 @@ class VanPOS_Dashboard {
 															$payment_type_label = '';
 															if ( in_array( $payment_type, array( 'deposit', 'security_deposit' ), true ) ) {
 																$payment_type_label = __( 'Security Deposit', 'vanjorn-rental-pos' );
-															} elseif ( in_array( $payment_type, array( 'remaining', 'second_payment' ), true ) ) {
+															} elseif ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 																$payment_type_label = __( 'Remaining Payment', 'vanjorn-rental-pos' );
 															} else {
 																$payment_type_label = __( 'Payment', 'vanjorn-rental-pos' );

@@ -136,59 +136,6 @@ class VanPOS_Item_Display {
 	}
 
 	/**
-	 * Display item data in cart (replaces default meta display)
-	 *
-	 * @param array  $item_data Item data array
-	 * @param array  $cart_item Cart item data
-	 * @param string $cart_item_key Cart item key
-	 * @return array Modified item data
-	 */
-	public static function display_cart_item_data( $item_data, $cart_item, $cart_item_key ) {
-		// Only process on cart or checkout pages
-		if ( ! is_cart() && ! is_checkout() ) {
-			return $item_data;
-		}
-
-		// Get rental meta
-		$rental_meta = self::get_rental_meta( $cart_item );
-		if ( empty( $rental_meta ) ) {
-			return $item_data;
-		}
-
-		// Clear default item data to avoid duplicates
-		$item_data = array();
-
-		// Add formatted meta
-		$formatted_meta = self::format_rental_meta( $rental_meta, is_cart() ? self::TYPE_CART : self::TYPE_CHECKOUT );
-		foreach ( $formatted_meta as $entry ) {
-			$item_data[] = array(
-				'key'   => $entry['label'],
-				'value' => $entry['value'],
-			);
-		}
-
-		return $item_data;
-	}
-
-	/**
-	 * Display item name in checkout (adds meta after name)
-	 *
-	 * @param string $name Product name
-	 * @param array  $cart_item Cart item data
-	 * @param string $cart_item_key Cart item key
-	 * @return string Modified product name
-	 */
-	public static function display_checkout_item_name( $name, $cart_item, $cart_item_key ) {
-		// Only on checkout page
-		if ( ! is_checkout() ) {
-			return $name;
-		}
-
-		$meta_html = self::render_item_meta( $cart_item, self::TYPE_CHECKOUT );
-		return $name . $meta_html;
-	}
-
-	/**
 	 * Hide default WooCommerce meta keys to prevent duplicate display
 	 *
 	 * @param array $hidden_meta Hidden meta keys
@@ -247,7 +194,7 @@ class VanPOS_Item_Display {
 	 */
 	private static function resolve_primary_order_id( $order ) {
 		$payment_type = (string) $order->get_meta( '_vanpos_payment_type' );
-		if ( '' === $payment_type || 'primary_rental' === $payment_type || 'initial' === $payment_type || 'full' === $payment_type ) {
+		if ( '' === $payment_type || 'primary_rental' === $payment_type || 'full' === $payment_type ) {
 			return (int) $order->get_id();
 		}
 		$primary_id = (int) $order->get_meta( '_vanpos_primary_order_id' );
@@ -275,14 +222,13 @@ class VanPOS_Item_Display {
 		}
 
 		$payment_type = (string) $order->get_meta( '_vanpos_payment_type' );
-		if ( in_array( $payment_type, array( 'remaining', 'second_payment' ), true ) ) {
+		if ( VanPOS_Order_Manager::is_remaining_payment( $payment_type ) ) {
 			return 0.0;
 		}
 
 		$primary_id = self::resolve_primary_order_id( $order );
 		if ( $primary_id > 0 && class_exists( 'VanPOS_Order_Manager' ) ) {
-			if ( VanPOS_Order_Manager::has_payment_order( $primary_id, 'remaining' )
-				|| VanPOS_Order_Manager::has_payment_order( $primary_id, 'second_payment' ) ) {
+			if ( VanPOS_Order_Manager::has_remaining_payment_order( $primary_id ) ) {
 				return 0.0;
 			}
 		}
@@ -453,19 +399,18 @@ class VanPOS_Item_Display {
 			$remaining_amount = self::resolve_display_remaining_amount( $item );
 
 			if ( $order ) {
-				$payment_type = $order->get_meta( '_vanpos_payment_type' );
-				if ( 'initial' === $payment_type || 'full' === $payment_type ) {
-					$initial_payment_amount = $order->get_total();
-				} else {
-					$primary_order_id = self::resolve_primary_order_id( $order );
-					if ( $primary_order_id && class_exists( 'VanPOS_Order_Manager' ) ) {
-						$payment_orders = VanPOS_Order_Manager::get_payment_orders( $primary_order_id );
-						foreach ( $payment_orders as $payment_order ) {
-							if ( 'initial' === $payment_order->get_meta( '_vanpos_payment_type' ) ) {
-								$initial_payment_amount = $payment_order->get_total();
-								break;
-							}
-						}
+				// The primary rental order IS the initial payment in the current
+				// architecture; _vanpos_initial_payment on it holds the canonical
+				// upfront amount. Reuse the existing order object when it already
+				// is the primary to avoid an extra wc_get_order() round-trip.
+				$primary_order_id = self::resolve_primary_order_id( $order );
+				$source           = ( $primary_order_id === (int) $order->get_id() )
+					? $order
+					: wc_get_order( $primary_order_id );
+				if ( $source ) {
+					$raw = (float) $source->get_meta( '_vanpos_initial_payment' );
+					if ( $raw > 0 ) {
+						$initial_payment_amount = $raw;
 					}
 				}
 			}
@@ -575,7 +520,7 @@ class VanPOS_Item_Display {
 
 		$output = '';
 		foreach ( $formatted as $entry ) {
-			$output .= $entry['label'] . ': ' . strip_tags( $entry['value'] ) . "\n";
+			$output .= $entry['label'] . ': ' . wp_strip_all_tags( $entry['value'] ) . "\n";
 		}
 
 		return $output;

@@ -1177,11 +1177,14 @@ class VanPOS_Functions {
 	/**
 	 * Calculate rental price using rental plugin's logic
 	 *
-	 * @param int $product_id Product ID.
-	 * @param int $rental_days Number of rental days.
+	 * @param int $product_id    Product ID.
+	 * @param int $rental_nights Number of billable nights (days − 1). All callers
+	 *                           pass nights, not the inclusive day count, so pricing
+	 *                           tiers and total-override keys in WCRP product meta
+	 *                           must be configured per-night as well.
 	 * @return float Calculated price.
 	 */
-	public static function calculate_rental_price( $product_id, $rental_days ) {
+	public static function calculate_rental_price( $product_id, $rental_nights ) {
 		$product = wc_get_product( $product_id );
 		if ( ! $product ) {
 			return 0;
@@ -1210,9 +1213,9 @@ class VanPOS_Functions {
 
 		// Check for total overrides (period_selection pricing type)
 		$total_overrides = get_post_meta( $product_id, '_wcrp_rental_products_total_overrides', true );
-		if ( ! empty( $total_overrides ) && is_array( $total_overrides ) && isset( $total_overrides[ $rental_days ] ) ) {
-			// Use total override price if available for this number of days
-			$override_price = (float) $total_overrides[ $rental_days ];
+		if ( ! empty( $total_overrides ) && is_array( $total_overrides ) && isset( $total_overrides[ $rental_nights ] ) ) {
+			// Use total override price if available for this number of nights
+			$override_price = (float) $total_overrides[ $rental_nights ];
 			// Convert to inc/exc tax based on WooCommerce settings
 			$prices_include_tax = get_option( 'woocommerce_prices_include_tax' );
 			if ( 'yes' === $prices_include_tax ) {
@@ -1267,7 +1270,7 @@ class VanPOS_Functions {
 			if ( ! empty( $pricing_tiers_data ) && isset( $pricing_tiers_data['days'] ) && isset( $pricing_tiers_data['percent'] ) ) {
 				foreach ( $pricing_tiers_data['days'] as $index => $tier_days ) {
 					$tier_days = (int) $tier_days;
-					if ( $tier_days > $pricing_tier_highest && $rental_days > $tier_days ) {
+					if ( $tier_days > $pricing_tier_highest && $rental_nights > $tier_days ) {
 						$pricing_tier_highest = $tier_days;
 						if ( isset( $pricing_tiers_data['percent'][ $index ] ) ) {
 							$pricing_tier_percent = (float) $pricing_tiers_data['percent'][ $index ];
@@ -1292,10 +1295,10 @@ class VanPOS_Functions {
 		} elseif ( 'period' === $pricing_type ) {
 			if ( 1 === $pricing_period ) {
 				// Daily pricing
-				$calculated_price = $base_price * $rental_days;
+				$calculated_price = $base_price * $rental_nights;
 			} else {
 				// Period-based pricing
-				$periods = ceil( $rental_days / $pricing_period );
+				$periods = ceil( $rental_nights / $pricing_period );
 				$calculated_price = $base_price * $periods;
 
 				// Apply additional period percent if set
