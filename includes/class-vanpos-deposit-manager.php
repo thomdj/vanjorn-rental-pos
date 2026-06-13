@@ -1247,7 +1247,9 @@ class VanPOS_Deposit_Manager {
 			$parent_order->update_meta_data( '_vanpos_security_deposit_paid', 'yes' );
 		}
 
-		$parent_order->save();
+		// Meta-only on the parent; save_meta_data() avoids re-persisting (and possibly
+		// clobbering) the parent's status when a child order's payment completes.
+		$parent_order->save_meta_data();
 	}
 
 	/**
