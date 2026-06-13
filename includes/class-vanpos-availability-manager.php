@@ -135,12 +135,17 @@ class VanPOS_Availability_Manager {
 			return $result;
 		}
 
-		// Check if pickup is in the past
-		$now = new DateTime();
-		if ( $pickup_datetime < $now ) {
+		// Check if pickup is in the past. Compare date-only against "today" in the
+		// site's timezone (current_time), not the server's wall clock: $pickup_datetime
+		// is parsed at midnight and the pickup/return times are independent half-day
+		// slots, so a same-day pickup is not "in the past". The previous `new DateTime()`
+		// used the server timezone AND its wall-clock time, which rejected every
+		// same-day booking (the POS/add-order and change-date flows both hit this path).
+		$today = new DateTime( current_time( 'Y-m-d' ) );
+		if ( $pickup_datetime < $today ) {
 			$result['valid'] = false;
 			$result['message'] = __( 'Pickup date cannot be in the past.', 'vanjorn-rental-pos' );
-			$result['alternatives'] = self::get_next_pickup_dates( $now->format( 'Y-m-d' ) );
+			$result['alternatives'] = self::get_next_pickup_dates( $today->format( 'Y-m-d' ) );
 			return $result;
 		}
 
