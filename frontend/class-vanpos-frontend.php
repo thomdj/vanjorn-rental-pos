@@ -542,7 +542,7 @@ class VanPOS_Frontend {
 	}
 }
 
-// Initialize frontend
-if ( ! is_admin() ) {
-	new VanPOS_Frontend();
-}
+// Note: instantiation is owned by VJ_Rental_POS::init_components() (always, so the
+// AJAX handlers register on admin-ajax requests too). A second `new VanPOS_Frontend()`
+// here would bind a duplicate set of hooks on front-end requests, double-firing
+// enqueue/localize and re-registering every booking AJAX action.

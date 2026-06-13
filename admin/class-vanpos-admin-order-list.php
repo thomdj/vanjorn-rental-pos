@@ -379,7 +379,14 @@ class VanPOS_Admin_Order_List {
 		$is_paid = $date_paid || $order->has_status( array( 'processing', 'completed' ) ) || $this->is_child_payment_order_settled_after_refund( $order );
 
 		if ( $is_child_order && $is_paid ) {
-			$paid_date = $date_paid ? $date_paid->date_i18n( get_option( 'date_format' ) ) : $order->get_date_created()->date_i18n( get_option( 'date_format' ) );
+			// $date_paid can be null even when $is_paid is true (e.g. a refunded
+			// security-deposit child settled via is_child_payment_order_settled_after_refund()),
+			// and get_date_created() can itself be null on imported/programmatic orders —
+			// so guard both before calling ->date_i18n() or one bad row 500s the table.
+			$created   = $order->get_date_created();
+			$paid_date = $date_paid
+				? $date_paid->date_i18n( get_option( 'date_format' ) )
+				: ( $created ? $created->date_i18n( get_option( 'date_format' ) ) : '' );
 			?>
 			<mark class="order-status status-paid" style="background: #46b450; color: #fff; padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 4px;"><?php esc_html_e( 'Paid', 'vanjorn-rental-pos' ); ?></mark><br>
 			<small class="vanpos-due-date-meta" style="color: #666; display: block; margin-top: 2px;">

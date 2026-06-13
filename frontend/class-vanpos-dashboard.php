@@ -408,7 +408,7 @@ class VanPOS_Dashboard {
 									<div class="vanpos-info-block">
 										<div class="vanpos-info-title"><?php esc_html_e( 'Order Date', 'vanjorn-rental-pos' ); ?></div>
 										<div class="vanpos-info-value">
-											<?php echo esc_html( $order_data['order_date']->date_i18n( get_option( 'date_format' ) ) ); ?>
+											<?php echo $order_data['order_date'] ? esc_html( $order_data['order_date']->date_i18n( get_option( 'date_format' ) ) ) : esc_html_x( '—', 'placeholder for missing order date', 'vanjorn-rental-pos' ); ?>
 										</div>
 									</div>
 

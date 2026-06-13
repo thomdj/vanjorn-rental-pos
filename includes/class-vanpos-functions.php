@@ -1190,6 +1190,10 @@ class VanPOS_Functions {
 			return 0;
 		}
 
+		// A rental always bills at least one night; clamp so a degenerate 0-night
+		// input (e.g. a same-day pickup/return) can never price daily/period lines at €0.
+		$rental_nights = max( 1, (int) $rental_nights );
+
 		// Get default rental options
 		$default_rental_options = get_option( 'wcrp_rental_products_default_rental_options', array() );
 
@@ -1207,7 +1211,9 @@ class VanPOS_Functions {
 				? $default_rental_options['_wcrp_rental_products_pricing_period'] 
 				: 1;
 		}
-		$pricing_period = (int) $pricing_period;
+		// Floor at 1: a stored/empty pricing period of 0 would otherwise divide by
+		// zero in the period branch below (warning + INF on PHP 7, fatal on PHP 8).
+		$pricing_period = max( 1, (int) $pricing_period );
 
 		$base_price = (float) $product->get_price();
 
