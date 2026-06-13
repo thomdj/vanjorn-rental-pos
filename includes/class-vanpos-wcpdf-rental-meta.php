@@ -152,17 +152,37 @@ final class VanPOS_WCPDF_Rental_Meta {
 
 		$sku = isset( $data['sku'] ) ? (string) $data['sku'] : '';
 
-		$pickup_date = (string) $item->get_meta( '_vanpos_pickup_date' );
+		// Line items store the canonical rental keys WITHOUT the underscore prefix
+		// (vanpos_pickup_date, not _vanpos_pickup_date). Read those first, then the
+		// stray underscore copy, then the WCRP keys. The previous underscore-only item
+		// reads always returned '' for times/days, so the PDF dropped them whenever the
+		// wcrp date fallback made $has_rental true (skipping the order-level fallback).
+		$pickup_date = (string) $item->get_meta( 'vanpos_pickup_date' );
+		if ( '' === $pickup_date ) {
+			$pickup_date = (string) $item->get_meta( '_vanpos_pickup_date' );
+		}
 		if ( '' === $pickup_date ) {
 			$pickup_date = (string) $item->get_meta( 'wcrp_rental_products_rent_from' );
 		}
-		$return_date = (string) $item->get_meta( '_vanpos_return_date' );
+		$return_date = (string) $item->get_meta( 'vanpos_return_date' );
+		if ( '' === $return_date ) {
+			$return_date = (string) $item->get_meta( '_vanpos_return_date' );
+		}
 		if ( '' === $return_date ) {
 			$return_date = (string) $item->get_meta( 'wcrp_rental_products_rent_to' );
 		}
-		$pickup_time = (string) $item->get_meta( '_vanpos_pickup_time' );
-		$return_time = (string) $item->get_meta( '_vanpos_return_time' );
-		$rental_days = (string) $item->get_meta( '_vanpos_rental_days' );
+		$pickup_time = (string) $item->get_meta( 'vanpos_pickup_time' );
+		if ( '' === $pickup_time ) {
+			$pickup_time = (string) $item->get_meta( '_vanpos_pickup_time' );
+		}
+		$return_time = (string) $item->get_meta( 'vanpos_return_time' );
+		if ( '' === $return_time ) {
+			$return_time = (string) $item->get_meta( '_vanpos_return_time' );
+		}
+		$rental_days = (string) $item->get_meta( 'vanpos_rental_days' );
+		if ( '' === $rental_days ) {
+			$rental_days = (string) $item->get_meta( '_vanpos_rental_days' );
+		}
 
 		$has_rental = ( '' !== $pickup_date || '' !== $return_date || '' !== $pickup_time || '' !== $return_time || '' !== $rental_days );
 		if ( ! $has_rental ) {
