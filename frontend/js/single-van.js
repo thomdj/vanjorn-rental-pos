@@ -27,12 +27,17 @@
 
     const s = (typeof vanposData !== 'undefined' && vanposData.strings) ? vanposData.strings : {};
     const fmtPrice = typeof window.vanposFormatPrice === 'function' ? window.vanposFormatPrice : function (n) { return '€' + Number(n).toFixed(2); };
+    // Local-timezone Y-m-d. Avoid toISOString(), which converts to UTC and shifts
+    // the day backwards for a local-midnight date in any timezone ahead of UTC.
+    function localYmd(d) {
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
     const fmtDate = typeof vanposData !== 'undefined' && vanposData.dateLocale
         ? function (d) {
             try { return d.toLocaleDateString(vanposData.dateLocale, { year: 'numeric', month: 'short', day: 'numeric' }); }
-            catch (e) { return d.toISOString().slice(0, 10); }
+            catch (e) { return localYmd(d); }
         }
-        : function (d) { return d.toISOString().slice(0, 10); };
+        : function (d) { return localYmd(d); };
 
     /**
      * Calculate rental days — same Kestrel-compatible formula as calendar.js.
