@@ -272,12 +272,6 @@ class VanPOS_Customer_Account {
 	}
 
 	/**
-	 * Display due date in orders table
-	 *
-	 * @param WC_Order $order Order object.
-	 * @return void
-	 */
-	/**
 	 * Display due date in orders table.
 	 *
 	 * Logic migrated from the orders.php template elseif block now that the
