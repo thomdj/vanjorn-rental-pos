@@ -354,6 +354,11 @@ class VanPOS_Rental_Returned {
 		}
 
 		self::clear_availability_cache_for_item( $order_item_id );
+
+		// Keep the returns-queue menu badge in sync immediately.
+		if ( class_exists( 'VanPOS_Admin_Returns_Queue_Query' ) ) {
+			VanPOS_Admin_Returns_Queue_Query::flush_count_cache();
+		}
 	}
 
 	/**
