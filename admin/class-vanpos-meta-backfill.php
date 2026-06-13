@@ -148,12 +148,19 @@ class VanPOS_Meta_Backfill {
 	 * @return string[]
 	 */
 	private static function stray_item_meta_keys() {
+		// Single source of truth: VanPOS_Meta_Registry::stray_item_keys(). The fallback
+		// mirrors it for the (load-order) case where the registry is unavailable. Note
+		// it now includes _vanpos_rental_nights, which the historical list omitted.
+		if ( class_exists( 'VanPOS_Meta_Registry' ) ) {
+			return VanPOS_Meta_Registry::stray_item_keys();
+		}
 		return array(
 			'_vanpos_pickup_date',
 			'_vanpos_return_date',
 			'_vanpos_pickup_time',
 			'_vanpos_return_time',
 			'_vanpos_rental_days',
+			'_vanpos_rental_nights',
 			'_vanpos_include_dog',
 			'_vanpos_include_cleaning',
 		);

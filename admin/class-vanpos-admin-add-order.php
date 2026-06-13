@@ -944,13 +944,15 @@ class VanPOS_Admin_Add_Order {
 		// The underscore-prefixed copies are stray meta (no readers; the backfill deletes
 		// them via stray_item_meta_keys), so they are intentionally not written here.
 
-		// Flags on the line item (not only order meta) so VanPOS_Item_Display and PDF paths
-		// that read $item->get_meta( '_vanpos_include_*' ) behave like checkout orders.
+		// Item-level option flags use the canonical NON-underscore keys, matching checkout
+		// (checkout_create_order_line_item writes vanpos_include_*; promote_rental_meta_to_order
+		// reads them). The order-level _vanpos_include_* flags that consumers actually read
+		// (bookings calendar, discount manager) are set separately below.
 		if ( $include_dog ) {
-			$item->add_meta_data( '_vanpos_include_dog', true );
+			$item->add_meta_data( 'vanpos_include_dog', true );
 		}
 		if ( $include_cleaning ) {
-			$item->add_meta_data( '_vanpos_include_cleaning', true );
+			$item->add_meta_data( 'vanpos_include_cleaning', true );
 		}
 
 		$item->add_meta_data( '_vanpos_original_price', $total_price );
