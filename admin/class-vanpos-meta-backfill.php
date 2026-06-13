@@ -130,6 +130,7 @@ class VanPOS_Meta_Backfill {
 			'vanpos_pickup_time' => '_vanpos_pickup_time',
 			'vanpos_return_time' => '_vanpos_return_time',
 			'vanpos_rental_days' => '_vanpos_rental_days',
+			'vanpos_rental_nights' => '_vanpos_rental_nights',
 		);
 	}
 
@@ -230,6 +231,23 @@ class VanPOS_Meta_Backfill {
 					: ( (int) round( ( $return_ts - $pickup_ts ) / DAY_IN_SECONDS ) + 1 );
 				if ( $days > 0 ) {
 					$source_values['vanpos_rental_days'] = (string) $days;
+				}
+			}
+		}
+
+		// Compute rental_nights from dates as a last resort (nights = days - 1).
+		if ( '' === $source_values['vanpos_rental_nights']
+			&& '' !== $source_values['vanpos_pickup_date']
+			&& '' !== $source_values['vanpos_return_date']
+		) {
+			$pickup_ts = strtotime( $source_values['vanpos_pickup_date'] );
+			$return_ts = strtotime( $source_values['vanpos_return_date'] );
+			if ( $pickup_ts && $return_ts && $return_ts >= $pickup_ts ) {
+				$nights = class_exists( 'VanPOS_Functions' )
+					? VanPOS_Functions::rental_nights_from_dates( $source_values['vanpos_pickup_date'], $source_values['vanpos_return_date'] )
+					: (int) round( ( $return_ts - $pickup_ts ) / DAY_IN_SECONDS );
+				if ( $nights > 0 ) {
+					$source_values['vanpos_rental_nights'] = (string) $nights;
 				}
 			}
 		}
