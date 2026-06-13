@@ -666,7 +666,9 @@ class VanPOS_Order_Manager {
 		if ( self::is_remaining_payment( $payment_type ) ) {
 			$primary_order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
 		}
-		$primary_order->save();
+		// Meta-only on the parent; a full save() here can clobber the parent's
+		// just-set paid status when create_child_order_on_payment_complete runs.
+		$primary_order->save_meta_data();
 
 		$order->save();
 
@@ -922,7 +924,9 @@ class VanPOS_Order_Manager {
 		if ( isset( $due_date ) && $due_date ) {
 			$primary_order->update_meta_data( '_vanpos_security_deposit_due_date', $due_date );
 		}
-		$primary_order->save();
+		// Meta-only on the parent; a full save() here can clobber the parent's
+		// just-set paid status when create_child_order_on_payment_complete runs.
+		$primary_order->save_meta_data();
 		
 		$order->save();
 

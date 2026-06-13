@@ -403,7 +403,10 @@ class VanPOS_Admin_Order_List {
 		if ( ! $is_child_order && class_exists( 'VanPOS_Order_Manager' ) ) {
 			$child_orders = VanPOS_Order_Manager::get_payment_orders( $order->get_id() );
 			if ( ! empty( $child_orders ) ) {
-				$all_paid = true;
+				// The primary order IS the deposit payment, so "Fully Paid" requires the
+				// primary's own deposit to be settled too — not just the children. Seed the
+				// rollup with the primary's paid flag ($is_paid, computed above) instead of true.
+				$all_paid = $is_paid;
 				foreach ( $child_orders as $child_order ) {
 					$child_date_paid = $child_order->get_date_paid();
 					$child_is_paid = $child_date_paid || $child_order->has_status( array( 'processing', 'completed' ) ) || $this->is_child_payment_order_settled_after_refund( $child_order );

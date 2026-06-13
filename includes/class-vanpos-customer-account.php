@@ -25,7 +25,12 @@ class VanPOS_Customer_Account {
 		// Priority 5 ensures this runs BEFORE Deposit_Manager::process_deposit_order
 		// (priority 10) which needs _vanpos_order_type to already be set.
 		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'set_rental_order_type' ), 5, 1 );
-		
+		// Also stamp on Block/Store-API checkout, which fires a different action and
+		// passes a WC_Order object (set_rental_order_type accepts either). Without this
+		// the type is never stamped on Store-API orders, so every query keyed on
+		// _vanpos_order_type (dashboards, admin overview pivot) silently drops them.
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'set_rental_order_type' ), 5, 1 );
+
 		// Backfill: create child orders when payment settles or an admin manually
 		// completes an order. Security deposit and remaining orders are already created
 		// at checkout (priority 10/15 above), so these only fire for edge cases
@@ -107,6 +112,10 @@ class VanPOS_Customer_Account {
 	 * @return void
 	 */
 	public static function create_child_order_on_payment_complete( $order_id ) {
+		// Runs on woocommerce_payment_complete / _status_completed. Wrap defensively so a
+		// throw during child-order creation can never propagate out of the gateway's
+		// payment processing and leave the order half-finalised (mirrors set_rental_order_type).
+		try {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
 			return;
@@ -130,7 +139,8 @@ class VanPOS_Customer_Account {
 		// Detected via metadata (type not yet stamped) — record it for future reads.
 		if ( '' === (string) $order->get_meta( '_vanpos_order_type' ) ) {
 			$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
-			$order->save();
+			// Meta-only; avoid a full save() clobbering the just-set paid status.
+			$order->save_meta_data();
 		}
 
 		// Check if child order already exists
@@ -195,6 +205,14 @@ class VanPOS_Customer_Account {
 				'remaining',
 				$remaining_amount
 			);
+		}
+		} catch ( Exception $e ) {
+			if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->error(
+					'create_child_order_on_payment_complete failed: ' . $e->getMessage(),
+					array( 'source' => 'vanjorn-rental-pos' )
+				);
+			}
 		}
 	}
 
