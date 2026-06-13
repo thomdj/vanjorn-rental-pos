@@ -60,10 +60,6 @@ class VanPOS_Deposit_Manager {
 		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'process_deposit_order' ), 10, 1 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'block_checkout_create_order' ), 10, 1 );
 		
-		// Order hooks
-		add_filter( 'woocommerce_order_item_display_meta_key', array( __CLASS__, 'display_order_meta_key' ), 10, 3 );
-		add_filter( 'woocommerce_order_item_display_meta_value', array( __CLASS__, 'display_order_meta_value' ), 10, 3 );
-		
 		// Payment complete hooks
 		add_action( 'woocommerce_payment_complete', array( __CLASS__, 'payment_complete' ), 10, 1 );
 	}
@@ -341,8 +337,8 @@ class VanPOS_Deposit_Manager {
 		// Calculate 50% deposit on the BASE item total (€1,260.00 -> €630.00)
 		// Fees are NOT included in this calculation - they're paid in full separately
 		$deposit_percentage = self::get_deposit_percentage();
-		$deposit = $amount * ( $deposit_percentage / 100.0 );
-		$remaining = $amount - $deposit;
+		$deposit = VanPOS_Functions::round_money( $amount * ( $deposit_percentage / 100.0 ) );
+		$remaining = VanPOS_Functions::round_money( $amount - $deposit );
 
 		// Store deposit info in cart item (similar to AWCDP structure)
 		$cart_item_data['vanpos_deposit']['deposit'] = $deposit;
@@ -880,7 +876,7 @@ class VanPOS_Deposit_Manager {
 		$fee_total = isset( WC()->cart->deposit_info['fee_total'] ) ? WC()->cart->deposit_info['fee_total'] : 0;
 		
 		// Deposit amount for checkout includes fees (€630 + €200 = €830)
-		$deposit_amount = WC()->cart->deposit_info['deposit_amount'] + $fee_total;
+		$deposit_amount = VanPOS_Functions::round_money( WC()->cart->deposit_info['deposit_amount'] + $fee_total );
 		
 		// Get original cart total (before deposit override)
 		remove_filter( 'woocommerce_cart_get_total', array( __CLASS__, 'cart_get_total' ), 99999 );
@@ -888,7 +884,7 @@ class VanPOS_Deposit_Manager {
 		add_filter( 'woocommerce_cart_get_total', array( __CLASS__, 'cart_get_total' ), 99999, 1 );
 		
 		// Second payment is the remaining item amount only (€630), fees are already paid
-		$second_payment = $cart_total - $deposit_amount;
+		$second_payment = VanPOS_Functions::round_money( $cart_total - $deposit_amount );
 
 		// Store deposit info in order meta
 		$order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
@@ -973,10 +969,10 @@ class VanPOS_Deposit_Manager {
 		// Calculate remaining item amount (original item total - item deposit)
 		// Original item total = cart_total - fees
 		$original_item_total = $cart_total - $fee_total;
-		$second_payment = $original_item_total - $item_deposit; // Remaining item amount (€630)
+		$second_payment = VanPOS_Functions::round_money( $original_item_total - $item_deposit ); // Remaining item amount (€630)
 		
 		// Deposit amount for order meta - fee-inclusive, matching the classic path.
-		$deposit_amount = $item_deposit + $fee_total;
+		$deposit_amount = VanPOS_Functions::round_money( $item_deposit + $fee_total );
 
 		// Store deposit info in order meta
 		$order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
@@ -1067,8 +1063,8 @@ class VanPOS_Deposit_Manager {
 	 * cannot read them.
 	 *
 	 * This method reads the first rental item's meta and promotes it to
-	 * order-level meta, matching what VanPOS_Order_Manager::create_primary_rental_order()
-	 * does for the POS flow.
+	 * order-level meta — the same order-level _vanpos_* shape the POS add-order
+	 * flow (VanPOS_Admin_Add_Order) writes directly.
 	 *
 	 * NOT to be merged with VanPOS_Order_Manager::update_missing_rental_metadata().
 	 * That method is the admin backfill for legacy/broken orders and BACK-DERIVES
@@ -1169,7 +1165,7 @@ class VanPOS_Deposit_Manager {
 		// checkout (create_order / block_checkout_create_order); read them back here.
 		$deposit_amount   = (float) $order->get_meta( '_vanpos_initial_payment' );
 		$second_payment   = (float) $order->get_meta( '_vanpos_remaining_payment' );
-		$total_price      = $deposit_amount + $second_payment;
+		$total_price      = VanPOS_Functions::round_money( $deposit_amount + $second_payment );
 		$order->update_meta_data( '_vanpos_total_price', $total_price );
 		$order->update_meta_data( '_vanpos_initial_payment', $deposit_amount );
 		$order->update_meta_data( '_vanpos_remaining_payment', $second_payment );
@@ -1252,85 +1248,4 @@ class VanPOS_Deposit_Manager {
 		$parent_order->save_meta_data();
 	}
 
-	/**
-	 * Display order meta key
-	 *
-	 * @param string $display_key Display key.
-	 * @param object $meta Meta object.
-	 * @param object $order_item Order item.
-	 * @return string
-	 */
-	public static function display_order_meta_key( $display_key, $meta, $order_item ) {
-		$keys = array(
-			// Canonical (no underscore prefix) rental item-meta keys.
-			'vanpos_pickup_date'      => __( 'Pickup date', 'vanjorn-rental-pos' ),
-			'vanpos_return_date'      => __( 'Return date', 'vanjorn-rental-pos' ),
-			'vanpos_pickup_time'      => __( 'Pickup time', 'vanjorn-rental-pos' ),
-			'vanpos_return_time'      => __( 'Return time', 'vanjorn-rental-pos' ),
-			'vanpos_rental_days'      => __( 'Rental days', 'vanjorn-rental-pos' ),
-			// Stray underscore duplicates on line items.
-			'_vanpos_pickup_date'     => __( 'Pickup date', 'vanjorn-rental-pos' ),
-			'_vanpos_return_date'     => __( 'Return date', 'vanjorn-rental-pos' ),
-			'_vanpos_pickup_time'     => __( 'Pickup time', 'vanjorn-rental-pos' ),
-			'_vanpos_return_time'     => __( 'Return time', 'vanjorn-rental-pos' ),
-			'_vanpos_rental_days'     => __( 'Rental days', 'vanjorn-rental-pos' ),
-			// Financial fields - canonical convention IS underscored.
-			'_vanpos_original_price'  => __( 'Original price', 'vanjorn-rental-pos' ),
-			'_vanpos_deposit_amount'  => __( 'Deposit amount', 'vanjorn-rental-pos' ),
-			'_vanpos_remaining_amount' => __( 'Remaining amount', 'vanjorn-rental-pos' ),
-		);
-
-		if ( isset( $keys[ $meta->key ] ) ) {
-			return $keys[ $meta->key ];
-		}
-
-		return $display_key;
-	}
-
-	/**
-	 * Display order meta value
-	 *
-	 * @param string $display_value Display value.
-	 * @param object $meta Meta object.
-	 * @param object $order_item Order item.
-	 * @return string
-	 */
-	public static function display_order_meta_value( $display_value, $meta, $order_item ) {
-		$value = $meta->value;
-
-		// Price fields (canonical convention is underscored for financials)
-		if ( in_array( $meta->key, array( '_vanpos_original_price', '_vanpos_deposit_amount', '_vanpos_remaining_amount' ), true ) ) {
-			return wc_price( $value );
-		}
-
-		// Date fields - format for display
-		if ( in_array( $meta->key, array( 'vanpos_pickup_date', 'vanpos_return_date', '_vanpos_pickup_date', '_vanpos_return_date' ), true ) && ! empty( $value ) ) {
-			$timestamp = strtotime( $value );
-			return $timestamp ? date_i18n( get_option( 'date_format' ), $timestamp ) : $value;
-		}
-
-		// Time fields — normalise legacy slot labels to the configured times.
-		// Mapping is context-independent (does not vary by pickup vs return key):
-		//   'afternoon' → vanpos_pickup_time  (15:00 in the afternoon-pickup model)
-		//   'morning'   → vanpos_return_time  (11:00 in the afternoon-pickup model)
-		// See VanPOS_Item_Display::format_time_slot() for the canonical explanation.
-		if ( in_array( $meta->key, array( 'vanpos_pickup_time', 'vanpos_return_time', '_vanpos_pickup_time', '_vanpos_return_time' ), true ) && ! empty( $value ) ) {
-			$slot = strtolower( trim( (string) $value ) );
-			if ( 'afternoon' === $slot ) {
-				return VanPOS_Functions::get_setting( 'vanpos_pickup_time', '15:00' );
-			}
-			if ( 'morning' === $slot ) {
-				return VanPOS_Functions::get_setting( 'vanpos_return_time', '11:00' );
-			}
-			return ucfirst( (string) $value );
-		}
-
-		// Rental days - add "days" suffix
-		if ( in_array( $meta->key, array( 'vanpos_rental_days', '_vanpos_rental_days' ), true ) && '' !== $value ) {
-			$days = (int) $value;
-			return $days . ' ' . _n( 'day', 'days', $days, 'vanjorn-rental-pos' );
-		}
-
-		return $display_value;
-	}
 }

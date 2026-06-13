@@ -1352,6 +1352,22 @@ class VanPOS_Functions {
 	}
 
 	/**
+	 * Round a monetary amount to the store's configured decimal places.
+	 *
+	 * Single source of truth for money rounding. Deposit/remaining splits
+	 * (total * pct/100, total - deposit) otherwise carry sub-cent residue that the
+	 * meta-backfill tool then has to scrub; rounding here keeps every order flow
+	 * storing identical 2-dp values at the point the split is computed.
+	 *
+	 * @param mixed $amount Numeric amount.
+	 * @return float
+	 */
+	public static function round_money( $amount ) {
+		$decimals = function_exists( 'wc_get_price_decimals' ) ? wc_get_price_decimals() : 2;
+		return round( (float) $amount, $decimals );
+	}
+
+	/**
 	 * Add product to cart with rental dates
 	 *
 	 * @param int    $product_id Product ID.

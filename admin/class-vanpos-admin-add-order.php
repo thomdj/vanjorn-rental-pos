@@ -600,8 +600,8 @@ class VanPOS_Admin_Add_Order {
 		$days_until      = $order_date->diff( $pickup_dt )->days;
 		$is_short_term   = ( $days_until < $short_term_threshold );
 
-		$initial_payment   = $is_short_term ? $total_price : $total_price * ( $deposit_pct / 100 );
-		$remaining_payment = $is_short_term ? 0 : $total_price - $initial_payment;
+		$initial_payment   = $is_short_term ? $total_price : VanPOS_Functions::round_money( $total_price * ( $deposit_pct / 100 ) );
+		$remaining_payment = $is_short_term ? 0 : VanPOS_Functions::round_money( $total_price - $initial_payment );
 
 		// Security deposit product price
 		$sec_deposit_amount = 0;
@@ -743,8 +743,8 @@ class VanPOS_Admin_Add_Order {
 			$deposit_payment   = $total_price;
 			$remaining_payment = 0;
 		} else {
-			$deposit_payment   = $total_price * ( $deposit_pct / 100 );
-			$remaining_payment = $total_price - $deposit_payment;
+			$deposit_payment   = VanPOS_Functions::round_money( $total_price * ( $deposit_pct / 100 ) );
+			$remaining_payment = VanPOS_Functions::round_money( $total_price - $deposit_payment );
 		}
 
 		// The parent order's actual charge depends on whether a remaining
@@ -939,22 +939,20 @@ class VanPOS_Admin_Add_Order {
 		$item->add_meta_data( 'vanpos_rental_days', $days );
 		$item->add_meta_data( 'vanpos_rental_nights', $nights );
 
-		// Underscore-prefixed keys match checkout (see VanPOS_Deposit_Manager::checkout_create_order_line_item)
-		// so storefront and admin-created orders share the same line-item shape for displays and tools.
-		$item->add_meta_data( '_vanpos_pickup_date', $pickup_date );
-		$item->add_meta_data( '_vanpos_return_date', $return_date );
-		$item->add_meta_data( '_vanpos_pickup_time', $pickup_time );
-		$item->add_meta_data( '_vanpos_return_time', $return_time );
-		$item->add_meta_data( '_vanpos_rental_days', $days );
-		$item->add_meta_data( '_vanpos_rental_nights', $nights );
+		// NOTE: item-level date/time/days/nights use the canonical NON-underscore keys
+		// above, matching checkout (VanPOS_Deposit_Manager::checkout_create_order_line_item).
+		// The underscore-prefixed copies are stray meta (no readers; the backfill deletes
+		// them via stray_item_meta_keys), so they are intentionally not written here.
 
-		// Flags on the line item (not only order meta) so VanPOS_Item_Display and PDF paths
-		// that read $item->get_meta( '_vanpos_include_*' ) behave like checkout orders.
+		// Item-level option flags use the canonical NON-underscore keys, matching checkout
+		// (checkout_create_order_line_item writes vanpos_include_*; promote_rental_meta_to_order
+		// reads them). The order-level _vanpos_include_* flags that consumers actually read
+		// (bookings calendar, discount manager) are set separately below.
 		if ( $include_dog ) {
-			$item->add_meta_data( '_vanpos_include_dog', true );
+			$item->add_meta_data( 'vanpos_include_dog', true );
 		}
 		if ( $include_cleaning ) {
-			$item->add_meta_data( '_vanpos_include_cleaning', true );
+			$item->add_meta_data( 'vanpos_include_cleaning', true );
 		}
 
 		$item->add_meta_data( '_vanpos_original_price', $total_price );
@@ -986,7 +984,7 @@ class VanPOS_Admin_Add_Order {
 			$order->add_item( $tax_item );
 		}
 
-		// Rental metadata (mirrors create_primary_rental_order)
+		// Rental metadata: order-level _vanpos_* meta for the primary rental order.
 		$booking_ref = VanPOS_Order_Manager::generate_booking_reference();
 
 		$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
