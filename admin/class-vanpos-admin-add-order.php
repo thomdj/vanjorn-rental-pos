@@ -984,7 +984,7 @@ class VanPOS_Admin_Add_Order {
 			$order->add_item( $tax_item );
 		}
 
-		// Rental metadata (mirrors create_primary_rental_order)
+		// Rental metadata: order-level _vanpos_* meta for the primary rental order.
 		$booking_ref = VanPOS_Order_Manager::generate_booking_reference();
 
 		$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );

@@ -1063,8 +1063,8 @@ class VanPOS_Deposit_Manager {
 	 * cannot read them.
 	 *
 	 * This method reads the first rental item's meta and promotes it to
-	 * order-level meta, matching what VanPOS_Order_Manager::create_primary_rental_order()
-	 * does for the POS flow.
+	 * order-level meta — the same order-level _vanpos_* shape the POS add-order
+	 * flow (VanPOS_Admin_Add_Order) writes directly.
 	 *
 	 * NOT to be merged with VanPOS_Order_Manager::update_missing_rental_metadata().
 	 * That method is the admin backfill for legacy/broken orders and BACK-DERIVES

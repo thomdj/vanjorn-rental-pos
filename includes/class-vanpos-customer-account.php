@@ -244,7 +244,7 @@ class VanPOS_Customer_Account {
 		$has_deposit_order = $order->get_meta( '_vanpos_order_has_remaining_payment' );
 		if ( 'yes' !== $has_deposit_order ) {
 			// No deposit split — check if there's a remaining amount from other sources
-			// (e.g. admin-created orders via VanPOS_Order_Manager::create_primary_rental_order)
+			// (e.g. admin-created orders from the POS add-order flow)
 			foreach ( $order->get_items() as $item ) {
 				$item_remaining = (float) $item->get_meta( '_vanpos_remaining_amount' );
 				if ( $item_remaining > 0 ) {
