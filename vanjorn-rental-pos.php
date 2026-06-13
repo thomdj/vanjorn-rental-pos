@@ -218,6 +218,11 @@ class VJ_Rental_POS {
 		// Load core functions
 		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-functions.php';
 
+		// Meta-key registry — single source of truth for which order/item meta keys
+		// the plugin owns and which must never be auto-deleted. Reference only:
+		// no hooks, no side effects, performs no deletions.
+		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-meta-registry.php';
+
 		// CMIT CODE - UPDATED - 15 MAY 2026 — Kestrel “mark returned” → instant VanPOS availability.
 		require_once VANPOS_PLUGIN_DIR . 'includes/class-vanpos-rental-returned.php';
 
