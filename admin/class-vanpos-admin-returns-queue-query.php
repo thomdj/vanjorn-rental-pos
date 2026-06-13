@@ -46,6 +46,15 @@ class VanPOS_Admin_Returns_Queue_Query {
 		if ( null === $lookback ) {
 			$lookback = self::DEFAULT_LOOKBACK;
 		}
+		// Cache the badge count briefly: this runs on every admin pageview and would
+		// otherwise load every order in the lookback window each time. Five minutes is
+		// fresh enough for a menu badge, and flush_count_cache() clears it immediately
+		// when a rental is marked returned.
+		$cache_key = 'vanpos_returns_pending_count_' . $lookback;
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return (int) $cached;
+		}
 		$result = self::get_result(
 			array(
 				'lookback' => $lookback,
@@ -56,7 +65,18 @@ class VanPOS_Admin_Returns_Queue_Query {
 			),
 			true
 		);
-		return (int) $result['total'];
+		$count = (int) $result['total'];
+		set_transient( $cache_key, $count, 5 * MINUTE_IN_SECONDS );
+		return $count;
+	}
+
+	/**
+	 * Clear the cached pending-returns badge count (see count_pending()).
+	 *
+	 * @return void
+	 */
+	public static function flush_count_cache() {
+		delete_transient( 'vanpos_returns_pending_count_' . self::DEFAULT_LOOKBACK );
 	}
 
 	/**

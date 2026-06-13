@@ -1222,7 +1222,9 @@ class VanPOS_Deposit_Manager {
 		$has_remaining = $order->get_meta( '_vanpos_order_has_remaining_payment' );
 		if ( $has_remaining === 'yes' ) {
 			$order->update_meta_data( '_vanpos_initial_payment_paid', 'yes' );
-			$order->save();
+			// Meta-only; save_meta_data() avoids re-persisting (and possibly clobbering)
+			// the order's just-set paid status when this fires on woocommerce_payment_complete.
+			$order->save_meta_data();
 			return;
 		}
 
@@ -1245,7 +1247,9 @@ class VanPOS_Deposit_Manager {
 			$parent_order->update_meta_data( '_vanpos_security_deposit_paid', 'yes' );
 		}
 
-		$parent_order->save();
+		// Meta-only on the parent; save_meta_data() avoids re-persisting (and possibly
+		// clobbering) the parent's status when a child order's payment completes.
+		$parent_order->save_meta_data();
 	}
 
 	/**

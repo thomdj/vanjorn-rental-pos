@@ -41,6 +41,11 @@ class VanPOS_Item_Display {
 		// Order display (order view, order received)
 		add_action( 'woocommerce_order_item_meta_start', array( __CLASS__, 'display_order_item_meta' ), 5, 4 );
 		add_filter( 'woocommerce_hidden_order_itemmeta', array( __CLASS__, 'hide_default_meta' ), 10, 1 );
+		// hide_default_meta only covers the admin order screen. On the frontend (order
+		// received, view order, order-pay/failed) and in emails, WooCommerce hides only
+		// underscore-prefixed keys, so the non-underscore rental keys would render raw —
+		// duplicating the formatted block above. Strip the same set from formatted meta.
+		add_filter( 'woocommerce_order_item_get_formatted_meta_data', array( __CLASS__, 'hide_frontend_item_meta' ), 10, 2 );
 
 		// Admin order edit - same unified display
 		add_action( 'woocommerce_after_order_itemmeta', array( __CLASS__, 'display_admin_item_meta' ), 10, 3 );
@@ -142,7 +147,18 @@ class VanPOS_Item_Display {
 	 * @return array Modified hidden meta keys
 	 */
 	public static function hide_default_meta( $hidden_meta ) {
-		$rental_meta_keys = array(
+		return array_merge( $hidden_meta, self::get_hidden_item_meta_keys() );
+	}
+
+	/**
+	 * Internal rental/VanPOS line-item meta keys that must never render as raw
+	 * "key: value" rows. The formatted block (display_order_item_meta /
+	 * display_email_item_meta_detailed) presents this information instead.
+	 *
+	 * @return array<int,string>
+	 */
+	private static function get_hidden_item_meta_keys() {
+		return array(
 			'vanpos_pickup_date',
 			'vanpos_pickup_time',
 			'vanpos_return_date',
@@ -169,8 +185,32 @@ class VanPOS_Item_Display {
 			// WooCommerce internal key — suppressed here so no theme file is needed for this.
 			'_reduced_stock',
 		);
+	}
 
-		return array_merge( $hidden_meta, $rental_meta_keys );
+	/**
+	 * Hide internal line-item meta on the frontend and in emails.
+	 *
+	 * woocommerce_hidden_order_itemmeta only applies on the admin order screen.
+	 * WC_Order_Item::get_formatted_meta_data() (used by wc_display_item_meta on the
+	 * order-received / view-order / order-pay pages and in emails) auto-hides only
+	 * underscore-prefixed keys, so the non-underscore rental keys would otherwise
+	 * leak through as raw rows beside the formatted block. Strip the same set here.
+	 *
+	 * @param array         $formatted_meta Meta objects keyed by meta id.
+	 * @param WC_Order_Item $item           Order line item (unused).
+	 * @return array
+	 */
+	public static function hide_frontend_item_meta( $formatted_meta, $item ) {
+		if ( ! is_array( $formatted_meta ) ) {
+			return $formatted_meta;
+		}
+		$hidden = self::get_hidden_item_meta_keys();
+		foreach ( $formatted_meta as $id => $meta ) {
+			if ( isset( $meta->key ) && in_array( $meta->key, $hidden, true ) ) {
+				unset( $formatted_meta[ $id ] );
+			}
+		}
+		return $formatted_meta;
 	}
 
 	/**

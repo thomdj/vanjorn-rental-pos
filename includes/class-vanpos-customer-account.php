@@ -25,7 +25,21 @@ class VanPOS_Customer_Account {
 		// Priority 5 ensures this runs BEFORE Deposit_Manager::process_deposit_order
 		// (priority 10) which needs _vanpos_order_type to already be set.
 		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'set_rental_order_type' ), 5, 1 );
-		
+		// Also stamp on Block/Store-API checkout, which fires a different action and
+		// passes a WC_Order object (set_rental_order_type accepts either). Without this
+		// the type is never stamped on Store-API orders, so every query keyed on
+		// _vanpos_order_type (dashboards, admin overview pivot) silently drops them.
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'set_rental_order_type' ), 5, 1 );
+
+		// Promote rental dates to ORDER-LEVEL meta for every primary rental order.
+		// Deposit_Manager promotes them only for deposit-split bookings
+		// (process_deposit_order returns early when there is no remaining payment), so
+		// full-payment bookings would keep dates only on the line item and never appear
+		// in the admin dashboard (its pivot filters on order-level _vanpos_*_date).
+		// Priority 20 runs after the deposit/Store-API promoters, so it only fills gaps.
+		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'ensure_order_rental_dates' ), 20, 1 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'ensure_order_rental_dates' ), 20, 1 );
+
 		// Backfill: create child orders when payment settles or an admin manually
 		// completes an order. Security deposit and remaining orders are already created
 		// at checkout (priority 10/15 above), so these only fire for edge cases
@@ -101,12 +115,70 @@ class VanPOS_Customer_Account {
 	}
 
 	/**
+	 * Promote line-item rental dates to order-level meta when they are missing.
+	 *
+	 * The admin dashboard overview query pivots on ORDER-LEVEL _vanpos_pickup_date /
+	 * _return_date. VanPOS_Deposit_Manager promotes these only for deposit-split
+	 * bookings, so a full-payment booking keeps its dates only on the line item and
+	 * never appears in the dashboard. This fills that gap for any primary rental order,
+	 * writing nothing but date/time meta (no financial meta). Idempotent.
+	 *
+	 * Classic checkout passes an order ID; the Store API passes a WC_Order object.
+	 *
+	 * @param int|WC_Order $order_or_id Order ID or object.
+	 * @return void
+	 */
+	public static function ensure_order_rental_dates( $order_or_id ) {
+		try {
+			$order = $order_or_id instanceof WC_Order ? $order_or_id : wc_get_order( $order_or_id );
+			if ( ! $order || $order->get_meta( '_vanpos_pickup_date' ) ) {
+				return; // No order, or order-level dates already present.
+			}
+			if ( ! VanPOS_Order_Manager::is_primary_rental_order( $order ) ) {
+				return;
+			}
+			foreach ( $order->get_items() as $item ) {
+				$pickup = (string) $item->get_meta( 'vanpos_pickup_date' );
+				if ( '' === $pickup ) {
+					continue; // Not the rental item.
+				}
+				$order->update_meta_data( '_vanpos_pickup_date', $pickup );
+				$return = (string) $item->get_meta( 'vanpos_return_date' );
+				if ( '' !== $return ) {
+					$order->update_meta_data( '_vanpos_return_date', $return );
+				}
+				$pickup_time = (string) $item->get_meta( 'vanpos_pickup_time' );
+				if ( '' !== $pickup_time ) {
+					$order->update_meta_data( '_vanpos_pickup_time', $pickup_time );
+				}
+				$return_time = (string) $item->get_meta( 'vanpos_return_time' );
+				if ( '' !== $return_time ) {
+					$order->update_meta_data( '_vanpos_return_time', $return_time );
+				}
+				$order->save();
+				break; // First rental item only.
+			}
+		} catch ( Exception $e ) {
+			if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->error(
+					'ensure_order_rental_dates failed: ' . $e->getMessage(),
+					array( 'source' => 'vanjorn-rental-pos' )
+				);
+			}
+		}
+	}
+
+	/**
 	 * Create child order when primary order payment is completed
 	 *
 	 * @param int $order_id Order ID.
 	 * @return void
 	 */
 	public static function create_child_order_on_payment_complete( $order_id ) {
+		// Runs on woocommerce_payment_complete / _status_completed. Wrap defensively so a
+		// throw during child-order creation can never propagate out of the gateway's
+		// payment processing and leave the order half-finalised (mirrors set_rental_order_type).
+		try {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
 			return;
@@ -130,7 +202,8 @@ class VanPOS_Customer_Account {
 		// Detected via metadata (type not yet stamped) — record it for future reads.
 		if ( '' === (string) $order->get_meta( '_vanpos_order_type' ) ) {
 			$order->update_meta_data( '_vanpos_order_type', 'primary_rental' );
-			$order->save();
+			// Meta-only; avoid a full save() clobbering the just-set paid status.
+			$order->save_meta_data();
 		}
 
 		// Check if child order already exists
@@ -195,6 +268,14 @@ class VanPOS_Customer_Account {
 				'remaining',
 				$remaining_amount
 			);
+		}
+		} catch ( Exception $e ) {
+			if ( function_exists( 'wc_get_logger' ) ) {
+				wc_get_logger()->error(
+					'create_child_order_on_payment_complete failed: ' . $e->getMessage(),
+					array( 'source' => 'vanjorn-rental-pos' )
+				);
+			}
 		}
 	}
 

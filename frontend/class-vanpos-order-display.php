@@ -471,14 +471,19 @@ class VanPOS_Order_Display {
 					'label' => __( 'Booking total (incl. VAT):', 'vanjorn-rental-pos' ),
 					'value' => wc_price( $booking_total ),
 				);
-				$new_total_rows['vanpos_paid_now'] = array(
-					'label' => __( 'Paid now:', 'vanjorn-rental-pos' ),
-					'value' => wc_price( $paid_now_amount ),
-				);
-				$new_total_rows['vanpos_pay_later'] = array(
-					'label' => __( 'Pay later:', 'vanjorn-rental-pos' ),
-					'value' => wc_price( max( 0, $remaining_amount ) ),
-				);
+				// Only show the installment split when a later payment actually exists.
+				// A full-payment booking has no remaining order, so a "Pay later: 0" row
+				// is meaningless and looks broken.
+				if ( $remaining_amount > 0 ) {
+					$new_total_rows['vanpos_paid_now'] = array(
+						'label' => __( 'Paid now:', 'vanjorn-rental-pos' ),
+						'value' => wc_price( $paid_now_amount ),
+					);
+					$new_total_rows['vanpos_pay_later'] = array(
+						'label' => __( 'Pay later:', 'vanjorn-rental-pos' ),
+						'value' => wc_price( $remaining_amount ),
+					);
+				}
 
 				// Insert Security Deposit before order total
 				$deposit_days = 14;

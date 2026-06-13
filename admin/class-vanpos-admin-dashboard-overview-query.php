@@ -882,6 +882,11 @@ class VanPOS_Admin_Dashboard_Overview_Query {
 			case '30days':
 				$end = strtotime( '+30 days', $end );
 				break;
+			case 'all':
+				// Wide window so every booking (past and far-future) is listed.
+				$start = strtotime( '-10 years', $start );
+				$end   = strtotime( '+10 years', $end );
+				break;
 			case 'today':
 			default:
 				break;
