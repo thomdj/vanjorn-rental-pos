@@ -683,6 +683,7 @@ class VanPOS_Admin_Dashboard_Page {
 			'3days'  => __( 'Next 3 days', 'vanjorn-rental-pos' ),
 			'7days'  => __( 'Next 7 days', 'vanjorn-rental-pos' ),
 			'30days' => __( 'Next 30 days', 'vanjorn-rental-pos' ),
+			'all'    => __( 'All dates', 'vanjorn-rental-pos' ),
 		);
 	}
 
