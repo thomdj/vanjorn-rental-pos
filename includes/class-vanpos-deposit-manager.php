@@ -337,8 +337,8 @@ class VanPOS_Deposit_Manager {
 		// Calculate 50% deposit on the BASE item total (€1,260.00 -> €630.00)
 		// Fees are NOT included in this calculation - they're paid in full separately
 		$deposit_percentage = self::get_deposit_percentage();
-		$deposit = $amount * ( $deposit_percentage / 100.0 );
-		$remaining = $amount - $deposit;
+		$deposit = VanPOS_Functions::round_money( $amount * ( $deposit_percentage / 100.0 ) );
+		$remaining = VanPOS_Functions::round_money( $amount - $deposit );
 
 		// Store deposit info in cart item (similar to AWCDP structure)
 		$cart_item_data['vanpos_deposit']['deposit'] = $deposit;
@@ -876,7 +876,7 @@ class VanPOS_Deposit_Manager {
 		$fee_total = isset( WC()->cart->deposit_info['fee_total'] ) ? WC()->cart->deposit_info['fee_total'] : 0;
 		
 		// Deposit amount for checkout includes fees (€630 + €200 = €830)
-		$deposit_amount = WC()->cart->deposit_info['deposit_amount'] + $fee_total;
+		$deposit_amount = VanPOS_Functions::round_money( WC()->cart->deposit_info['deposit_amount'] + $fee_total );
 		
 		// Get original cart total (before deposit override)
 		remove_filter( 'woocommerce_cart_get_total', array( __CLASS__, 'cart_get_total' ), 99999 );
@@ -884,7 +884,7 @@ class VanPOS_Deposit_Manager {
 		add_filter( 'woocommerce_cart_get_total', array( __CLASS__, 'cart_get_total' ), 99999, 1 );
 		
 		// Second payment is the remaining item amount only (€630), fees are already paid
-		$second_payment = $cart_total - $deposit_amount;
+		$second_payment = VanPOS_Functions::round_money( $cart_total - $deposit_amount );
 
 		// Store deposit info in order meta
 		$order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
@@ -969,10 +969,10 @@ class VanPOS_Deposit_Manager {
 		// Calculate remaining item amount (original item total - item deposit)
 		// Original item total = cart_total - fees
 		$original_item_total = $cart_total - $fee_total;
-		$second_payment = $original_item_total - $item_deposit; // Remaining item amount (€630)
+		$second_payment = VanPOS_Functions::round_money( $original_item_total - $item_deposit ); // Remaining item amount (€630)
 		
 		// Deposit amount for order meta - fee-inclusive, matching the classic path.
-		$deposit_amount = $item_deposit + $fee_total;
+		$deposit_amount = VanPOS_Functions::round_money( $item_deposit + $fee_total );
 
 		// Store deposit info in order meta
 		$order->update_meta_data( '_vanpos_order_has_remaining_payment', 'yes' );
@@ -1165,7 +1165,7 @@ class VanPOS_Deposit_Manager {
 		// checkout (create_order / block_checkout_create_order); read them back here.
 		$deposit_amount   = (float) $order->get_meta( '_vanpos_initial_payment' );
 		$second_payment   = (float) $order->get_meta( '_vanpos_remaining_payment' );
-		$total_price      = $deposit_amount + $second_payment;
+		$total_price      = VanPOS_Functions::round_money( $deposit_amount + $second_payment );
 		$order->update_meta_data( '_vanpos_total_price', $total_price );
 		$order->update_meta_data( '_vanpos_initial_payment', $deposit_amount );
 		$order->update_meta_data( '_vanpos_remaining_payment', $second_payment );

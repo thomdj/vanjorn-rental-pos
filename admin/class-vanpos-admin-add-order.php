@@ -600,8 +600,8 @@ class VanPOS_Admin_Add_Order {
 		$days_until      = $order_date->diff( $pickup_dt )->days;
 		$is_short_term   = ( $days_until < $short_term_threshold );
 
-		$initial_payment   = $is_short_term ? $total_price : $total_price * ( $deposit_pct / 100 );
-		$remaining_payment = $is_short_term ? 0 : $total_price - $initial_payment;
+		$initial_payment   = $is_short_term ? $total_price : VanPOS_Functions::round_money( $total_price * ( $deposit_pct / 100 ) );
+		$remaining_payment = $is_short_term ? 0 : VanPOS_Functions::round_money( $total_price - $initial_payment );
 
 		// Security deposit product price
 		$sec_deposit_amount = 0;
@@ -743,8 +743,8 @@ class VanPOS_Admin_Add_Order {
 			$deposit_payment   = $total_price;
 			$remaining_payment = 0;
 		} else {
-			$deposit_payment   = $total_price * ( $deposit_pct / 100 );
-			$remaining_payment = $total_price - $deposit_payment;
+			$deposit_payment   = VanPOS_Functions::round_money( $total_price * ( $deposit_pct / 100 ) );
+			$remaining_payment = VanPOS_Functions::round_money( $total_price - $deposit_payment );
 		}
 
 		// The parent order's actual charge depends on whether a remaining

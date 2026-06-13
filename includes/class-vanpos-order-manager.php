@@ -227,8 +227,8 @@ class VanPOS_Order_Manager {
 			$order->update_meta_data( '_is_short_term_booking', 'yes' );
 		} else {
 			// Split payment based on configured deposit percentage
-			$initial_payment = $total_price * ( $deposit_pct / 100 );
-			$remaining_payment = $total_price - $initial_payment;
+			$initial_payment = VanPOS_Functions::round_money( $total_price * ( $deposit_pct / 100 ) );
+			$remaining_payment = VanPOS_Functions::round_money( $total_price - $initial_payment );
 			
 			// Set short-term booking flag
 			$order->update_meta_data( '_is_short_term_booking', 'no' );
