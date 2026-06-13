@@ -106,8 +106,9 @@ class VanPOS_Meta_Registry {
 			'_vanpos_rental_days'                 => self::RENTAL,
 			'_vanpos_rental_nights'               => self::RENTAL,
 			'_vanpos_due_date'                    => self::RENTAL,     // AutomateWoo date variable source
-			'_vanpos_pickup_date_formatted'       => self::DISPLAY,
-			'_vanpos_return_date_formatted'       => self::DISPLAY,
+			// *_formatted companions + camper name are AutomateWoo email merge fields.
+			'_vanpos_pickup_date_formatted'       => self::AUTOMATEWOO,
+			'_vanpos_return_date_formatted'       => self::AUTOMATEWOO,
 
 			// --- Options -----------------------------------------------------
 			'_vanpos_include_dog'                 => self::OPTION,
@@ -122,11 +123,11 @@ class VanPOS_Meta_Registry {
 			'_vanpos_price_per_day'               => self::FINANCIAL,
 			'_vanpos_price_overridden'            => self::FINANCIAL,
 			'_vanpos_no_vat'                      => self::FINANCIAL,  // affects tax handling
-			'_vanpos_total_price_formatted'       => self::DISPLAY,
-			'_vanpos_initial_payment_formatted'   => self::DISPLAY,
-			'_vanpos_remaining_payment_formatted' => self::DISPLAY,
-			'_vanpos_security_deposit_payment_formatted' => self::DISPLAY,
-			'_vanpos_extension_amount_formatted'  => self::DISPLAY,
+			'_vanpos_total_price_formatted'       => self::AUTOMATEWOO,
+			'_vanpos_initial_payment_formatted'   => self::AUTOMATEWOO,
+			'_vanpos_remaining_payment_formatted' => self::AUTOMATEWOO,
+			'_vanpos_security_deposit_payment_formatted' => self::AUTOMATEWOO,
+			'_vanpos_extension_amount_formatted'  => self::AUTOMATEWOO,
 
 			// --- Payment state / linkage -------------------------------------
 			'_vanpos_initial_payment_paid'        => self::PAYMENT,
@@ -155,7 +156,7 @@ class VanPOS_Meta_Registry {
 			'_vanpos_date_change_history'         => self::AUDIT,
 
 			// --- Display / email --------------------------------------------
-			'_vanpos_camper_name'                 => self::DISPLAY,
+			'_vanpos_camper_name'                 => self::AUTOMATEWOO,
 
 			// --- Deprecated (migrate_local_meta migrates then deletes) -------
 			'_vanpos_deposit_amount'              => self::DEPRECATED, // order level only; canonical at ITEM level
