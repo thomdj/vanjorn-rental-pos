@@ -60,10 +60,6 @@ class VanPOS_Deposit_Manager {
 		add_action( 'woocommerce_checkout_order_processed', array( __CLASS__, 'process_deposit_order' ), 10, 1 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', array( __CLASS__, 'block_checkout_create_order' ), 10, 1 );
 		
-		// Order hooks
-		add_filter( 'woocommerce_order_item_display_meta_key', array( __CLASS__, 'display_order_meta_key' ), 10, 3 );
-		add_filter( 'woocommerce_order_item_display_meta_value', array( __CLASS__, 'display_order_meta_value' ), 10, 3 );
-		
 		// Payment complete hooks
 		add_action( 'woocommerce_payment_complete', array( __CLASS__, 'payment_complete' ), 10, 1 );
 	}
@@ -1252,85 +1248,4 @@ class VanPOS_Deposit_Manager {
 		$parent_order->save_meta_data();
 	}
 
-	/**
-	 * Display order meta key
-	 *
-	 * @param string $display_key Display key.
-	 * @param object $meta Meta object.
-	 * @param object $order_item Order item.
-	 * @return string
-	 */
-	public static function display_order_meta_key( $display_key, $meta, $order_item ) {
-		$keys = array(
-			// Canonical (no underscore prefix) rental item-meta keys.
-			'vanpos_pickup_date'      => __( 'Pickup date', 'vanjorn-rental-pos' ),
-			'vanpos_return_date'      => __( 'Return date', 'vanjorn-rental-pos' ),
-			'vanpos_pickup_time'      => __( 'Pickup time', 'vanjorn-rental-pos' ),
-			'vanpos_return_time'      => __( 'Return time', 'vanjorn-rental-pos' ),
-			'vanpos_rental_days'      => __( 'Rental days', 'vanjorn-rental-pos' ),
-			// Stray underscore duplicates on line items.
-			'_vanpos_pickup_date'     => __( 'Pickup date', 'vanjorn-rental-pos' ),
-			'_vanpos_return_date'     => __( 'Return date', 'vanjorn-rental-pos' ),
-			'_vanpos_pickup_time'     => __( 'Pickup time', 'vanjorn-rental-pos' ),
-			'_vanpos_return_time'     => __( 'Return time', 'vanjorn-rental-pos' ),
-			'_vanpos_rental_days'     => __( 'Rental days', 'vanjorn-rental-pos' ),
-			// Financial fields - canonical convention IS underscored.
-			'_vanpos_original_price'  => __( 'Original price', 'vanjorn-rental-pos' ),
-			'_vanpos_deposit_amount'  => __( 'Deposit amount', 'vanjorn-rental-pos' ),
-			'_vanpos_remaining_amount' => __( 'Remaining amount', 'vanjorn-rental-pos' ),
-		);
-
-		if ( isset( $keys[ $meta->key ] ) ) {
-			return $keys[ $meta->key ];
-		}
-
-		return $display_key;
-	}
-
-	/**
-	 * Display order meta value
-	 *
-	 * @param string $display_value Display value.
-	 * @param object $meta Meta object.
-	 * @param object $order_item Order item.
-	 * @return string
-	 */
-	public static function display_order_meta_value( $display_value, $meta, $order_item ) {
-		$value = $meta->value;
-
-		// Price fields (canonical convention is underscored for financials)
-		if ( in_array( $meta->key, array( '_vanpos_original_price', '_vanpos_deposit_amount', '_vanpos_remaining_amount' ), true ) ) {
-			return wc_price( $value );
-		}
-
-		// Date fields - format for display
-		if ( in_array( $meta->key, array( 'vanpos_pickup_date', 'vanpos_return_date', '_vanpos_pickup_date', '_vanpos_return_date' ), true ) && ! empty( $value ) ) {
-			$timestamp = strtotime( $value );
-			return $timestamp ? date_i18n( get_option( 'date_format' ), $timestamp ) : $value;
-		}
-
-		// Time fields — normalise legacy slot labels to the configured times.
-		// Mapping is context-independent (does not vary by pickup vs return key):
-		//   'afternoon' → vanpos_pickup_time  (15:00 in the afternoon-pickup model)
-		//   'morning'   → vanpos_return_time  (11:00 in the afternoon-pickup model)
-		// See VanPOS_Item_Display::format_time_slot() for the canonical explanation.
-		if ( in_array( $meta->key, array( 'vanpos_pickup_time', 'vanpos_return_time', '_vanpos_pickup_time', '_vanpos_return_time' ), true ) && ! empty( $value ) ) {
-			$slot = strtolower( trim( (string) $value ) );
-			if ( 'afternoon' === $slot ) {
-				return VanPOS_Functions::get_setting( 'vanpos_pickup_time', '15:00' );
-			}
-			if ( 'morning' === $slot ) {
-				return VanPOS_Functions::get_setting( 'vanpos_return_time', '11:00' );
-			}
-			return ucfirst( (string) $value );
-		}
-
-		// Rental days - add "days" suffix
-		if ( in_array( $meta->key, array( 'vanpos_rental_days', '_vanpos_rental_days' ), true ) && '' !== $value ) {
-			$days = (int) $value;
-			return $days . ' ' . _n( 'day', 'days', $days, 'vanjorn-rental-pos' );
-		}
-
-		return $display_value;
-	}
 }
