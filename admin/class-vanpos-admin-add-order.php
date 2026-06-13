@@ -939,14 +939,10 @@ class VanPOS_Admin_Add_Order {
 		$item->add_meta_data( 'vanpos_rental_days', $days );
 		$item->add_meta_data( 'vanpos_rental_nights', $nights );
 
-		// Underscore-prefixed keys match checkout (see VanPOS_Deposit_Manager::checkout_create_order_line_item)
-		// so storefront and admin-created orders share the same line-item shape for displays and tools.
-		$item->add_meta_data( '_vanpos_pickup_date', $pickup_date );
-		$item->add_meta_data( '_vanpos_return_date', $return_date );
-		$item->add_meta_data( '_vanpos_pickup_time', $pickup_time );
-		$item->add_meta_data( '_vanpos_return_time', $return_time );
-		$item->add_meta_data( '_vanpos_rental_days', $days );
-		$item->add_meta_data( '_vanpos_rental_nights', $nights );
+		// NOTE: item-level date/time/days/nights use the canonical NON-underscore keys
+		// above, matching checkout (VanPOS_Deposit_Manager::checkout_create_order_line_item).
+		// The underscore-prefixed copies are stray meta (no readers; the backfill deletes
+		// them via stray_item_meta_keys), so they are intentionally not written here.
 
 		// Flags on the line item (not only order meta) so VanPOS_Item_Display and PDF paths
 		// that read $item->get_meta( '_vanpos_include_*' ) behave like checkout orders.
